@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Vitsumoc</title>
+  
+  
+  <link href="https://vitsumoc.github.io/atom.xml" rel="self"/>
+  
+  <link href="https://vitsumoc.github.io/"/>
+  <updated>2023-11-17T09:11:56.492Z</updated>
+  <id>https://vitsumoc.github.io/</id>
+  
+  <author>
+    <name>vc</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>在Windows中使用Linux——WSL</title>
+    <link href="https://vitsumoc.github.io/2023/11/17/WSL/"/>
+    <id>https://vitsumoc.github.io/2023/11/17/WSL/</id>
+    <published>2023-11-17T08:36:34.000Z</published>
+    <updated>2023-11-17T09:11:56.492Z</updated>
+    
+    <content type="html"><![CDATA[<p><a href="https://learn.microsoft.com/zh-cn/windows/wsl/">https://learn.microsoft.com/zh-cn/windows/wsl/</a></p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;a href=&quot;https://learn.microsoft.com/zh-cn/windows/wsl/&quot;&gt;https://learn.microsoft.com/zh-cn/windows/wsl/&lt;/a&gt;&lt;/p&gt;
+</summary>
+      
+    
+    
+    
+    <category term="豆知识" scheme="https://vitsumoc.github.io/categories/%E8%B1%86%E7%9F%A5%E8%AF%86/"/>
+    
+    
+  </entry>
+  
+</feed>
