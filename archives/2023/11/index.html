@@ -1,21 +1,243 @@
-<!DOCTYPE html><html lang="zh"><head><meta charset="UTF-8"><title>Vitsumoc</title><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><meta http-equiv="X-UA-Compatible" content="IE=Edge，chrome=1"><meta name="description" content=""><meta name="keywords"><meta name="author" content="vc"><link rel="short icon" href="/images/favicon.png"><link rel="icon" href="/images/favicon.png"><!--[if lt IE 9]>
-<script src="/js/modernizr.js"></script>
-<![endif]-->
-<link rel="stylesheet" href="/css/iconfont.css">
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>归档: 2023/11 | Vitsumoc</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  
+  
+    <link rel="alternate" href="/atom.xml" title="Vitsumoc" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
 
-<link rel="stylesheet" href="/css/index.css?v=202311171712.css">
-<meta name="generator" content="Hexo 6.3.0"><link rel="alternate" href="/atom.xml" title="Vitsumoc" type="application/atom+xml">
-</head><body><header id="header" class="header-navigation"><nav><div class="logo"><a href="https://vitsumoc.github.io">Vitsumoc</a></div><h2 id="mnavh"><span class="navicon"></span></h2><ul id="starlist"><li><a href="/">首页</a></li><li><a href="/time.html">时间轴</a></li></ul><div class="searchbox"><div id="search_bar" class="search_bar"><input id="keyboard" placeholder="想搜点什么呢.." type="text" name="keyboard" autocomplete="off" class="input"><p class="search_ico"><span></span></p></div></div></nav></header><article><main><div class="blogtab"><div data-scroll-reveal="enter bottom over 1s" class="blogs"><h3 class="blogtitle"><a href="/2023/11/17/WSL/" target="_blank">在Windows中使用Linux——WSL</a></h3><span class="blogpic"><a href="/2023/11/17/WSL/" title="在Windows中使用Linux——WSL"><img src="/" alt=""></a></span><p class="blogtext">https://learn.microsoft.com/zh-cn/windows/wsl/
-</p><div class="bloginfo"><ul><li class="author"><a href="/">vc</a></li><li class="lmname"><a href="/categories/%E8%B1%86%E7%9F%A5%E8%AF%86/">豆知识</a></li><li class="timer">2023-11-17 16:36:34</li><!--li.view--><!--    span 34567--><!--    | 已阅读--><!--li.like 9999--></ul></div></div></div><div class="pagelist"><span class="page-number current">1</span></div></main><aside class="r_box"><div class="card box"><h2>我的名片</h2><div class="box_con"><p>Vitsumoc</p>
-<p>Gopher</p>
-<p>vanchun032@gmail.com</p>
-</div></div><div class="category box"><h2>文章分类</h2><div class="box_con"><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%B1%86%E7%9F%A5%E8%AF%86/">豆知识</a><span class="category-list-count">1</span></li></ul></div></div><div class="box recommend"><h2>推荐</h2><div class="box_con"><ul></ul></div></div><div class="tags box"><h2>标签</h2><div class="box_con"></div></div><div class="zhaocai box"><h2>站长本人</h2><div class="box_con"><img src="/images/gopher.png"></div></div></aside></article><footer><section class="footer_bottom"><div class="footer_container"><p class="copyright"><a href='https://hexo.io/' target='_blank'>建站工具</a>
-<a href='https://tianhui.xin' target='_blank'>建站主题</a>
-</p><ul class="social_network"></ul></div></section></footer><div class="cd-top"><i class="iconfont icon-top"></i></div>
-<script src="/js/jquery.min.js"></script>
-<script src="/js/scrollreveal.js"></script>
-<script src="/js/hc-sticky.js"></script>
-<script src="/js/canvas-nest.js" type="text/javascript" color="47,135,193" opacity="0.7" zIndex="-2" count="199"></script>
-<script src="/js/common.js?v=202311171712.js"></script>
-<script src="/js/index.js?v=202311171712.js"></script>
-</body></html>
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Vitsumoc</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/."><i class="fa fa-home"></i> 首页</a>
+        
+          <a class="main-nav-link" href="/archives/"><i class="fa fa-archive"></i> 归档</a>
+        
+          <a class="main-nav-link" href="/about/"><i class="fa fa-user"></i> 关于</a>
+        
+      </nav>
+    </div>
+    <div id="search-form">
+      <div id="result-mask" class="hide"></div>
+      <label><input id="search-key" type="text" autocomplete="off" placeholder="搜索"></label>
+      <div id="result-wrap" class="hide">
+        <div id="search-result"></div>
+      </div>
+      <div class="hide">
+        <template id="search-tpl">
+          <div class="item">
+            <a href="/{path}" title="{title}">
+              <div class="title">{title}</div>
+              <div class="time">{date}</div>
+              <div class="tags">{tags}</div>
+            </a>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main">
+
+  
+  
+    
+    
+    <section class="archives-wrap">
+      <div class="archive-title">
+        
+          <i class="fa fa-date"></i>
+          2023年11月
+        
+      </div>
+      <div class="archives">
+  
+  <ul class="archive-article archive-type-post">
+  <li class="archive-article-inner">
+    <a href="/2023/11/20/SSH.html">
+      <time class="dt-published" datetime="2023-11-20T01:20:06.000Z" itemprop="datePublished">2023年11月20日</time>
+      | <span class="archive-article-title">SSH过程</span>
+    </a>
+  </li>
+</ul>
+
+
+  
+  
+  <ul class="archive-article archive-type-post">
+  <li class="archive-article-inner">
+    <a href="/2023/11/17/WSL.html">
+      <time class="dt-published" datetime="2023-11-17T08:36:34.000Z" itemprop="datePublished">2023年11月17日</time>
+      | <span class="archive-article-title">在Windows中使用Linux——WSL</span>
+    </a>
+  </li>
+</ul>
+
+
+
+  </div></section>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-posts"></i> 最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/11/20/SSH.html">SSH过程</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/17/WSL.html">在Windows中使用Linux——WSL</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-classify"></i> 分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">网络编程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%B1%86%E7%9F%A5%E8%AF%86/">豆知识</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-archive"></i> 归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/">2023年11月</a><span class="archive-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+    
+
+  
+</aside>
+        
+      </div>
+      <a id="totop" href="#top"></a>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      <p>
+        <!-- <a href="/sitemap.xml">网站地图</a> -->
+        <!-- <span> | </span><a href="/atom.xml">订阅本站</a> -->
+        <!-- <span> | </span><a href="/about/">联系博主</a> -->
+      </p>
+      
+      <p>
+        <span>Copyright &copy; 2023 vc.</span>
+        <span>Theme by <a href="https://github.com/chaooo/hexo-theme-BlueLake/" target="_blank">BlueLake.</a></span>
+        <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span>
+      </p>
+    </div>
+  </div>
+</footer>
+
+    </div>
+  </div>
+  
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+<script src="/js/search.json.js"></script>
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+
+
+
+
+</body>
+</html>
