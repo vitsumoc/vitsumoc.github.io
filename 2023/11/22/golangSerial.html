@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>golang与串口设备在项目中的运用 | 小站</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+    <meta name="description" content="探索编程乐趣">
+  
+  
+  
+    <link rel="alternate" href="/atom.xml" title="小站" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">小站</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">探索编程乐趣</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/."><i class="fa fa-home"></i> 首页</a>
+        
+          <a class="main-nav-link" href="/archives/"><i class="fa fa-archive"></i> 归档</a>
+        
+          <a class="main-nav-link" href="/about/"><i class="fa fa-user"></i> 关于</a>
+        
+      </nav>
+    </div>
+    <div id="search-form">
+      <div id="result-mask" class="hide"></div>
+      <label><input id="search-key" type="text" autocomplete="off" placeholder="搜索"></label>
+      <div id="result-wrap" class="hide">
+        <div id="search-result"></div>
+      </div>
+      <div class="hide">
+        <template id="search-tpl">
+          <div class="item">
+            <a href="/{path}" title="{title}">
+              <div class="title">{title}</div>
+              <div class="time">{date}</div>
+              <div class="tags">{tags}</div>
+            </a>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-golangSerial" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      golang与串口设备在项目中的运用
+    </h1>
+  
+
+
+      </header>
+    
+    <div class="article-meta">
+      
+      <span class="article-date">
+  <i class="fa fa-date"></i>
+  <time class="dt-published" datetime="2023-11-22T03:06:28.000Z" itemprop="datePublished">2023年11月22日</time>
+</span>
+      
+  <div class="article-category">
+    <i class="fa fa-classify"></i>
+    <a class="article-category-link" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/">项目实践</a>
+  </div>
+
+      
+        <span class="article-views">
+  <i class="fa fa-views"></i>
+  <i id="busuanzi_container_page_pv">
+      <i id="busuanzi_value_page_pv"></i>
+  </i>
+</span>
+
+      
+      <!-- 
+<a href="/2023/11/22/golangSerial.html#comments" class="article-comment-link">
+  
+    
+    
+    
+    
+    
+  
+  <i class="fa fa-commt"></i>
+  留言
+</a>
+
+ -->
+    </div>
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="需求简述"><a href="#需求简述" class="headerlink" title="需求简述"></a>需求简述</h1><p>硬件设备使用485Modbus通讯，需使用golang编写采集程序，将数据采集至平台。</p>
+<span id="more"></span>
+
+<h1 id="方案简述"><a href="#方案简述" class="headerlink" title="方案简述"></a>方案简述</h1><p>使用串口服务器将485Modbus通讯转为TCPModbus，并将串口服务器设置为TCPserver。</p>
+<p>使用golang编写采集器，定期向串口服务器建立TCP链接，采集数据。</p>
+<h1 id="技术点与实现"><a href="#技术点与实现" class="headerlink" title="技术点与实现"></a>技术点与实现</h1><h2 id="点表"><a href="#点表" class="headerlink" title="点表"></a>点表</h2><p>通过<code>struct</code>实现点位表</p>
+<p>这里使用Raw表示原始点表数据，和通讯协议一一对应</p>
+<p>后续可将Raw结构封装至更高层的业务结构，用来实现业务数据的表示、嵌套能其他功能</p>
+<figure class="highlight golang"><figcaption><span>golang</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> StructMcuRaw <span class="keyword">struct</span> &#123;</span><br><span class="line">	Ver               [<span class="number">4</span>]<span class="type">uint8</span> <span class="string">`json:&quot;ver&quot;`</span>                                                                               <span class="comment">// 软件版本[4]char</span></span><br><span class="line">	Id                <span class="type">uint16</span>   <span class="string">`json:&quot;id&quot;`</span>                                                                                <span class="comment">// 通信箱id</span></span><br><span class="line">	TargetAngle       <span class="type">uint16</span>   <span class="string">`json:&quot;targetAngle&quot; IEC104:&quot;yc&quot; IEC104Name:&quot;子阵目标角度&quot; IEC104Unit:&quot;°&quot; IEC104Factor:&quot;0.1&quot;`</span> <span class="comment">// 对整个子阵设置目标角度</span></span><br><span class="line">	InitSnowDepth     <span class="type">uint16</span>   <span class="string">`json:&quot;initSnowDepth&quot; IEC104:&quot;yx&quot; IEC104Name:&quot;标定初始雪深标志&quot;`</span>                              <span class="comment">// 标定初始雪深标志</span></span><br><span class="line">	PrecipitationType <span class="type">uint16</span>   <span class="string">`json:&quot;precipitationType&quot;`</span>                                                                 <span class="comment">// 降水类型</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="读取二进制数据"><a href="#读取二进制数据" class="headerlink" title="读取二进制数据"></a>读取二进制数据</h2><p>通过<code>binary</code>包，可以实现从buffer中读取数据向<code>struct</code>赋值</p>
+<figure class="highlight golang"><figcaption><span>golang</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(p *StructMcuRaw)</span></span> MCUFromByte(res *bytes.Buffer) &#123;</span><br><span class="line">	<span class="comment">// 软件版本[4]char</span></span><br><span class="line">	<span class="keyword">for</span> x := <span class="number">0</span>; x &lt; <span class="number">4</span>; x++ &#123;</span><br><span class="line">		binary.Read(res, binary.BigEndian, p.Ver[x])</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 通信箱id</span></span><br><span class="line">	binary.Read(res, binary.BigEndian, &amp;p.Id)</span><br><span class="line">	<span class="comment">// 对整个子阵设置目标角度</span></span><br><span class="line">	binary.Read(res, binary.BigEndian, &amp;p.TargetAngle)</span><br><span class="line">	<span class="comment">// 标定初始雪深标志</span></span><br><span class="line">	binary.Read(res, binary.BigEndian, &amp;p.InitSnowDepth)</span><br><span class="line">	<span class="comment">// 降水类型</span></span><br><span class="line">	binary.Read(res, binary.BigEndian, &amp;p.PrecipitationType)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="封装为query"><a href="#封装为query" class="headerlink" title="封装为query"></a>封装为query</h2><p>在本项目中，query指对单个设备的采集方法</p>
+<p>将数据读取封装成query方法，包括TCP采集过程、日志记录、包格式处理等</p>
+<figure class="highlight golang"><figcaption><span>golang</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">MCUQuery</span><span class="params">(conn *net.Conn, reader *bufio.Reader, buffer *[]<span class="type">byte</span>, cb *rs.StructCommBox, mcu *rs.StructMcu)</span></span> <span class="type">error</span> &#123;</span><br><span class="line">	<span class="comment">// 查询地址</span></span><br><span class="line">	addInt, err := strconv.Atoi(mcu.Addr)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 包编号</span></span><br><span class="line">	tcpSeq := TcpSeq()</span><br><span class="line">	<span class="keyword">var</span> query = []<span class="type">byte</span>&#123;</span><br><span class="line">		<span class="type">uint8</span>(tcpSeq / <span class="number">0x100</span>), <span class="type">uint8</span>(tcpSeq % <span class="number">0x100</span>), <span class="comment">// 编号</span></span><br><span class="line">		<span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x06</span>, <span class="comment">// 长度</span></span><br><span class="line">		<span class="type">byte</span>(addInt), <span class="number">0x03</span>, <span class="number">0x00</span>, <span class="number">0xa0</span>, <span class="number">0x00</span>, <span class="number">0x29</span>&#125; <span class="comment">// 指令</span></span><br><span class="line">	(*conn).SetWriteDeadline(time.Now().Add(rs.QUERY_DEFAULT_TIMEOUT))</span><br><span class="line">	_, err = (*conn).Write(query)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Log(<span class="literal">true</span>, cb.IpAddr, cb.Port, []<span class="type">byte</span>&#123;&#125;)</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 日志</span></span><br><span class="line">	log.Log(<span class="literal">true</span>, cb.IpAddr, cb.Port, query)</span><br><span class="line">	<span class="comment">// 接收</span></span><br><span class="line">	(*conn).SetReadDeadline(time.Now().Add(rs.QUERY_DEFAULT_TIMEOUT))</span><br><span class="line">	n, err := (*reader).Read(*buffer)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Log(<span class="literal">false</span>, cb.IpAddr, cb.Port, []<span class="type">byte</span>&#123;&#125;)</span><br><span class="line">		<span class="keyword">return</span> err</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 日志</span></span><br><span class="line">	log.Log(<span class="literal">false</span>, cb.IpAddr, cb.Port, (*buffer)[:n])</span><br><span class="line">	<span class="comment">// 解析</span></span><br><span class="line">	res := bytes.NewBuffer(*buffer)</span><br><span class="line">	<span class="comment">// TCP头</span></span><br><span class="line">	<span class="keyword">var</span> tcpHeader rs.StructTCPHeader</span><br><span class="line">	tcpHeader.TCPHeaderFromByte(res)</span><br><span class="line">	<span class="keyword">if</span> tcpHeader.Seq != tcpSeq &#123;</span><br><span class="line">		<span class="keyword">return</span> errors.New(<span class="string">&quot;TCP异常&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> tcpHeader.Len != <span class="number">85</span> &#123;</span><br><span class="line">		<span class="keyword">return</span> errors.New(<span class="string">&quot;TCP长度异常&quot;</span>)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// modbus头</span></span><br><span class="line">	<span class="keyword">var</span> mbHeader rs.StructMudbusHeader</span><br><span class="line">	mbHeader.MudbusHeaderFromByte(res)</span><br><span class="line">	<span class="comment">// mcu内容</span></span><br><span class="line">	mcu.Raw.MCUFromByte(res)</span><br><span class="line">	mcu.VUpdate = <span class="literal">true</span> <span class="comment">// 标记更新</span></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="封装为采集过程"><a href="#封装为采集过程" class="headerlink" title="封装为采集过程"></a>封装为采集过程</h2><p>最后需要将所有的采集query放置在统一的采集过程中</p>
+<p>在一次采集过程中，创建一条TCP链接，完成所有采集动作，最后断开链接</p>
+<figure class="highlight golang"><figcaption><span>golang</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">Collect</span><span class="params">(cb *rs.StructCommBox)</span></span> &#123;</span><br><span class="line">	<span class="comment">// 记录网络占用</span></span><br><span class="line">	NetCh &lt;- <span class="literal">true</span></span><br><span class="line">	<span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		&lt;-NetCh</span><br><span class="line">	&#125;()</span><br><span class="line">	<span class="comment">// 初始化采集标识</span></span><br><span class="line">	eraseFlag(cb)</span><br><span class="line">	<span class="comment">// 采集结束后更新时标</span></span><br><span class="line">	<span class="keyword">defer</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		updateTs(cb)</span><br><span class="line">	&#125;()</span><br><span class="line">	<span class="comment">// 建链</span></span><br><span class="line">	conn, err := net.DialTimeout(<span class="string">&quot;tcp&quot;</span>, cb.IpAddr+<span class="string">&quot;:&quot;</span>+cb.Port, rs.QUERY_DEFAULT_TIMEOUT)</span><br><span class="line">	<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">		log.Log(<span class="literal">true</span>, cb.IpAddr, cb.Port, []<span class="type">byte</span>&#123;&#125;)</span><br><span class="line">		<span class="keyword">return</span></span><br><span class="line">	&#125;</span><br><span class="line">	cb.VUpdate = <span class="literal">true</span></span><br><span class="line">	<span class="keyword">defer</span> conn.Close()</span><br><span class="line">	<span class="comment">// 读写缓存</span></span><br><span class="line">	readBuf := bufio.NewReader(conn)</span><br><span class="line">	buffer := <span class="built_in">make</span>([]<span class="type">byte</span>, <span class="number">256</span>)</span><br><span class="line">	<span class="comment">// 按mcu查询</span></span><br><span class="line">	<span class="keyword">for</span> x := <span class="number">0</span>; x &lt; <span class="built_in">len</span>(cb.Mcus); x++ &#123;</span><br><span class="line">		<span class="comment">// 切换MCU预留时间, 提高成功率</span></span><br><span class="line">		time.Sleep(rs.QUERY_MCU_INTERVAL)</span><br><span class="line">		<span class="comment">// 查mcu信息</span></span><br><span class="line">		mcu := cb.Mcus[x]</span><br><span class="line">		err = cmd.MCUQuery(&amp;conn, readBuf, &amp;buffer, cb, mcu)</span><br><span class="line">		<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">		&#125;</span><br><span class="line">		<span class="comment">// 分次查跟踪器信息</span></span><br><span class="line">		<span class="keyword">for</span> y := <span class="number">0</span>; y &lt; mcu.TracerNum; &#123;</span><br><span class="line">			<span class="comment">// 切换Tracer预留时间, 提高成功率</span></span><br><span class="line">			time.Sleep(rs.QUERY_TRACER_INTERVAL)</span><br><span class="line">			<span class="comment">// 查询长度</span></span><br><span class="line">			tracerLen := rs.QUERY_TRACER_COUNT</span><br><span class="line">			<span class="keyword">if</span> mcu.TracerNum-y &lt; rs.QUERY_TRACER_COUNT &#123;</span><br><span class="line">				tracerLen = mcu.TracerNum - y</span><br><span class="line">			&#125;</span><br><span class="line">			err = cmd.TracerQuery(&amp;conn, readBuf, &amp;buffer, cb, mcu, y, tracerLen)</span><br><span class="line">			<span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">				<span class="keyword">return</span></span><br><span class="line">			&#125;</span><br><span class="line">			y += tracerLen</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>使用golang+串口服务器进行串口通讯，非常的简单、直观，易于开发维护。</p>
+<p>在本次项目实践中，由于golang提供了方便的并发编程与控制机制，高负载环境下的性能也得到了充分保障。</p>
+
+        
+            <div id="toc-article">
+                
+  <div class="widget-wrap" id="toc-wrap">
+    <h3 class="widget-title"><i class="fa fa-toc"></i> 文章目录</h3>
+    <div class="widget">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%9C%80%E6%B1%82%E7%AE%80%E8%BF%B0"><span class="toc-text">需求简述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%96%B9%E6%A1%88%E7%AE%80%E8%BF%B0"><span class="toc-text">方案简述</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%8A%80%E6%9C%AF%E7%82%B9%E4%B8%8E%E5%AE%9E%E7%8E%B0"><span class="toc-text">技术点与实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%82%B9%E8%A1%A8"><span class="toc-text">点表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AF%BB%E5%8F%96%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%95%B0%E6%8D%AE"><span class="toc-text">读取二进制数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%81%E8%A3%85%E4%B8%BAquery"><span class="toc-text">封装为query</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%81%E8%A3%85%E4%B8%BA%E9%87%87%E9%9B%86%E8%BF%87%E7%A8%8B"><span class="toc-text">封装为采集过程</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol>
+    </div>
+  </div>
+
+
+            </div>
+        
+        
+          <blockquote id="copyright">
+              <p>原文链接: <a href="https://vitsumoc.github.io/2023/11/22/golangSerial.html">https://vitsumoc.github.io/2023/11/22/golangSerial.html</a></p>
+              <p>版权声明: 转载请注明出处.</p>
+          </blockquote>
+        
+      
+    </div>
+    <footer class="article-footer">
+      
+        <div class="article-tag-wrap">
+          
+
+          
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/golang/" rel="tag">golang</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E4%B8%B2%E5%8F%A3%E9%80%9A%E8%AE%AF/" rel="tag">串口通讯</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" rel="tag">网络编程</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" rel="tag">项目实践</a></li></ul>
+
+          
+
+
+        </div>
+      
+      
+        
+<nav id="article-nav">
+  
+    <a href="/2023/11/20/SSH.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">older</strong>
+      <div class="article-nav-title">
+        
+          SSH握手过程
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+      
+      
+        
+
+
+
+
+
+
+
+
+      
+    </footer>
+  </div>
+</article>
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-posts"></i> 最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/11/22/golangSerial.html">golang与串口设备在项目中的运用</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/20/SSH.html">SSH握手过程</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/17/WSL.html">在Windows中使用Linux——WSL</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-tag"></i> 标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/Linux/" style="font-size: 10px;">Linux</a> <a href="/tags/SSH/" style="font-size: 10px;">SSH</a> <a href="/tags/golang/" style="font-size: 10px;">golang</a> <a href="/tags/%E4%B8%B2%E5%8F%A3%E9%80%9A%E8%AE%AF/" style="font-size: 10px;">串口通讯</a> <a href="/tags/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" style="font-size: 10px;">环境配置</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" style="font-size: 20px;">网络编程</a> <a href="/tags/%E8%B1%86%E7%9F%A5%E8%AF%86/" style="font-size: 10px;">豆知识</a> <a href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" style="font-size: 10px;">项目实践</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-classify"></i> 分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">网络编程</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%B1%86%E7%9F%A5%E8%AF%86/">豆知识</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/">项目实践</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-archive"></i> 归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/">2023年11月</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-tag"></i> 标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SSH/" rel="tag">SSH</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%B2%E5%8F%A3%E9%80%9A%E8%AE%AF/" rel="tag">串口通讯</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" rel="tag">环境配置</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" rel="tag">网络编程</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B1%86%E7%9F%A5%E8%AF%86/" rel="tag">豆知识</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" rel="tag">项目实践</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+</aside>
+        
+      </div>
+      <a id="totop" href="#top"></a>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      <p>
+        <!-- <a href="/sitemap.xml">网站地图</a> -->
+        <!-- <span> | </span><a href="/atom.xml">订阅本站</a> -->
+        <!-- <span> | </span><a href="/about/">联系博主</a> -->
+      </p>
+      
+      <p>
+        <span>Copyright &copy; 2023 vc.</span>
+        <span>Theme by <a href="https://github.com/chaooo/hexo-theme-BlueLake/" target="_blank">BlueLake.</a></span>
+        <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span>
+      </p>
+    </div>
+  </div>
+</footer>
+
+    </div>
+  </div>
+  
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+<script src="/js/search.json.js"></script>
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+
+
+
+
+</body>
+</html>
