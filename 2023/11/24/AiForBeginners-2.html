@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   
   
-  <title>category: 项目实践 | Thinking...</title>
+  <title>AI入门笔记（2）——知识表示与专家系统 | Thinking...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   
     <meta name="description" content="想想">
@@ -82,35 +82,135 @@
 </header>
 
       <div class="outer">
-        <section id="main">
-
-  
-  
+        <section id="main"><article id="post-AiForBeginners-2" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner">
     
     
-    <section class="archives-wrap">
-      <div class="archive-title">
+      <header class="article-header">
         
-          <i class="fa fa-classify"></i>
-          项目实践
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      AI入门笔记（2）——知识表示与专家系统
+    </h1>
+  
+
+
+      </header>
+    
+    <div class="article-meta">
+      
+      <span class="article-date">
+  <i class="fa fa-date"></i>
+  <time class="dt-published" datetime="2023-11-24T07:33:38.000Z" itemprop="datePublished">2023年11月24日</time>
+</span>
+      
+  <div class="article-category">
+    <i class="fa fa-classify"></i>
+    <a class="article-category-link" href="/categories/AI%E5%AD%A6%E4%B9%A0/">AI学习</a>
+  </div>
+
+      
+        <span class="article-views">
+  <i class="fa fa-views"></i>
+  <i id="busuanzi_container_page_pv">
+      <i id="busuanzi_value_page_pv"></i>
+  </i>
+</span>
+
+      
+      <!-- 
+<a href="/2023/11/24/AiForBeginners-2.html#comments" class="article-comment-link">
+  
+    
+    
+    
+    
+    
+  
+  <i class="fa fa-commt"></i>
+  留言
+</a>
+
+ -->
+    </div>
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="课程"><a href="#课程" class="headerlink" title="课程"></a>课程</h1><p><a target="_blank" rel="noopener" href="https://github.com/microsoft/AI-For-Beginners/blob/main/lessons/2-Symbolic/README.md">https://github.com/microsoft/AI-For-Beginners/blob/main/lessons/2-Symbolic/README.md</a></p>
+<p>这是微软提供的AI-For-Beginners课程第二课，介绍了过去常见的自顶向下的AI设计方法。</p>
+<span id="more"></span>
+
+<h1 id="内容"><a href="#内容" class="headerlink" title="内容"></a>内容</h1><p>通过DIKW金字塔，探讨了 数据、信息、知识、智慧 的含义，传统的人工智能实现方式就是一类尝试将数据组织成知识的方法。</p>
+<p>探讨了使用计算机表达知识的几种方式。</p>
+<h2 id="专家系统"><a href="#专家系统" class="headerlink" title="专家系统"></a>专家系统</h2><p>介绍了早期<code>symbolic AI</code>的一种成功实践：专家系统。</p>
+<p>将专家系统的实现区分为两种类型：向后推理与向前推理。</p>
+<p>后向推理实现专家系统的代码实践：<a target="_blank" rel="noopener" href="https://github.com/vitsumoc/exercise-AI-Beginner/blob/main/2-Symbolic/animal_Inference.py">https://github.com/vitsumoc/exercise-AI-Beginner/blob/main/2-Symbolic/animal_Inference.py</a></p>
+<h2 id="本体论和语义网"><a href="#本体论和语义网" class="headerlink" title="本体论和语义网"></a>本体论和语义网</h2><p><code>ontology</code> 本体指的是某个概念实体，<code>Semantic Web</code> 语义网指的是对本体的各种规范性描述的集合，简单的有对本体属性的描述，复杂的有对各种逻辑关系的描述。</p>
+<p>本体和语义网也是对人类思考方式的归纳和模仿，是一种组织复杂数据形成知识的方式，<code>WikiData</code> 就是这样的一个知识库。</p>
+<p>使用语义网实现家谱查询系统的代码实践：<a target="_blank" rel="noopener" href="https://github.com/vitsumoc/exercise-AI-Beginner/blob/main/2-Symbolic/family_ontology.py">https://github.com/vitsumoc/exercise-AI-Beginner/blob/main/2-Symbolic/family_ontology.py</a></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>学习了<code>Symbolic AI</code>的概念，历史，还通过几个简单例子进行了最简单的了解。</p>
+<p>可以感受到曾经计算机行业的先驱者们为了赋予计算机智能，付出了多少辛劳和汗水，也取得了巨大的成果。</p>
+<p>However, the important characteristics of knowledge-based systems is that you can always <em>explain</em> exactly how any of the decisions were made.</p>
+
+        
+            <div id="toc-article">
+                
+  <div class="widget-wrap" id="toc-wrap">
+    <h3 class="widget-title"><i class="fa fa-toc"></i> 文章目录</h3>
+    <div class="widget">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AF%BE%E7%A8%8B"><span class="toc-text">课程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%86%85%E5%AE%B9"><span class="toc-text">内容</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%93%E5%AE%B6%E7%B3%BB%E7%BB%9F"><span class="toc-text">专家系统</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%AC%E4%BD%93%E8%AE%BA%E5%92%8C%E8%AF%AD%E4%B9%89%E7%BD%91"><span class="toc-text">本体论和语义网</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol>
+    </div>
+  </div>
+
+
+            </div>
+        
+        
+      
+    </div>
+    <footer class="article-footer">
+      
+        <div class="article-tag-wrap">
+          
+
+          
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/AI/" rel="tag">AI</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag">笔记</a></li></ul>
+
+          
+
+
+        </div>
+      
+      
+        
+<nav id="article-nav">
+  
+    <a href="/2023/11/24/AiForBeginners-1.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">older</strong>
+      <div class="article-nav-title">
+        
+          AI入门笔记（1）——简介与历史
         
       </div>
-      <div class="archives">
-  
-  <ul class="archive-article archive-type-post">
-  <li class="archive-article-inner">
-    <a href="/2023/11/22/golangSerial.html">
-      <time class="dt-published" datetime="2023-11-22T03:06:28.000Z" itemprop="datePublished">2023年11月22日</time>
-      | <span class="archive-article-title">golang与串口设备在项目中的运用</span>
     </a>
-  </li>
-</ul>
+  
+  
+</nav>
+
+      
+      
+        
 
 
 
-  </div></section>
 
 
+
+
+
+      
+    </footer>
+  </div>
+</article>
 </section>
         
           <aside id="sidebar">
@@ -235,6 +335,9 @@
 
 
 
+
+  
+  
 
 
 
