@@ -135,13 +135,13 @@
     </div>
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h1 id="subSocks简介"><a href="#subSocks简介" class="headerlink" title="subSocks简介"></a>subSocks简介</h1><p><a target="_blank" rel="noopener" href="https://github.com/luyuhuang/subsocks">subSocks</a>是<a target="_blank" rel="noopener" href="https://luyuhuang.tech/">Luyu Hang</a>制作的纯golang网络代理软件。</p>
+        <h1 id="subSocks简介"><a href="#subSocks简介" class="headerlink" title="subSocks简介"></a>subSocks简介</h1><p><a target="_blank" rel="noopener" href="https://github.com/luyuhuang/subsocks">subSocks</a>是<a target="_blank" rel="noopener" href="https://luyuhuang.tech/">Luyu Huang</a>制作的纯golang网络代理软件。</p>
 <p>这里是作者本人对此项目的介绍<a target="_blank" rel="noopener" href="https://luyuhuang.tech/2020/12/02/subsocks.html">文档</a>。</p>
 <span id="more"></span>
 
 <h1 id="为什么要做SSH包装"><a href="#为什么要做SSH包装" class="headerlink" title="为什么要做SSH包装"></a>为什么要做SSH包装</h1><p>因为之前使用v2ray总是被封端口，但是VPS上的22端口始终建在，考虑到SSH协议比较复杂，包括了Shell，SFTP等多种应用。我认为使用SSH协议包装流量可以起到一定的伪装作用，减少端口被封的可能性。</p>
 <p>subSocks项目的代码结构非常漂亮，添加SSH包装非常便捷。</p>
-<h1 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h1><p>首先需要了解subSocks的代码结构，Luyu Hang的<a target="_blank" rel="noopener" href="https://luyuhuang.tech/2020/12/02/subsocks.html">文档</a>中描述的非常详细，我只需要实现SSHWarpper和SSHStripper。</p>
+<h1 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h1><p>首先需要了解subSocks的代码结构，Luyu Huang的<a target="_blank" rel="noopener" href="https://luyuhuang.tech/2020/12/02/subsocks.html">文档</a>中描述的非常详细，我只需要实现SSHWarpper和SSHStripper。</p>
 <p>golang已经提供了SSH的官方实现，参考<a target="_blank" rel="noopener" href="https://pkg.go.dev/golang.org/x/crypto/ssh">文档</a>。并且提供了使用SSH进行远程Shell的示例。</p>
 <p>之后需要对SSH的<a href="/2023/11/20/SSH.html">通讯过程</a>，<code>Session</code> <code>Channel</code> <code>Request</code>等等各种概念有基础的了解。</p>
 <p>使用ssh包中的代码，在服务端使用TCP链接，创建SSH服务器，等待客户端链接后获取Channel，将Channel包装为Stripper。</p>
