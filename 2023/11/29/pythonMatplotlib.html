@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Matplotlib入门笔记 | Thinking...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+    <meta name="description" content="想想">
+  
+  
+  
+    <link rel="alternate" href="/atom.xml" title="Thinking..." type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+  
+  
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Thinking...</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">想想</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        
+          <a class="main-nav-link" href="/."><i class="fa fa-home"></i> 首页</a>
+        
+          <a class="main-nav-link" href="/archives/"><i class="fa fa-archive"></i> 归档</a>
+        
+          <a class="main-nav-link" href="/about/"><i class="fa fa-user"></i> 关于</a>
+        
+      </nav>
+    </div>
+    <div id="search-form">
+      <div id="result-mask" class="hide"></div>
+      <label><input id="search-key" type="text" autocomplete="off" placeholder="搜索"></label>
+      <div id="result-wrap" class="hide">
+        <div id="search-result"></div>
+      </div>
+      <div class="hide">
+        <template id="search-tpl">
+          <div class="item">
+            <a href="/{path}" title="{title}">
+              <div class="title">{title}</div>
+              <div class="time">{date}</div>
+              <div class="tags">{tags}</div>
+            </a>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-pythonMatplotlib" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Matplotlib入门笔记
+    </h1>
+  
+
+
+      </header>
+    
+    <div class="article-meta">
+      
+      <span class="article-date">
+  <i class="fa fa-date"></i>
+  <time class="dt-published" datetime="2023-11-29T07:40:57.000Z" itemprop="datePublished">2023年11月29日</time>
+</span>
+      
+  <div class="article-category">
+    <i class="fa fa-classify"></i>
+    <a class="article-category-link" href="/categories/python/">python</a>
+  </div>
+
+      
+        <span class="article-views">
+  <i class="fa fa-views"></i>
+  <i id="busuanzi_container_page_pv">
+      <i id="busuanzi_value_page_pv"></i>
+  </i>
+</span>
+
+      
+      <!-- 
+<a href="/2023/11/29/pythonMatplotlib.html#comments" class="article-comment-link">
+  
+    
+    
+    
+    
+    
+  
+  <i class="fa fa-commt"></i>
+  留言
+</a>
+
+ -->
+    </div>
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>网站 <a target="_blank" rel="noopener" href="https://matplotlib.org/stable/">https://matplotlib.org/stable/</a></p>
+<p>Matplotlib 是一个用于创建静态、动画和交互式可视化的综合库。</p>
+<p>本文是学习 Matplotlib 过程中的笔记，所有内容都来自官方文档：<a target="_blank" rel="noopener" href="https://matplotlib.org/stable/users/explain/quick_start.html">https://matplotlib.org/stable/users/explain/quick_start.html</a></p>
+<span id="more"></span>
+
+<h1 id="1-入门示例"><a href="#1-入门示例" class="headerlink" title="1. 入门示例"></a>1. 入门示例</h1><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> matplotlib <span class="keyword">as</span> mpl</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">e1</span>():</span><br><span class="line">  x = np.linspace(<span class="number">0</span>, <span class="number">2</span> * np.pi, <span class="number">200</span>)</span><br><span class="line">  y = np.sin(x)</span><br><span class="line"></span><br><span class="line">  fig, ax = plt.subplots()</span><br><span class="line">  ax.plot(x, y)</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e1()</span><br></pre></td></tr></table></figure>
+
+<h1 id="2-窗口、图像和绘制"><a href="#2-窗口、图像和绘制" class="headerlink" title="2. 窗口、图像和绘制"></a>2. 窗口、图像和绘制</h1><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">e2</span>():</span><br><span class="line">  <span class="comment"># 创建一个只有一个 axes 的 figure</span></span><br><span class="line">  fig, ax = plt.subplots()</span><br><span class="line">  <span class="comment"># 在 axes 上 plot 一些数据</span></span><br><span class="line">  ax.plot([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], [<span class="number">1</span>, <span class="number">4</span>, <span class="number">2</span>, <span class="number">3</span>])</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e2()</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-figure-的构成部分"><a href="#3-figure-的构成部分" class="headerlink" title="3. figure 的构成部分"></a>3. figure 的构成部分</h1><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># figure 是一个绘图窗口</span></span><br><span class="line"><span class="comment"># axes 是一副数据图像</span></span><br><span class="line"><span class="comment"># axis 是坐标轴</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">e3</span>():</span><br><span class="line">  <span class="comment"># 一个没有 axes 的 figure</span></span><br><span class="line">  fig = plt.figure()</span><br><span class="line">  <span class="comment"># 只有一个 axes 的图像</span></span><br><span class="line">  fig, ax = plt.subplots()</span><br><span class="line">  <span class="comment"># 2 * 2 布局的图像</span></span><br><span class="line">  fig, axs = plt.subplots(<span class="number">2</span>, <span class="number">2</span>)</span><br><span class="line">  <span class="comment"># 左一右二布局</span></span><br><span class="line">  fig, axs = plt.subplot_mosaic([[<span class="string">&#x27;left&#x27;</span>, <span class="string">&#x27;right_top&#x27;</span>], [<span class="string">&#x27;left&#x27;</span>, <span class="string">&#x27;right_bottom&#x27;</span>]])</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e3()</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-输入数据类型"><a href="#4-输入数据类型" class="headerlink" title="4. 输入数据类型"></a>4. 输入数据类型</h1><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">e4</span>():</span><br><span class="line">  <span class="comment"># plot 接受 np.array np.ma.masked_array np.asarray 三种类型的输入</span></span><br><span class="line">  <span class="comment"># 如果不是此类数据，需要先进行处理</span></span><br><span class="line">  b = np.matrix([[<span class="number">1</span>, <span class="number">2</span>], [<span class="number">3</span>, <span class="number">4</span>]])</span><br><span class="line">  b_asarray = np.asarray(b)</span><br><span class="line">  <span class="comment"># 对于一些已经准备好的对象(字典)数据, 也可以用下面的方式输入</span></span><br><span class="line">  np.random.seed(<span class="number">19680801</span>)  <span class="comment"># seed the random number generator.</span></span><br><span class="line">  <span class="comment"># a 是 0-50 的整数 用于每个数据的 x 坐标</span></span><br><span class="line">  <span class="comment"># b 是 50个随机数 用于每个数据的 y 坐标 (50个0-1的随机数 * 10 再加 x坐标)</span></span><br><span class="line">  <span class="comment"># c 随机颜色 50个50以下的整数</span></span><br><span class="line">  <span class="comment"># d 是随机尺寸</span></span><br><span class="line">  data = &#123;<span class="string">&#x27;a&#x27;</span>: np.arange(<span class="number">50</span>),</span><br><span class="line">          <span class="string">&#x27;c&#x27;</span>: np.random.randint(<span class="number">0</span>, <span class="number">50</span>, <span class="number">50</span>),</span><br><span class="line">          <span class="string">&#x27;d&#x27;</span>: np.random.randn(<span class="number">50</span>)&#125;</span><br><span class="line">  data[<span class="string">&#x27;b&#x27;</span>] = data[<span class="string">&#x27;a&#x27;</span>] + <span class="number">10</span> * np.random.randn(<span class="number">50</span>)</span><br><span class="line">  data[<span class="string">&#x27;d&#x27;</span>] = np.<span class="built_in">abs</span>(data[<span class="string">&#x27;d&#x27;</span>]) * <span class="number">100</span></span><br><span class="line"></span><br><span class="line">  fig, ax = plt.subplots(figsize=(<span class="number">5</span>, <span class="number">2.7</span>), layout=<span class="string">&#x27;constrained&#x27;</span>)</span><br><span class="line">  <span class="comment"># 离散数据 使用字典中的内容赋值</span></span><br><span class="line">  ax.scatter(<span class="string">&#x27;a&#x27;</span>, <span class="string">&#x27;b&#x27;</span>, c=<span class="string">&#x27;c&#x27;</span>, s=<span class="string">&#x27;d&#x27;</span>, data=data)</span><br><span class="line">  ax.set_xlabel(<span class="string">&#x27;entry a&#x27;</span>)</span><br><span class="line">  ax.set_ylabel(<span class="string">&#x27;entry b&#x27;</span>)</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e4()</span><br></pre></td></tr></table></figure>
+
+<h1 id="5-接口风格"><a href="#5-接口风格" class="headerlink" title="5. 接口风格"></a>5. 接口风格</h1><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># mplib提供了两种接口风格 一是显示的获取各层对象并调用 二是直接使用plt搞定一切</span></span><br><span class="line"><span class="comment"># 显示风格的例子</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">e5_1</span>():</span><br><span class="line">  x = np.linspace(<span class="number">0</span>, <span class="number">2</span>, <span class="number">100</span>)  <span class="comment"># 示意数据</span></span><br><span class="line">  <span class="comment"># 获得 figure 和 axes</span></span><br><span class="line">  fig, ax = plt.subplots(figsize=(<span class="number">5</span>, <span class="number">2.7</span>), layout=<span class="string">&#x27;constrained&#x27;</span>)</span><br><span class="line">  <span class="comment"># 一次二次和三次函数</span></span><br><span class="line">  ax.plot(x, x, label=<span class="string">&#x27;linear&#x27;</span>)</span><br><span class="line">  ax.plot(x, x**<span class="number">2</span>, label=<span class="string">&#x27;quadratic&#x27;</span>)</span><br><span class="line">  ax.plot(x, x**<span class="number">3</span>, label=<span class="string">&#x27;cubic&#x27;</span>)</span><br><span class="line">  <span class="comment"># 指定xy的label</span></span><br><span class="line">  ax.set_xlabel(<span class="string">&#x27;x label&#x27;</span>)</span><br><span class="line">  ax.set_ylabel(<span class="string">&#x27;y label&#x27;</span>)</span><br><span class="line">  <span class="comment"># axes 的title</span></span><br><span class="line">  ax.set_title(<span class="string">&quot;Simple Plot&quot;</span>)</span><br><span class="line">  <span class="comment"># 添加一个图例 用来显示各plot的label</span></span><br><span class="line">  ax.legend()</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 隐式风格的例子 效果和显示风格完全相同</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">e5_2</span>():</span><br><span class="line">  x = np.linspace(<span class="number">0</span>, <span class="number">2</span>, <span class="number">100</span>)</span><br><span class="line">  plt.figure(figsize=(<span class="number">5</span>, <span class="number">2.7</span>), layout=<span class="string">&#x27;constrained&#x27;</span>)</span><br><span class="line">  plt.plot(x, x, label=<span class="string">&#x27;linear&#x27;</span>)</span><br><span class="line">  plt.plot(x, x**<span class="number">2</span>, label=<span class="string">&#x27;quadratic&#x27;</span>)</span><br><span class="line">  plt.plot(x, x**<span class="number">3</span>, label=<span class="string">&#x27;cubic&#x27;</span>)</span><br><span class="line">  plt.xlabel(<span class="string">&#x27;x label&#x27;</span>)</span><br><span class="line">  plt.ylabel(<span class="string">&#x27;y label&#x27;</span>)</span><br><span class="line">  plt.title(<span class="string">&quot;Simple Plot&quot;</span>)</span><br><span class="line">  plt.legend()</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e5_1()</span><br><span class="line">e5_2()</span><br></pre></td></tr></table></figure>
+
+<h1 id="6-制作辅助函数"><a href="#6-制作辅助函数" class="headerlink" title="6. 制作辅助函数"></a>6. 制作辅助函数</h1><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 制作工具函数, 避免代码重复</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">e6_plotter</span>(<span class="params">ax, data1, data2, param_dict</span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    A helper function to make a graph.</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    out = ax.plot(data1, data2, **param_dict)</span><br><span class="line">    <span class="keyword">return</span> out</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">e6</span>():</span><br><span class="line">  data1, data2, data3, data4 = np.random.randn(<span class="number">4</span>, <span class="number">100</span>)  <span class="comment"># make 4 random data sets</span></span><br><span class="line">  fig, (ax1, ax2) = plt.subplots(<span class="number">1</span>, <span class="number">2</span>, figsize=(<span class="number">5</span>, <span class="number">2.7</span>))</span><br><span class="line">  e6_plotter(ax1, data1, data2, &#123;<span class="string">&#x27;marker&#x27;</span>: <span class="string">&#x27;x&#x27;</span>&#125;)</span><br><span class="line">  e6_plotter(ax2, data3, data4, &#123;<span class="string">&#x27;marker&#x27;</span>: <span class="string">&#x27;o&#x27;</span>&#125;)</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e6()</span><br></pre></td></tr></table></figure>
+
+<h1 id="7-样式"><a href="#7-样式" class="headerlink" title="7. 样式"></a>7. 样式</h1><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">e7</span>():</span><br><span class="line">  data1, data2 = np.random.randn(<span class="number">2</span>, <span class="number">100</span>)</span><br><span class="line">  fig, ax = plt.subplots(figsize=(<span class="number">5</span>, <span class="number">2.7</span>))</span><br><span class="line">  x = np.arange(<span class="built_in">len</span>(data1))</span><br><span class="line">  <span class="comment"># plot 直接跟样式参数</span></span><br><span class="line">  ax.plot(x, np.cumsum(data1), color=<span class="string">&#x27;blue&#x27;</span>, linewidth=<span class="number">3</span>, linestyle=<span class="string">&#x27;--&#x27;</span>)</span><br><span class="line">  l, = ax.plot(x, np.cumsum(data2), color=<span class="string">&#x27;orange&#x27;</span>, linewidth=<span class="number">2</span>)</span><br><span class="line">  <span class="comment"># plot 后对返回内容进行样式赋值</span></span><br><span class="line">  l.set_linestyle(<span class="string">&#x27;:&#x27;</span>)</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e7()</span><br></pre></td></tr></table></figure>
+
+<h1 id="8-标记"><a href="#8-标记" class="headerlink" title="8. 标记"></a>8. 标记</h1><h2 id="基础标记"><a href="#基础标记" class="headerlink" title="基础标记"></a>基础标记</h2><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">e8_1</span>():</span><br><span class="line">  mu, sigma = <span class="number">115</span>, <span class="number">15</span></span><br><span class="line">  <span class="comment"># x 是一万个值的列表 randn 会给出一组正态分布的随机数结果</span></span><br><span class="line">  x = mu + sigma * np.random.randn(<span class="number">10000</span>)</span><br><span class="line">  fig, ax = plt.subplots(figsize=(<span class="number">5</span>, <span class="number">2.7</span>), layout=<span class="string">&#x27;constrained&#x27;</span>)</span><br><span class="line">  <span class="comment"># the histogram of the data</span></span><br><span class="line">  <span class="comment"># 直方图参数: x-数据内容 50-柱数量 density-返回概率密度 </span></span><br><span class="line">  n, bins, patches = ax.hist(x, <span class="number">50</span>, density=<span class="literal">True</span>, facecolor=<span class="string">&#x27;C0&#x27;</span>, alpha=<span class="number">0.75</span>)</span><br><span class="line"></span><br><span class="line">  <span class="comment"># 轴和图的标题</span></span><br><span class="line">  ax.set_xlabel(<span class="string">&#x27;Length [cm]&#x27;</span>)</span><br><span class="line">  ax.set_ylabel(<span class="string">&#x27;Probability&#x27;</span>)</span><br><span class="line">  ax.set_title(<span class="string">&#x27;Aardvark lengths\n (not really)&#x27;</span>)</span><br><span class="line">  <span class="comment"># 文本 (使用了数学符号)</span></span><br><span class="line">  ax.text(<span class="number">75</span>, <span class="number">.025</span>, <span class="string">r&#x27;$\mu=115,\ \sigma=15$&#x27;</span>)</span><br><span class="line">  <span class="comment"># 轴定义</span></span><br><span class="line">  ax.axis([<span class="number">55</span>, <span class="number">175</span>, <span class="number">0</span>, <span class="number">0.03</span>])</span><br><span class="line">  <span class="comment"># 网线</span></span><br><span class="line">  ax.grid(<span class="literal">True</span>)</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e8_1()</span><br></pre></td></tr></table></figure>
+
+<h2 id="标记图上的点"><a href="#标记图上的点" class="headerlink" title="标记图上的点"></a>标记图上的点</h2><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">e8_2</span>():</span><br><span class="line">  fig, ax = plt.subplots(figsize=(<span class="number">5</span>, <span class="number">2.7</span>))</span><br><span class="line"></span><br><span class="line">  t = np.arange(<span class="number">0.0</span>, <span class="number">5.0</span>, <span class="number">0.01</span>)</span><br><span class="line">  s = np.cos(<span class="number">2</span> * np.pi * t)</span><br><span class="line">  line, = ax.plot(t, s, lw=<span class="number">2</span>)</span><br><span class="line">  <span class="comment"># 使用点位、文本位、箭头设置来标记点</span></span><br><span class="line">  ax.annotate(<span class="string">&#x27;local max&#x27;</span>, xy=(<span class="number">2</span>, <span class="number">1</span>), xytext=(<span class="number">3</span>, <span class="number">1.5</span>),</span><br><span class="line">            arrowprops=<span class="built_in">dict</span>(facecolor=<span class="string">&#x27;black&#x27;</span>, shrink=<span class="number">0.05</span>))</span><br><span class="line">  <span class="comment"># y轴limit</span></span><br><span class="line">  ax.set_ylim(-<span class="number">2</span>, <span class="number">2</span>)</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e8_2()</span><br></pre></td></tr></table></figure>
+
+<h2 id="添加-Legend用以区分数据"><a href="#添加-Legend用以区分数据" class="headerlink" title="添加 Legend用以区分数据"></a>添加 Legend用以区分数据</h2><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">e8_3</span>():</span><br><span class="line">  data1, data2, data3 = np.random.randn(<span class="number">3</span>, <span class="number">100</span>)</span><br><span class="line">  fig, ax = plt.subplots(figsize=(<span class="number">5</span>, <span class="number">2.7</span>))</span><br><span class="line">  ax.plot(np.arange(<span class="built_in">len</span>(data1)), data1, label=<span class="string">&#x27;data1&#x27;</span>)</span><br><span class="line">  ax.plot(np.arange(<span class="built_in">len</span>(data2)), data2, label=<span class="string">&#x27;data2&#x27;</span>)</span><br><span class="line">  ax.plot(np.arange(<span class="built_in">len</span>(data3)), data3, <span class="string">&#x27;d&#x27;</span>, label=<span class="string">&#x27;data3&#x27;</span>)</span><br><span class="line">  ax.legend()</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e8_3()</span><br></pre></td></tr></table></figure>
+
+<h1 id="9-轴的比例和刻度"><a href="#9-轴的比例和刻度" class="headerlink" title="9. 轴的比例和刻度"></a>9. 轴的比例和刻度</h1><h2 id="轴的比例定义"><a href="#轴的比例定义" class="headerlink" title="轴的比例定义"></a>轴的比例定义</h2><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">e9_1</span>():</span><br><span class="line">  <span class="comment"># 100 个随机数</span></span><br><span class="line">  data1 = np.random.randn(<span class="number">100</span>)</span><br><span class="line">  <span class="comment"># 两个 axes</span></span><br><span class="line">  fig, axs = plt.subplots(<span class="number">1</span>, <span class="number">2</span>, figsize=(<span class="number">5</span>, <span class="number">2.7</span>), layout=<span class="string">&#x27;constrained&#x27;</span>)</span><br><span class="line">  <span class="comment"># x轴为随机数的数量</span></span><br><span class="line">  xdata = np.arange(<span class="built_in">len</span>(data1))</span><br><span class="line">  <span class="comment"># y数据为 10 ** data1</span></span><br><span class="line">  data = <span class="number">10</span>**data1</span><br><span class="line">  <span class="comment"># axes 使用折线图</span></span><br><span class="line">  axs[<span class="number">0</span>].plot(xdata, data)</span><br><span class="line">  <span class="comment"># axes 使用对数坐标 图像内容接近 data1 的原始值</span></span><br><span class="line">  axs[<span class="number">1</span>].set_yscale(<span class="string">&#x27;log&#x27;</span>)</span><br><span class="line">  axs[<span class="number">1</span>].plot(xdata, data)</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e9_1()</span><br></pre></td></tr></table></figure>
+
+<h2 id="手动操作-axis-上的-ticks"><a href="#手动操作-axis-上的-ticks" class="headerlink" title="手动操作 axis 上的 ticks"></a>手动操作 axis 上的 ticks</h2><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">e9_2</span>():</span><br><span class="line">  data1 = np.random.randn(<span class="number">100</span>)</span><br><span class="line">  xdata = np.arange(<span class="built_in">len</span>(data1))</span><br><span class="line">  fig, axs = plt.subplots(<span class="number">2</span>, <span class="number">1</span>, layout=<span class="string">&#x27;constrained&#x27;</span>)</span><br><span class="line">  axs[<span class="number">0</span>].plot(xdata, data1)</span><br><span class="line">  axs[<span class="number">0</span>].set_title(<span class="string">&#x27;Automatic ticks&#x27;</span>)</span><br><span class="line"></span><br><span class="line">  axs[<span class="number">1</span>].plot(xdata, data1)</span><br><span class="line">  <span class="comment"># 设置x 轴和显示内容</span></span><br><span class="line">  axs[<span class="number">1</span>].set_xticks(np.arange(<span class="number">0</span>, <span class="number">100</span>, <span class="number">30</span>), [<span class="string">&#x27;zero&#x27;</span>, <span class="string">&#x27;30&#x27;</span>, <span class="string">&#x27;sixty&#x27;</span>, <span class="string">&#x27;90&#x27;</span>])</span><br><span class="line">  <span class="comment"># 设置 y 轴</span></span><br><span class="line">  axs[<span class="number">1</span>].set_yticks([-<span class="number">1.5</span>, <span class="number">0</span>, <span class="number">1.5</span>])</span><br><span class="line">  axs[<span class="number">1</span>].set_title(<span class="string">&#x27;Manual ticks&#x27;</span>)</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e9_2()</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用时间做轴"><a href="#使用时间做轴" class="headerlink" title="使用时间做轴"></a>使用时间做轴</h2><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">e9_3</span>():</span><br><span class="line">  fig, ax = plt.subplots(figsize=(<span class="number">5</span>, <span class="number">2.7</span>), layout=<span class="string">&#x27;constrained&#x27;</span>)</span><br><span class="line">  <span class="comment"># 通过时间范围和间隔构建时间戳数组</span></span><br><span class="line">  dates = np.arange(np.datetime64(<span class="string">&#x27;2021-11-15&#x27;</span>), np.datetime64(<span class="string">&#x27;2021-12-25&#x27;</span>),</span><br><span class="line">                    np.timedelta64(<span class="number">1</span>, <span class="string">&#x27;h&#x27;</span>))</span><br><span class="line">  <span class="comment"># 随机数的数据</span></span><br><span class="line">  data = np.cumsum(np.random.randn(<span class="built_in">len</span>(dates)))</span><br><span class="line">  <span class="comment"># x 和 y 数据正常放入图像</span></span><br><span class="line">  ax.plot(dates, data)</span><br><span class="line">  <span class="comment"># 设置日期格式化方式并添加到轴</span></span><br><span class="line">  cdf = mpl.dates.ConciseDateFormatter(ax.xaxis.get_major_locator())</span><br><span class="line">  ax.xaxis.set_major_formatter(cdf)</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e9_3()</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用字符串做轴"><a href="#使用字符串做轴" class="headerlink" title="使用字符串做轴"></a>使用字符串做轴</h2><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">e9_4</span>():</span><br><span class="line">  fig, ax = plt.subplots(figsize=(<span class="number">5</span>, <span class="number">2.7</span>), layout=<span class="string">&#x27;constrained&#x27;</span>)</span><br><span class="line">  categories = [<span class="string">&#x27;turnips&#x27;</span>, <span class="string">&#x27;rutabaga&#x27;</span>, <span class="string">&#x27;cucumber&#x27;</span>, <span class="string">&#x27;pumpkins&#x27;</span>]</span><br><span class="line"></span><br><span class="line">  ax.bar(categories, np.random.rand(<span class="built_in">len</span>(categories)))</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e9_4()</span><br></pre></td></tr></table></figure>
+
+<h2 id="添加更多的轴"><a href="#添加更多的轴" class="headerlink" title="添加更多的轴"></a>添加更多的轴</h2><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">e9_5</span>():</span><br><span class="line">  t = np.arange(<span class="number">0.0</span>, <span class="number">5.0</span>, <span class="number">0.01</span>)</span><br><span class="line">  s = np.cos(<span class="number">2</span> * np.pi * t)</span><br><span class="line">  <span class="comment"># fig上的图像为 ax1 和 ax3</span></span><br><span class="line">  fig, (ax1, ax3) = plt.subplots(<span class="number">1</span>, <span class="number">2</span>, figsize=(<span class="number">7</span>, <span class="number">2.7</span>), layout=<span class="string">&#x27;constrained&#x27;</span>)</span><br><span class="line">  l1, = ax1.plot(t, s)</span><br><span class="line">  <span class="comment"># ax2 和 ax1 绘制在一起, 共享x轴</span></span><br><span class="line">  ax2 = ax1.twinx()</span><br><span class="line">  l2, = ax2.plot(t, <span class="built_in">range</span>(<span class="built_in">len</span>(t)), <span class="string">&#x27;C1&#x27;</span>)</span><br><span class="line">  ax2.legend([l1, l2], [<span class="string">&#x27;Sine (left)&#x27;</span>, <span class="string">&#x27;Straight (right)&#x27;</span>])</span><br><span class="line"></span><br><span class="line">  ax3.plot(t, s)</span><br><span class="line">  ax3.set_xlabel(<span class="string">&#x27;Angle [rad]&#x27;</span>)</span><br><span class="line">  <span class="comment"># secondary_xaxis 用于创建一个新的x轴 传入了和原x轴的互相转换函数</span></span><br><span class="line">  ax4 = ax3.secondary_xaxis(<span class="string">&#x27;top&#x27;</span>, functions=(np.rad2deg, np.deg2rad))</span><br><span class="line">  ax4.set_xlabel(<span class="string">&#x27;Angle [°]&#x27;</span>)</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e9_5()</span><br></pre></td></tr></table></figure>
+
+<h1 id="10-色块图"><a href="#10-色块图" class="headerlink" title="10. 色块图"></a>10. 色块图</h1><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">e10</span>():</span><br><span class="line">  data1, data2, data3 = np.random.randn(<span class="number">3</span>, <span class="number">100</span>)</span><br><span class="line">  X, Y = np.meshgrid(np.linspace(-<span class="number">3</span>, <span class="number">3</span>, <span class="number">128</span>), np.linspace(-<span class="number">3</span>, <span class="number">3</span>, <span class="number">128</span>))</span><br><span class="line">  Z = (<span class="number">1</span> - X/<span class="number">2</span> + X**<span class="number">5</span> + Y**<span class="number">3</span>) * np.exp(-X**<span class="number">2</span> - Y**<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">  fig, axs = plt.subplots(<span class="number">2</span>, <span class="number">2</span>, layout=<span class="string">&#x27;constrained&#x27;</span>)</span><br><span class="line">  pc = axs[<span class="number">0</span>, <span class="number">0</span>].pcolormesh(X, Y, Z, vmin=-<span class="number">1</span>, vmax=<span class="number">1</span>, cmap=<span class="string">&#x27;RdBu_r&#x27;</span>)</span><br><span class="line">  fig.colorbar(pc, ax=axs[<span class="number">0</span>, <span class="number">0</span>])</span><br><span class="line">  axs[<span class="number">0</span>, <span class="number">0</span>].set_title(<span class="string">&#x27;pcolormesh()&#x27;</span>)</span><br><span class="line"></span><br><span class="line">  co = axs[<span class="number">0</span>, <span class="number">1</span>].contourf(X, Y, Z, levels=np.linspace(-<span class="number">1.25</span>, <span class="number">1.25</span>, <span class="number">11</span>))</span><br><span class="line">  fig.colorbar(co, ax=axs[<span class="number">0</span>, <span class="number">1</span>])</span><br><span class="line">  axs[<span class="number">0</span>, <span class="number">1</span>].set_title(<span class="string">&#x27;contourf()&#x27;</span>)</span><br><span class="line"></span><br><span class="line">  pc = axs[<span class="number">1</span>, <span class="number">0</span>].imshow(Z**<span class="number">2</span> * <span class="number">100</span>, cmap=<span class="string">&#x27;plasma&#x27;</span>,</span><br><span class="line">                            norm=mpl.colors.LogNorm(vmin=<span class="number">0.01</span>, vmax=<span class="number">100</span>))</span><br><span class="line">  fig.colorbar(pc, ax=axs[<span class="number">1</span>, <span class="number">0</span>], extend=<span class="string">&#x27;both&#x27;</span>)</span><br><span class="line">  axs[<span class="number">1</span>, <span class="number">0</span>].set_title(<span class="string">&#x27;imshow() with LogNorm()&#x27;</span>)</span><br><span class="line"></span><br><span class="line">  pc = axs[<span class="number">1</span>, <span class="number">1</span>].scatter(data1, data2, c=data3, cmap=<span class="string">&#x27;RdBu_r&#x27;</span>)</span><br><span class="line">  fig.colorbar(pc, ax=axs[<span class="number">1</span>, <span class="number">1</span>], extend=<span class="string">&#x27;both&#x27;</span>)</span><br><span class="line">  axs[<span class="number">1</span>, <span class="number">1</span>].set_title(<span class="string">&#x27;scatter()&#x27;</span>)</span><br><span class="line">  plt.show()</span><br><span class="line"></span><br><span class="line">e10()</span><br></pre></td></tr></table></figure>
+
+<h1 id="11-多-axes-使用-dict-操作"><a href="#11-多-axes-使用-dict-操作" class="headerlink" title="11. 多 axes 使用 dict 操作"></a>11. 多 axes 使用 dict 操作</h1><figure class="highlight python"><figcaption><span>python</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">e11</span>():</span><br><span class="line">  fig, axd = plt.subplot_mosaic([[<span class="string">&#x27;upleft&#x27;</span>, <span class="string">&#x27;right&#x27;</span>],</span><br><span class="line">                               [<span class="string">&#x27;lowleft&#x27;</span>, <span class="string">&#x27;right&#x27;</span>]], layout=<span class="string">&#x27;constrained&#x27;</span>)</span><br><span class="line">  axd[<span class="string">&#x27;upleft&#x27;</span>].set_title(<span class="string">&#x27;upleft&#x27;</span>)</span><br><span class="line">  axd[<span class="string">&#x27;lowleft&#x27;</span>].set_title(<span class="string">&#x27;lowleft&#x27;</span>)</span><br><span class="line">  axd[<span class="string">&#x27;right&#x27;</span>].set_title(<span class="string">&#x27;right&#x27;</span>)</span><br><span class="line"></span><br><span class="line">e11()</span><br></pre></td></tr></table></figure>
+        
+            <div id="toc-article">
+                
+  <div class="widget-wrap" id="toc-wrap">
+    <h3 class="widget-title"><i class="fa fa-toc"></i> 文章目录</h3>
+    <div class="widget">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E5%85%A5%E9%97%A8%E7%A4%BA%E4%BE%8B"><span class="toc-text">1. 入门示例</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-%E7%AA%97%E5%8F%A3%E3%80%81%E5%9B%BE%E5%83%8F%E5%92%8C%E7%BB%98%E5%88%B6"><span class="toc-text">2. 窗口、图像和绘制</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-figure-%E7%9A%84%E6%9E%84%E6%88%90%E9%83%A8%E5%88%86"><span class="toc-text">3. figure 的构成部分</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E8%BE%93%E5%85%A5%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-text">4. 输入数据类型</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E6%8E%A5%E5%8F%A3%E9%A3%8E%E6%A0%BC"><span class="toc-text">5. 接口风格</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#6-%E5%88%B6%E4%BD%9C%E8%BE%85%E5%8A%A9%E5%87%BD%E6%95%B0"><span class="toc-text">6. 制作辅助函数</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#7-%E6%A0%B7%E5%BC%8F"><span class="toc-text">7. 样式</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#8-%E6%A0%87%E8%AE%B0"><span class="toc-text">8. 标记</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9F%BA%E7%A1%80%E6%A0%87%E8%AE%B0"><span class="toc-text">基础标记</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A0%87%E8%AE%B0%E5%9B%BE%E4%B8%8A%E7%9A%84%E7%82%B9"><span class="toc-text">标记图上的点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0-Legend%E7%94%A8%E4%BB%A5%E5%8C%BA%E5%88%86%E6%95%B0%E6%8D%AE"><span class="toc-text">添加 Legend用以区分数据</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#9-%E8%BD%B4%E7%9A%84%E6%AF%94%E4%BE%8B%E5%92%8C%E5%88%BB%E5%BA%A6"><span class="toc-text">9. 轴的比例和刻度</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BD%B4%E7%9A%84%E6%AF%94%E4%BE%8B%E5%AE%9A%E4%B9%89"><span class="toc-text">轴的比例定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%8B%E5%8A%A8%E6%93%8D%E4%BD%9C-axis-%E4%B8%8A%E7%9A%84-ticks"><span class="toc-text">手动操作 axis 上的 ticks</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%97%B6%E9%97%B4%E5%81%9A%E8%BD%B4"><span class="toc-text">使用时间做轴</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%81%9A%E8%BD%B4"><span class="toc-text">使用字符串做轴</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0%E6%9B%B4%E5%A4%9A%E7%9A%84%E8%BD%B4"><span class="toc-text">添加更多的轴</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#10-%E8%89%B2%E5%9D%97%E5%9B%BE"><span class="toc-text">10. 色块图</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#11-%E5%A4%9A-axes-%E4%BD%BF%E7%94%A8-dict-%E6%93%8D%E4%BD%9C"><span class="toc-text">11. 多 axes 使用 dict 操作</span></a></li></ol>
+    </div>
+  </div>
+
+
+            </div>
+        
+        
+      
+    </div>
+    <footer class="article-footer">
+      
+        <div class="article-tag-wrap">
+          
+
+          
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BA%93/" rel="tag">库</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag">笔记</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E8%B1%86%E7%9F%A5%E8%AF%86/" rel="tag">豆知识</a></li></ul>
+
+          
+
+
+        </div>
+      
+      
+        
+<nav id="article-nav">
+  
+    <a href="/2023/11/28/pythonNumpy.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">older</strong>
+      <div class="article-nav-title">
+        
+          Numpy入门笔记
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+      
+      
+        
+
+
+
+
+
+
+
+
+      
+    </footer>
+  </div>
+</article>
+</section>
+        
+          <aside id="sidebar">
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-posts"></i> 最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2023/11/29/pythonMatplotlib.html">Matplotlib入门笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/28/pythonNumpy.html">Numpy入门笔记</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/24/AiForBeginners-2.html">AI入门笔记（2）——知识表示与专家系统</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/24/AiForBeginners-1.html">AI入门笔记（1）——简介与历史</a>
+          </li>
+        
+          <li>
+            <a href="/2023/11/22/SSHInSubSocks.html">使用SSH包装Socks5代理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-tag"></i> 标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/AI/" style="font-size: 13.33px;">AI</a> <a href="/tags/Linux/" style="font-size: 10px;">Linux</a> <a href="/tags/SSH/" style="font-size: 13.33px;">SSH</a> <a href="/tags/golang/" style="font-size: 10px;">golang</a> <a href="/tags/python/" style="font-size: 13.33px;">python</a> <a href="/tags/%E4%B8%B2%E5%8F%A3%E9%80%9A%E8%AE%AF/" style="font-size: 10px;">串口通讯</a> <a href="/tags/%E5%BA%93/" style="font-size: 13.33px;">库</a> <a href="/tags/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" style="font-size: 10px;">环境配置</a> <a href="/tags/%E7%AC%94%E8%AE%B0/" style="font-size: 20px;">笔记</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" style="font-size: 16.67px;">网络编程</a> <a href="/tags/%E8%B1%86%E7%9F%A5%E8%AF%86/" style="font-size: 16.67px;">豆知识</a> <a href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" style="font-size: 10px;">项目实践</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-classify"></i> 分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/AI%E5%AD%A6%E4%B9%A0/">AI学习</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/python/">python</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">网络编程</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%B1%86%E7%9F%A5%E8%AF%86/">豆知识</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/">项目实践</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-archive"></i> 归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/">2023年11月</a><span class="archive-list-count">8</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title"><i class="fa fa-tag"></i> 标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/" rel="tag">AI</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SSH/" rel="tag">SSH</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/" rel="tag">python</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%B2%E5%8F%A3%E9%80%9A%E8%AE%AF/" rel="tag">串口通讯</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BA%93/" rel="tag">库</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" rel="tag">环境配置</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag">笔记</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" rel="tag">网络编程</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B1%86%E7%9F%A5%E8%AF%86/" rel="tag">豆知识</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" rel="tag">项目实践</a><span class="tag-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+
+  
+</aside>
+        
+      </div>
+      <a id="totop" href="#top"></a>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      <p>
+        <!-- <a href="/sitemap.xml">网站地图</a> -->
+        <!-- <span> | </span><a href="/atom.xml">订阅本站</a> -->
+        <!-- <span> | </span><a href="/about/">联系博主</a> -->
+      </p>
+      
+      <p>
+        <span>Copyright &copy; 2023 vc.</span>
+        <span>Theme by <a href="https://github.com/chaooo/hexo-theme-BlueLake/" target="_blank">BlueLake.</a></span>
+        <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span>
+      </p>
+    </div>
+  </div>
+</footer>
+
+    </div>
+  </div>
+  
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+<script src="/js/search.json.js"></script>
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+
+
+
+
+</body>
+</html>
