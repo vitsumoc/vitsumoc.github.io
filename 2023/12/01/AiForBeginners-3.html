@@ -155,10 +155,14 @@
 </ol>
 <h2 id="感知器的局限性"><a href="#感知器的局限性" class="headerlink" title="感知器的局限性"></a>感知器的局限性</h2><p><a target="_blank" rel="noopener" href="https://github.com/vitsumoc/exercise-AI-Beginner/blob/main/3-Perceptron/xor.ipynb">https://github.com/vitsumoc/exercise-AI-Beginner/blob/main/3-Perceptron/xor.ipynb</a></p>
 <p>感知器只能解决线性分类问题，对于无法使用一条直线分类的问题，往往就无法很好的收敛。</p>
-<p>例子中的异或问题就是一个完全无法收敛的例子。</p>
+<p>作业中的异或问题就是一个完全无法收敛的例子。</p>
 <h2 id="使用感知器-MNIST-数据识别手写数字"><a href="#使用感知器-MNIST-数据识别手写数字" class="headerlink" title="使用感知器 + MNIST 数据识别手写数字"></a>使用感知器 + MNIST 数据识别手写数字</h2><p><a target="_blank" rel="noopener" href="https://github.com/vitsumoc/exercise-AI-Beginner/blob/main/3-Perceptron/mnist.ipynb">https://github.com/vitsumoc/exercise-AI-Beginner/blob/main/3-Perceptron/mnist.ipynb</a></p>
 <p>在这个作业中使用感知器区分手写数字图像。</p>
 <p>使用PCA降低特征的维度，分析感知器训练结果差异的原因。</p>
+<h2 id="训练感知器识别任何手写数字"><a href="#训练感知器识别任何手写数字" class="headerlink" title="训练感知器识别任何手写数字"></a>训练感知器识别任何手写数字</h2><p>这个作业中需要拓展上一个作业的功能，训练10个不同的感知器，用来识别0-9全部的数字。</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/vitsumoc/exercise-AI-Beginner/blob/main/3-Perceptron/anyNum.ipynb">https://github.com/vitsumoc/exercise-AI-Beginner/blob/main/3-Perceptron/anyNum.ipynb</a></p>
+<p>参考上一个作业的方式，训练了10组weights，来判断一个数字是或不是特定的数字。</p>
+<p>每个感知器训练10000次，最终正确率 74.7%。</p>
 
         
             <div id="toc-article">
@@ -166,7 +170,7 @@
   <div class="widget-wrap" id="toc-wrap">
     <h3 class="widget-title"><i class="fa fa-toc"></i> 文章目录</h3>
     <div class="widget">
-      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AF%BE%E7%A8%8B"><span class="toc-text">课程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%86%85%E5%AE%B9"><span class="toc-text">内容</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%9A%8F%E5%A0%82%E4%BD%9C%E4%B8%9A"><span class="toc-text">随堂作业</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%AD%E7%BB%83%E6%84%9F%E7%9F%A5%E5%99%A8%E5%88%86%E7%B1%BB%E6%95%B0%E6%8D%AE"><span class="toc-text">训练感知器分类数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%84%9F%E7%9F%A5%E5%99%A8%E7%9A%84%E5%B1%80%E9%99%90%E6%80%A7"><span class="toc-text">感知器的局限性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%84%9F%E7%9F%A5%E5%99%A8-MNIST-%E6%95%B0%E6%8D%AE%E8%AF%86%E5%88%AB%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97"><span class="toc-text">使用感知器 + MNIST 数据识别手写数字</span></a></li></ol></li></ol>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%AF%BE%E7%A8%8B"><span class="toc-text">课程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%86%85%E5%AE%B9"><span class="toc-text">内容</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%9A%8F%E5%A0%82%E4%BD%9C%E4%B8%9A"><span class="toc-text">随堂作业</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%AD%E7%BB%83%E6%84%9F%E7%9F%A5%E5%99%A8%E5%88%86%E7%B1%BB%E6%95%B0%E6%8D%AE"><span class="toc-text">训练感知器分类数据</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%84%9F%E7%9F%A5%E5%99%A8%E7%9A%84%E5%B1%80%E9%99%90%E6%80%A7"><span class="toc-text">感知器的局限性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%84%9F%E7%9F%A5%E5%99%A8-MNIST-%E6%95%B0%E6%8D%AE%E8%AF%86%E5%88%AB%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97"><span class="toc-text">使用感知器 + MNIST 数据识别手写数字</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%AE%AD%E7%BB%83%E6%84%9F%E7%9F%A5%E5%99%A8%E8%AF%86%E5%88%AB%E4%BB%BB%E4%BD%95%E6%89%8B%E5%86%99%E6%95%B0%E5%AD%97"><span class="toc-text">训练感知器识别任何手写数字</span></a></li></ol></li></ol>
     </div>
   </div>
 
