@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   
   
-  <title>tag: 项目实践 | Thinking...</title>
+  <title>工作周报可视化 | Thinking...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   
     <meta name="description" content="想想">
@@ -82,35 +82,134 @@
 </header>
 
       <div class="outer">
-        <section id="main">
-
-  
-  
+        <section id="main"><article id="post-weekreport2chart" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-inner">
     
     
-    <section class="archives-wrap">
-      <div class="archive-title">
+      <header class="article-header">
         
-          <i class="fa fa-tag"></i>
-          项目实践
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      工作周报可视化
+    </h1>
+  
+
+
+      </header>
+    
+    <div class="article-meta">
+      
+      <span class="article-date">
+  <i class="fa fa-date"></i>
+  <time class="dt-published" datetime="2023-12-05T03:31:51.000Z" itemprop="datePublished">2023年12月05日</time>
+</span>
+      
+  <div class="article-category">
+    <i class="fa fa-classify"></i>
+    <a class="article-category-link" href="/categories/%E5%B0%8F%E7%8E%A9%E5%85%B7/">小玩具</a>
+  </div>
+
+      
+        <span class="article-views">
+  <i class="fa fa-views"></i>
+  <i id="busuanzi_container_page_pv">
+      <i id="busuanzi_value_page_pv"></i>
+  </i>
+</span>
+
+      
+      <!-- 
+<a href="/2023/12/05/weekreport2chart.html#comments" class="article-comment-link">
+  
+    
+    
+    
+    
+    
+  
+  <i class="fa fa-commt"></i>
+  留言
+</a>
+
+ -->
+    </div>
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h1><p>这个项目是一个纯粹的小玩具，起因是我公司的工作周报都是 <code>.doc</code> 格式存储的，现在到年底了，我又比较想知道我一年都干了哪些工作。显而易见的一个方式就是提取所有周报文字内容做词频分析。</p>
+<span id="more"></span>
+
+<h1 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h1><p>完成之后的效果还算不错，源码也放在了github上：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/vitsumoc/weekreport2chart">https://github.com/vitsumoc/weekreport2chart</a></p>
+<p>提取一段时间的工作周报内容，生成词云和河流图</p>
+<p><img src="/2023/12/05/weekreport2chart/wordcloud.png"></p>
+<p><img src="/2023/12/05/weekreport2chart/river.png"></p>
+<p>可以直接过滤低频词汇，或手动操作删除某些虚词、连词等</p>
+<p><img src="/2023/12/05/weekreport2chart/disable.png"></p>
+<h1 id="相关库"><a href="#相关库" class="headerlink" title="相关库"></a>相关库</h1><p>使用libreoffice将doc转为docx</p>
+<p>使用结巴分词分词：<a target="_blank" rel="noopener" href="https://github.com/fxsjy/jieba">https://github.com/fxsjy/jieba</a></p>
+<p>使用wordcloudjs词云：<a target="_blank" rel="noopener" href="https://wordcloud2-js.timdream.org/#love">https://wordcloud2-js.timdream.org/#love</a></p>
+<p>使用echarts河流图</p>
+
+        
+            <div id="toc-article">
+                
+  <div class="widget-wrap" id="toc-wrap">
+    <h3 class="widget-title"><i class="fa fa-toc"></i> 文章目录</h3>
+    <div class="widget">
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E8%B5%B7%E5%9B%A0"><span class="toc-text">起因</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E6%95%88%E6%9E%9C"><span class="toc-text">效果</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%9B%B8%E5%85%B3%E5%BA%93"><span class="toc-text">相关库</span></a></li></ol>
+    </div>
+  </div>
+
+
+            </div>
+        
+        
+      
+    </div>
+    <footer class="article-footer">
+      
+        <div class="article-tag-wrap">
+          
+
+          
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/js/" rel="tag">js</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/" rel="tag">python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%B0%8F%E7%8E%A9%E5%85%B7/" rel="tag">小玩具</a></li></ul>
+
+          
+
+
+        </div>
+      
+      
+        
+<nav id="article-nav">
+  
+    <a href="/2023/12/05/golua.html" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">older</strong>
+      <div class="article-nav-title">
+        
+          在golang中使用lua
         
       </div>
-      <div class="archives">
-  
-  <ul class="archive-article archive-type-post">
-  <li class="archive-article-inner">
-    <a href="/2023/11/22/golangSerial.html">
-      <time class="dt-published" datetime="2023-11-22T03:06:28.000Z" itemprop="datePublished">2023年11月22日</time>
-      | <span class="archive-article-title">golang与串口设备在项目中的运用</span>
     </a>
-  </li>
-</ul>
+  
+  
+</nav>
+
+      
+      
+        
 
 
 
-  </div></section>
 
 
+
+
+
+      
+    </footer>
+  </div>
+</article>
 </section>
         
           <aside id="sidebar">
@@ -235,6 +334,9 @@
 
 
 
+
+  
+  
 
 
 
