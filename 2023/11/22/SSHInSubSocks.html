@@ -1,141 +1,284 @@
+
+
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="vc">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="subSocks简介subSocks是Luyu Huang制作的纯golang网络代理软件。 这里是作者本人对此项目的介绍文档。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用SSH包装Socks5代理">
+<meta property="og:url" content="https://vitsumoc.github.io/2023/11/22/SSHInSubSocks.html">
+<meta property="og:site_name" content="Thinking...">
+<meta property="og:description" content="subSocks简介subSocks是Luyu Huang制作的纯golang网络代理软件。 这里是作者本人对此项目的介绍文档。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://vitsumoc.github.io/2023/11/22/SSHInSubSocks/wireshark.png">
+<meta property="article:published_time" content="2023-11-22T09:38:25.000Z">
+<meta property="article:modified_time" content="2023-12-07T07:44:08.102Z">
+<meta property="article:author" content="vc">
+<meta property="article:tag" content="网络编程">
+<meta property="article:tag" content="SSH">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://vitsumoc.github.io/2023/11/22/SSHInSubSocks/wireshark.png">
   
   
-  <title>使用SSH包装Socks5代理 | Thinking...</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   
-    <meta name="description" content="想想">
-  
-  
-  
-    <link rel="alternate" href="/atom.xml" title="Thinking..." type="application/atom+xml">
-  
-  
-    <link rel="shortcut icon" href="/favicon.png">
-  
-  
-    
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+  <title>使用SSH包装Socks5代理 - Thinking...</title>
 
-  
-  
-<link rel="stylesheet" href="/css/style.css">
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
-  
-    
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
 
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
   
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
   
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"vitsumoc.github.io","root":"/","version":"1.9.6","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
   
+
+
   
 <meta name="generator" content="Hexo 6.3.0"></head>
 
+
 <body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">Thinking...</a>
-      </h1>
-      
-        <h2 id="subtitle-wrap">
-          <a href="/" id="subtitle">想想</a>
-        </h2>
-      
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Thinking...</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
         
-          <a class="main-nav-link" href="/."><i class="fa fa-home"></i> 首页</a>
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
         
-          <a class="main-nav-link" href="/archives/"><i class="fa fa-archive"></i> 归档</a>
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
         
-          <a class="main-nav-link" href="/about/"><i class="fa fa-user"></i> 关于</a>
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
         
-      </nav>
-    </div>
-    <div id="search-form">
-      <div id="result-mask" class="hide"></div>
-      <label><input id="search-key" type="text" autocomplete="off" placeholder="搜索"></label>
-      <div id="result-wrap" class="hide">
-        <div id="search-result"></div>
-      </div>
-      <div class="hide">
-        <template id="search-tpl">
-          <div class="item">
-            <a href="/{path}" title="{title}">
-              <div class="title">{title}</div>
-              <div class="time">{date}</div>
-              <div class="tags">{tags}</div>
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
             </a>
-          </div>
-        </template>
-      </div>
-    </div>
-  </div>
-</header>
-
-      <div class="outer">
-        <section id="main"><article id="post-SSHInSubSocks" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
+          </li>
+          
         
-  
-    <h1 class="p-name article-title" itemprop="headline name">
-      使用SSH包装Socks5代理
-    </h1>
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
   
 
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">使用SSH包装Socks5代理</span>
+          
+        </div>
 
-      </header>
+        
+          
+  <div class="mt-3">
     
-    <div class="article-meta">
-      
-      <span class="article-date">
-  <i class="fa fa-date"></i>
-  <time class="dt-published" datetime="2023-11-22T09:38:25.000Z" itemprop="datePublished">2023年11月22日</time>
-</span>
-      
-  <div class="article-category">
-    <i class="fa fa-classify"></i>
-    <a class="article-category-link" href="/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">网络编程</a>
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-11-22 17:38" pubdate>
+          2023年11月22日 下午
+        </time>
+      </span>
+    
   </div>
 
-      
-        <span class="article-views">
-  <i class="fa fa-views"></i>
-  <i id="busuanzi_container_page_pv">
-      <i id="busuanzi_value_page_pv"></i>
-  </i>
-</span>
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          370 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          4 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
 
       
-      <!-- 
-<a href="/2023/11/22/SSHInSubSocks.html#comments" class="article-comment-link">
-  
-    
-    
-    
-    
-    
-  
-  <i class="fa fa-commt"></i>
-  留言
-</a>
-
- -->
     </div>
-    <div class="e-content article-entry" itemprop="articleBody">
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
       
-        <h1 id="subSocks简介"><a href="#subSocks简介" class="headerlink" title="subSocks简介"></a>subSocks简介</h1><p><a target="_blank" rel="noopener" href="https://github.com/luyuhuang/subsocks">subSocks</a>是<a target="_blank" rel="noopener" href="https://luyuhuang.tech/">Luyu Huang</a>制作的纯golang网络代理软件。</p>
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">使用SSH包装Socks5代理</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="subSocks简介"><a href="#subSocks简介" class="headerlink" title="subSocks简介"></a>subSocks简介</h1><p><a target="_blank" rel="noopener" href="https://github.com/luyuhuang/subsocks">subSocks</a>是<a target="_blank" rel="noopener" href="https://luyuhuang.tech/">Luyu Huang</a>制作的纯golang网络代理软件。</p>
 <p>这里是作者本人对此项目的介绍<a target="_blank" rel="noopener" href="https://luyuhuang.tech/2020/12/02/subsocks.html">文档</a>。</p>
 <span id="more"></span>
 
@@ -147,234 +290,370 @@
 <p>使用ssh包中的代码，在服务端使用TCP链接，创建SSH服务器，等待客户端链接后获取Channel，将Channel包装为Stripper。</p>
 <p>客户端与服务端相似，需要使用TCP链接，向服务端完成握手过程，之后可获得Session，将Session包装成Wrapper。</p>
 <h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>服务端必须配置密钥，可使用自己生成的密钥：</p>
-<figure class="highlight toml"><figcaption><span>toml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[server]</span> <span class="comment"># server configuration</span></span><br><span class="line"></span><br><span class="line"><span class="attr">protocol</span> = <span class="string">&quot;ssh&quot;</span></span><br><span class="line"><span class="attr">listen</span> = <span class="string">&quot;0.0.0.0:22&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">ssh.cert</span> = <span class="string">&quot;./id_rsa.pub&quot;</span></span><br><span class="line"><span class="attr">ssh.key</span> = <span class="string">&quot;./id_rsa&quot;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight toml"><figcaption><span>toml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs toml"><span class="hljs-section">[server]</span> <span class="hljs-comment"># server configuration</span><br><br><span class="hljs-attr">protocol</span> = <span class="hljs-string">&quot;ssh&quot;</span><br><span class="hljs-attr">listen</span> = <span class="hljs-string">&quot;0.0.0.0:22&quot;</span><br><br><span class="hljs-attr">ssh.cert</span> = <span class="hljs-string">&quot;./id_rsa.pub&quot;</span><br><span class="hljs-attr">ssh.key</span> = <span class="hljs-string">&quot;./id_rsa&quot;</span><br></code></pre></td></tr></table></figure>
 
 <p>客户端只需将协议设置为ssh，其他与subsocks相同:</p>
-<figure class="highlight toml"><figcaption><span>toml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[client]</span> <span class="comment"># client configuration</span></span><br><span class="line"></span><br><span class="line"><span class="attr">listen</span> = <span class="string">&quot;127.0.0.1:1080&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="attr">server.protocol</span> = <span class="string">&quot;ssh&quot;</span></span><br><span class="line"><span class="attr">server.address</span> = <span class="string">&quot;serverIP:22&quot;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight toml"><figcaption><span>toml</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs toml"><span class="hljs-section">[client]</span> <span class="hljs-comment"># client configuration</span><br><br><span class="hljs-attr">listen</span> = <span class="hljs-string">&quot;127.0.0.1:1080&quot;</span><br><br><span class="hljs-attr">server.protocol</span> = <span class="hljs-string">&quot;ssh&quot;</span><br><span class="hljs-attr">server.address</span> = <span class="hljs-string">&quot;serverIP:22&quot;</span><br></code></pre></td></tr></table></figure>
 
 <p>通过抓包验证，握手过程正常，通讯过程与SSH相同，多条链接使用正常，所有数据均经过加密：</p>
-<p><img src="/2023/11/22/SSHInSubSocks/wireshark.png"></p>
+<p><img src="/2023/11/22/SSHInSubSocks/wireshark.png" srcset="/img/loading.gif" lazyload></p>
 <p>通过观看视频网站验证，视频加载流畅，体验很好。</p>
 
-        
-            <div id="toc-article">
                 
-  <div class="widget-wrap" id="toc-wrap">
-    <h3 class="widget-title"><i class="fa fa-toc"></i> 文章目录</h3>
-    <div class="widget">
-      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#subSocks%E7%AE%80%E4%BB%8B"><span class="toc-text">subSocks简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E5%81%9ASSH%E5%8C%85%E8%A3%85"><span class="toc-text">为什么要做SSH包装</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0%E8%BF%87%E7%A8%8B"><span class="toc-text">实现过程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8"><span class="toc-text">使用</span></a></li></ol>
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="category-chain-item">网络编程</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
     </div>
-  </div>
-
-
-            </div>
-        
-        
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="print-no-link">#网络编程</a>
+      
+        <a href="/tags/SSH/" class="print-no-link">#SSH</a>
       
     </div>
-    <footer class="article-footer">
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>使用SSH包装Socks5代理</div>
+      <div>https://vitsumoc.github.io/2023/11/22/SSHInSubSocks.html</div>
+    </div>
+    <div class="license-meta">
       
-        <div class="article-tag-wrap">
-          
-
-          
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/SSH/" rel="tag">SSH</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" rel="tag">网络编程</a></li></ul>
-
-          
-
-
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>vc</div>
         </div>
       
       
-        
-<nav id="article-nav">
-  
-    <a href="/2023/11/22/golangSerial.html" id="article-nav-older" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">older</strong>
-      <div class="article-nav-title">
-        
-          golang与串口设备在项目中的运用
-        
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年11月22日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2023/11/24/AiForBeginners-1.html" title="AI入门笔记（1）——简介与历史">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">AI入门笔记（1）——简介与历史</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2023/11/22/golangSerial.html" title="golang与串口设备在项目中的运用">
+                        <span class="hidden-mobile">golang与串口设备在项目中的运用</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
       </div>
-    </a>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
   
+
+
+
   
-    <a href="/2023/11/24/AiForBeginners-1.html" id="article-nav-newer" class="article-nav-link-wrap">
-      <strong class="article-nav-caption">newer</strong>
-      <div class="article-nav-title">
-        
-          AI入门笔记（1）——简介与历史
-        
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
-    </a>
-  
-</nav>
-
-      
-      
-        
-
-
-
-
-
-
-
-
-      
-    </footer>
-  </div>
-</article>
-</section>
-        
-          <aside id="sidebar">
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title"><i class="fa fa-posts"></i> 最新文章</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2023/12/06/n2nBeginner.html">使用n2n连接不同局域网设备</a>
-          </li>
-        
-          <li>
-            <a href="/2023/12/05/weekreport2chart.html">工作周报可视化</a>
-          </li>
-        
-          <li>
-            <a href="/2023/12/05/golua.html">在golang中使用lua</a>
-          </li>
-        
-          <li>
-            <a href="/2023/12/01/linuxBoot.html">使用Systemd管理自启动</a>
-          </li>
-        
-          <li>
-            <a href="/2023/12/01/AiForBeginners-3.html">AI入门笔记（3）——感知器</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title"><i class="fa fa-tag"></i> 标签云</h3>
-    <div class="widget tagcloud">
-      <a href="/tags/AI/" style="font-size: 14px;">AI</a> <a href="/tags/Linux/" style="font-size: 12px;">Linux</a> <a href="/tags/SSH/" style="font-size: 12px;">SSH</a> <a href="/tags/golang/" style="font-size: 12px;">golang</a> <a href="/tags/js/" style="font-size: 10px;">js</a> <a href="/tags/python/" style="font-size: 16px;">python</a> <a href="/tags/%E4%B8%B2%E5%8F%A3%E9%80%9A%E8%AE%AF/" style="font-size: 10px;">串口通讯</a> <a href="/tags/%E5%B0%8F%E7%8E%A9%E5%85%B7/" style="font-size: 12px;">小玩具</a> <a href="/tags/%E5%BA%93/" style="font-size: 16px;">库</a> <a href="/tags/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" style="font-size: 12px;">环境配置</a> <a href="/tags/%E7%AC%94%E8%AE%B0/" style="font-size: 20px;">笔记</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E5%B7%A5%E5%85%B7/" style="font-size: 10px;">网络工具</a> <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" style="font-size: 16px;">网络编程</a> <a href="/tags/%E8%B1%86%E7%9F%A5%E8%AF%86/" style="font-size: 18px;">豆知识</a> <a href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" style="font-size: 10px;">项目实践</a>
-    </div>
-  </div>
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title"><i class="fa fa-classify"></i> 分类</h3>
-    <div class="widget">
-      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/AI%E5%AD%A6%E4%B9%A0/">AI学习</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/python/">python</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E5%B0%8F%E7%8E%A9%E5%85%B7/">小玩具</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BD%91%E7%BB%9C%E5%B7%A5%E5%85%B7/">网络工具</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">网络编程</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E8%B1%86%E7%9F%A5%E8%AF%86/">豆知识</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/">项目实践</a><span class="category-list-count">1</span></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title"><i class="fa fa-archive"></i> 归档</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/">2023年</a><span class="archive-list-count">14</span></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title"><i class="fa fa-tag"></i> 标签</h3>
-    <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/AI/" rel="tag">AI</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Linux/" rel="tag">Linux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SSH/" rel="tag">SSH</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/golang/" rel="tag">golang</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/js/" rel="tag">js</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/" rel="tag">python</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E4%B8%B2%E5%8F%A3%E9%80%9A%E8%AE%AF/" rel="tag">串口通讯</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%B0%8F%E7%8E%A9%E5%85%B7/" rel="tag">小玩具</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E5%BA%93/" rel="tag">库</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/" rel="tag">环境配置</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag">笔记</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E5%B7%A5%E5%85%B7/" rel="tag">网络工具</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" rel="tag">网络编程</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E8%B1%86%E7%9F%A5%E8%AF%86/" rel="tag">豆知识</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" rel="tag">项目实践</a><span class="tag-list-count">1</span></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-
-  
-</aside>
-        
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
       </div>
-      <a id="totop" href="#top"></a>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      <p>
-        <!-- <a href="/sitemap.xml">网站地图</a> -->
-        <!-- <span> | </span><a href="/atom.xml">订阅本站</a> -->
-        <!-- <span> | </span><a href="/about/">联系博主</a> -->
-      </p>
-      
-      <p>
-        <span>Copyright &copy; 2023 vc.</span>
-        <span>Theme by <a href="https://github.com/chaooo/hexo-theme-BlueLake/" target="_blank">BlueLake.</a></span>
-        <span>Powered by <a href="https://hexo.io/" target="_blank">Hexo.</a></span>
-      </p>
     </div>
   </div>
-</footer>
+</div>
 
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>vitusmoc Blog, Powered by </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
     </div>
-  </div>
-  
-<script src="/js/jquery-3.4.1.min.js"></script>
-
-
-<script src="/js/search.json.js"></script>
-
-
-  
-<script src="/fancybox/jquery.fancybox.min.js"></script>
-
-
-
-
-<script src="/js/script.js"></script>
-
-
-
-
-
-
-
-
   
   
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
 
 
 
   
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
+    <script  src="/js/img-lazyload.js" ></script>
   
 
 
 
 
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
 
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script  src="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
 </body>
 </html>
