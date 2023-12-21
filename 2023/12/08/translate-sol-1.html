@@ -24,10 +24,11 @@
 <meta property="og:description" content="原文 Sol - An MQTT broker from scratch. Part 1 - The protocol  前言我已经在物联网领域工作有一段时间了，这段时间里我一直在处理物联网架构相关的工作，探索物联网系统开发的最佳模式，研究相关的协议和标准，例如MQTT。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-12-08T07:30:15.000Z">
-<meta property="article:modified_time" content="2023-12-15T09:28:47.544Z">
+<meta property="article:modified_time" content="2023-12-21T11:04:47.093Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="网络编程">
 <meta property="article:tag" content="翻译">
+<meta property="article:tag" content="物联网">
 <meta name="twitter:card" content="summary_large_image">
   
   
@@ -286,8 +287,8 @@
 <p><strong>Sol</strong> 是一个C语言项目，一个超级简单的Linux平台的MQTT broker，支持MQTT 3.3.1，不兼容旧的版本，非常类似于轻量级的 <code>Mosquitto</code> （虽然这玩意已经是个轻量级软件了）。由于现在有很多种类的MQTT客户端，所以测试起来会比较简单。最终的成品可能会成为一个更简洁，功能更丰富的软件，我们要创造这个功能的最小化实现。顺便提一下，<strong>Sol</strong> 这个名字的来源有一半的原因是我对短名称的偏好，另一半的原因则是火星日 (The Martian docet)。或者说，<strong>Sol</strong> 可能代表<strong>S</strong>crappy <strong>O</strong>l’ <strong>L</strong>oser。emmmm</p>
 <p><strong>注意</strong>：这个项目一直到最后才会编译，你需要跟写所有的代码步骤。如果你想要在中途进行测试，我建议你自己建一个主函数来做这些测试或者修改。</p>
 <p>一步一步来，我一般会创建一个这样的文件结构来初始化我的C项目：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">sol&#x2F;
- ├── src&#x2F;
+<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><code class="language-text">sol/
+ ├── src/
  ├── CHANGELOG
  ├── CMakeLists.txt
  ├── COPYING
@@ -335,10 +336,7 @@
 <li>Retain flag： 保留标志，有保留标志的消息被发布到主题时，消息会被保留，之后连接进来的客户端也可以收到该消息。保留消息可以被另一条保留消息覆盖。</li>
 </ul>
 <p>所以，打开 Vim （或者其他任何你喜欢的IDE），创建名为 <code>mqtt.h</code> 的头文件，开始写关于 Fixed Header 的数据结构吧：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/mqtt.h</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">MQTT_H</span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">MQTT_H</span></span>
-
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/mqtt.h</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
 
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">MQTT_HEADER_LEN</span> <span class="token expression"><span class="token number">2</span></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">MQTT_ACK_LEN</span>    <span class="token expression"><span class="token number">4</span></span></span>
@@ -385,7 +383,7 @@
         <span class="token keyword">unsigned</span> dup <span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">;</span>       <span class="token comment">// 重复标识</span>
         <span class="token keyword">unsigned</span> type <span class="token operator">:</span> <span class="token number">4</span><span class="token punctuation">;</span>      <span class="token comment">// 4bit Flags</span>
     <span class="token punctuation">&#125;</span> bits<span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>最上方的两个 <code>#define</code> 定义了 MQTT Fixed Header 和 MQTT ACK 的长度。</p>
 <p>正如你在代码中看到的，我们利用了 <strong>union</strong>——一种可以在内存中的同一位置存储多种表示形式的结构——来表示一个字节。换句话说，与普通的 <code>struct</code> 不同，<code>union</code> 中只能有一个字段具有值（在此例中是byte或bits）。它们的内存位置是共享的，因此，通过使用<strong>位字段</strong>，我们可以有效地操作单个比特或字节的一部分。</p>
@@ -564,10 +562,7 @@
 
 <h2 id="二进制流编解码实现"><a href="#二进制流编解码实现" class="headerlink" title="二进制流编解码实现"></a>二进制流编解码实现</h2><p>在继续实现 <code>src/mqtt.h</code> 上所有定义的函数之前，我们需要实现一些辅助函数，以简化每个接收到的数据包的编码解码过程。</p>
 <p>让我们快速搞定这部分，这一块只是简单的序列化和反序列化操作而已（记得用Big-endian就行）。</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/pack.h</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">ifndef</span> <span class="token expression">PACK_H</span></span>
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">PACK_H</span></span>
-
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/pack.h</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
 <span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdint.h></span></span>
 
 <span class="token comment">/* 从数据流中获得数据的方法 */</span>
@@ -591,7 +586,7 @@
 <span class="token comment">// 将 len 个字节追加到bytes中</span>
 <span class="token keyword">void</span> <span class="token function">pack_bytes</span><span class="token punctuation">(</span><span class="token class-name">uint8_t</span> <span class="token operator">*</span><span class="token operator">*</span><span class="token punctuation">,</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">endif</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>以及相应的实现</p>
 <figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/pack.c</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
@@ -1157,8 +1152,8 @@
 
 <h1 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h1><p>从零开始MQTT broker的第一部分就这样结束了，我们做了两个模块，一个根据 OASIS 定义的标准描述MQTT协议结构，另一个则用来处理编解码操作。</p>
 <p>此时我们的文件结构是这样的：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">sol&#x2F;
- ├── src&#x2F;
+<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><code class="language-text">sol/
+ ├── src/
  │    ├── mqtt.h
  │    ├── mqtt.c
  │    ├── pack.h
@@ -1202,6 +1197,8 @@
         <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="print-no-link">#网络编程</a>
       
         <a href="/tags/%E7%BF%BB%E8%AF%91/" class="print-no-link">#翻译</a>
+      
+        <a href="/tags/%E7%89%A9%E8%81%94%E7%BD%91/" class="print-no-link">#物联网</a>
       
     </div>
   
