@@ -16,15 +16,15 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="原文 n2n Frequently Asked Questions项目地址  n2n 常见问题">
+    <meta name="description" content="原文 n2n Frequently Asked Questions">
 <meta property="og:type" content="article">
 <meta property="og:title" content="[翻译] n2n 常见问题">
 <meta property="og:url" content="https://vitsumoc.github.io/2023/12/07/translate-n2n-faq.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="原文 n2n Frequently Asked Questions项目地址  n2n 常见问题">
+<meta property="og:description" content="原文 n2n Frequently Asked Questions">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-12-07T08:55:07.000Z">
-<meta property="article:modified_time" content="2023-12-08T07:42:33.954Z">
+<meta property="article:modified_time" content="2023-12-22T01:17:30.781Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="网络编程">
 <meta property="article:tag" content="网络工具">
@@ -278,11 +278,11 @@
               <div class="markdown-body">
                 
                 <blockquote>
-<p>原文 <a target="_blank" rel="noopener" href="https://github.com/ntop/n2n/blob/dev/doc/Faq.md">n2n Frequently Asked Questions</a><br><a target="_blank" rel="noopener" href="https://github.com/ntop/n2n">项目地址</a></p>
+<p>原文 <a target="_blank" rel="noopener" href="https://github.com/ntop/n2n/blob/dev/doc/Faq.md">n2n Frequently Asked Questions</a></p>
 </blockquote>
-<h1 id="n2n-常见问题"><a href="#n2n-常见问题" class="headerlink" title="n2n 常见问题"></a>n2n 常见问题</h1><span id="more"></span>
+<span id="more"></span>
 
-<h2 id="发布"><a href="#发布" class="headerlink" title="发布"></a>发布</h2><h3 id="哪里能找到Windows系统的n2n软件？"><a href="#哪里能找到Windows系统的n2n软件？" class="headerlink" title="哪里能找到Windows系统的n2n软件？"></a>哪里能找到Windows系统的n2n软件？</h3><p>我们没有在<code>release</code>中发布Windows版本的n2n，但是我们的自动化测试流程会创建他们。你可以点击项目界面中的 <code>Actions</code>，选择 <code>Testing</code>，进入最近一次的运行实例，在界面最下方的 <code>Artifacts</code> 处下载 <code>binaries</code>，其中就包括了编译好的windows版本<code>n2n</code>。通常来说你可以使用 <code>x86_64-w64-mingw32\usr\sbin</code> 路径下的版本。</p>
+<h1 id="n2n-常见问题"><a href="#n2n-常见问题" class="headerlink" title="n2n 常见问题"></a>n2n 常见问题</h1><h2 id="发布"><a href="#发布" class="headerlink" title="发布"></a>发布</h2><h3 id="哪里能找到Windows系统的n2n软件？"><a href="#哪里能找到Windows系统的n2n软件？" class="headerlink" title="哪里能找到Windows系统的n2n软件？"></a>哪里能找到Windows系统的n2n软件？</h3><p>我们没有在<code>release</code>中发布Windows版本的n2n，但是我们的自动化测试流程会创建他们。你可以点击项目界面中的 <code>Actions</code>，选择 <code>Testing</code>，进入最近一次的运行实例，在界面最下方的 <code>Artifacts</code> 处下载 <code>binaries</code>，其中就包括了编译好的windows版本<code>n2n</code>。通常来说你可以使用 <code>x86_64-w64-mingw32\usr\sbin</code> 路径下的版本。</p>
 <p>此外，正如我们的<a target="_blank" rel="noopener" href="https://github.com/ntop/n2n#further-readings-and-related-projects">README</a>中提到的，luckytu 一直在更新<code>n2n</code>的<a target="_blank" rel="noopener" href="https://github.com/lucktu/n2n">Windows版本</a>，你也可以在他那里直接下载编译后的软件。</p>
 <h2 id="Supernode"><a href="#Supernode" class="headerlink" title="Supernode"></a>Supernode</h2><h3 id="我想部署一个私有的，有密码保护的supernode，需要怎么设置？"><a href="#我想部署一个私有的，有密码保护的supernode，需要怎么设置？" class="headerlink" title="我想部署一个私有的，有密码保护的supernode，需要怎么设置？"></a>我想部署一个私有的，有密码保护的supernode，需要怎么设置？</h3><p>你可以直接配置 <code>community.list</code> 文件，在其中设置一个 <code>&lt;community name&gt;</code> (输入单行文本即可) ，然后把这个 <code>&lt;community name&gt;</code> 当作您的密码。</p>
 <p>在启动 <code>supernode</code> 时，记得加上 <code>-c &lt;community file&gt;</code> 参数指定配置文件。这样，只有设置了 <code>-c &lt;community name&gt;</code> 的 <code>edge</code> 可以使用 <code>supernode</code>。</p>
