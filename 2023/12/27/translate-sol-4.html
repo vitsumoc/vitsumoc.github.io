@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://vitsumoc.github.io/2023/12/27/translate-sol-4/hashtable.png">
 <meta property="article:published_time" content="2023-12-27T02:08:27.000Z">
-<meta property="article:modified_time" content="2023-12-27T09:22:35.169Z">
+<meta property="article:modified_time" content="2023-12-28T11:22:09.171Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="网络编程">
 <meta property="article:tag" content="翻译">
@@ -286,8 +286,8 @@
 </blockquote>
 <span id="more"></span>
 
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在继续实现所有的 <code>handler</code> 之前，我们先设计和实现一些最常用的数据结构，包括 <strong>hashtable</strong>，<strong>list</strong> 和 <strong>trie</strong>。</p>
-<p><strong>trie</strong> 不是我们当前就用到的东西，但是在我们后续处理 <strong>topic</strong> 时会用到他。</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在继续实现所有的 <code>handler</code> 之前，我们先设计和实现一些最常用的数据结构，包括 <strong>哈希表(hashtable)<strong>，</strong>列表(list)</strong> 和 **特里树(trie)**。</p>
+<p><strong>特里树</strong> 不是我们当前就用到的东西，但是在我们后续处理 <strong>主题</strong> 时会用到他。</p>
 <p>也许实现这些数据结构这件事情对于我们这个项目来说有点过于底层了，也确实有很多成熟的实现可以拿来用。但是我个人比较喜欢在稍微有些规模的项目中自己实现数据结构，一方面是这样方便于之后随着项目需求对这些数据结构进行改进，另一方面是，实现数据结构的过程也确实是一个非常好的学习和探索的机会。</p>
 <h1 id="哈希表"><a href="#哈希表" class="headerlink" title="哈希表"></a>哈希表</h1><p>让我们从一个简单的哈希表开始，哈希表本质上是一个数组，他使用哈希值（下图中的Hashval % Bucketsize）作为存储我们信息的索引，并且试图尽可能的减少冲突情况（例如两个key计算出了同样的哈希值）。</p>
 <p><img src="/2023/12/27/translate-sol-4/hashtable.png" srcset="/img/loading.gif" lazyload alt="哈希表示意"></p>
@@ -1015,7 +1015,7 @@ List <span class="token operator">*</span><span class="token function">list_push
 <li>哈希表</li>
 <li>列表</li>
 </ul>
-<p>下一个要实现的数据结构是 <strong>trie</strong>，他可以让我们轻松的维护我们的主题和主题的分层结构。</p>
+<p>下一个要实现的数据结构是 <strong>特里树</strong>，他可以让我们轻松的维护我们的主题和主题的分层结构。</p>
 
                 
               </div>
@@ -1113,6 +1113,12 @@ List <span class="token operator">*</span><span class="token function">list_push
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2023/12/28/translate-sol-5.html" title="[翻译]Sol - 从零开始的MQTT broker - 第五部分：主题树">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">[翻译]Sol - 从零开始的MQTT broker - 第五部分：主题树</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
