@@ -24,7 +24,7 @@
 <meta property="og:description" content="原文 Sol - An MQTT broker from scratch. Part 3 - Server">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-12-22T01:44:08.000Z">
-<meta property="article:modified_time" content="2023-12-27T02:00:01.375Z">
+<meta property="article:modified_time" content="2023-12-29T03:05:29.662Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="网络编程">
 <meta property="article:tag" content="翻译">
@@ -225,7 +225,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.8k 字
+          2.9k 字
         
       </span>
     
@@ -236,7 +236,7 @@
         
         
         
-          24 分钟
+          25 分钟
         
       </span>
     
@@ -283,7 +283,7 @@
 </blockquote>
 <span id="more"></span>
 
-<p>这一部分我们会实现我们程序中的服务功能，通过之前在 <a target="_blank" rel="noopener" href="https://codepr.github.io/posts/sol-mqtt-broker-p2/">part-2</a> 中实现的 <code>network</code> 模块，我们可以比较轻松的接收并处理在 <a target="_blank" rel="noopener" href="https://codepr.github.io/posts/sol-mqtt-broker/">part-1</a> 中定义好的各种 <code>MQTT</code> 数据包。</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>这一部分我们会实现我们程序中的服务功能，通过之前在 <a target="_blank" rel="noopener" href="https://codepr.github.io/posts/sol-mqtt-broker-p2/">part-2</a> 中实现的 <code>network</code> 模块，我们可以比较轻松的接收并处理在 <a target="_blank" rel="noopener" href="https://codepr.github.io/posts/sol-mqtt-broker/">part-1</a> 中定义好的各种 <code>MQTT</code> 数据包。</p>
 <h1 id="服务端定义"><a href="#服务端定义" class="headerlink" title="服务端定义"></a>服务端定义</h1><p>我们的头文件非常简单，唯一向外提供的函数只有 <code>start_server</code>，他也只需要接收两个参数：</p>
 <ul>
 <li>一个IP地址</li>
@@ -311,7 +311,7 @@
 <span class="token comment">// 启动服务的函数</span>
 <span class="token keyword">int</span> <span class="token function">start_server</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
-<h1 id="服务端实现"><a href="#服务端实现" class="headerlink" title="服务端实现"></a>服务端实现</h1><p>实现的部分比我一开始预想的要庞大一些，所有我们所需的 <code>handler</code> 和 回调函数都会在这里定义。所以我们首先来实现三个最基础的回调函数，这三个函数是任何服务器都必不可少的：</p>
+<h1 id="服务端实现"><a href="#服务端实现" class="headerlink" title="服务端实现"></a>服务端实现</h1><p>实现的部分比我一开始预想的要庞大一些，所有我们所需的 <code>处理器(handler)</code> 和 回调函数都会在这里定义。所以我们首先来实现三个最基础的回调函数，这三个函数是任何服务器都必不可少的：</p>
 <ul>
 <li>用于建立连接的 <code>on_accept</code></li>
 <li>用于读取事件的 <code>on_read</code></li>
@@ -339,20 +339,18 @@
 <span class="token comment">/* Seconds in a Sol, easter egg */</span>
 <span class="token keyword">static</span> <span class="token keyword">const</span> <span class="token keyword">double</span> SOL_SECONDS <span class="token operator">=</span> <span class="token number">88775.24</span><span class="token punctuation">;</span>
 
-<span class="token comment">/*
- * General informations of the broker, all fields will be published
- * periodically to internal topics
- */</span>
+<span class="token comment">// 服务器本身状态信息</span>
+<span class="token comment">// 所有数据都会通过一个周期性回调发布</span>
 <span class="token keyword">static</span> <span class="token keyword">struct</span> <span class="token class-name">sol_info</span> info<span class="token punctuation">;</span>
 
 <span class="token comment">// broker 的全局实例, 包括了主题树和客户端的哈希表</span>
 <span class="token keyword">static</span> <span class="token keyword">struct</span> <span class="token class-name">sol</span> sol<span class="token punctuation">;</span>
 
-<span class="token comment">// handler 接口</span>
+<span class="token comment">// 处理器接口</span>
 <span class="token comment">// 内含客户端的 closure 与数据包 mqtt_packet</span>
 <span class="token keyword">typedef</span> <span class="token keyword">int</span> <span class="token function">handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-<span class="token comment">// 命令处理 hander, 每个函数负责处理对应名称的包</span>
+<span class="token comment">// 包处理器, 每个函数负责处理对应名称的包</span>
 <span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">connect_handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">disconnect_handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">subscribe_handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -364,7 +362,7 @@
 <span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">pubcomp_handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">pingreq_handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-<span class="token comment">// handler 数组, 同样使用 type 的值作为索引</span>
+<span class="token comment">// 处理器数组, 同样使用 type 的值作为索引</span>
 <span class="token keyword">static</span> handler <span class="token operator">*</span>handlers<span class="token punctuation">[</span><span class="token number">15</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
     <span class="token constant">NULL</span><span class="token punctuation">,</span>
     connect_handler<span class="token punctuation">,</span>
@@ -442,7 +440,7 @@
         <span class="token keyword">return</span><span class="token punctuation">;</span>
     <span class="token comment">// 填充内容</span>
     client_closure<span class="token operator">-></span>fd <span class="token operator">=</span> conn<span class="token punctuation">.</span>fd<span class="token punctuation">;</span>
-    client_closure<span class="token operator">-></span>obj <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    client_closure<span class="token operator">-></span>obj <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>                 <span class="token comment">// 闭包的主要对象, 这个项目中是 client 对象, 在第六部分定义</span>
     client_closure<span class="token operator">-></span>payload <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
     client_closure<span class="token operator">-></span>args <span class="token operator">=</span> client_closure<span class="token punctuation">;</span>      <span class="token comment">// 拿自己当回调参数</span>
     client_closure<span class="token operator">-></span>call <span class="token operator">=</span> on_read<span class="token punctuation">;</span>             <span class="token comment">// 数据来时触发 on_read</span>
@@ -458,7 +456,7 @@
     info<span class="token punctuation">.</span>nconnections<span class="token operator">++</span><span class="token punctuation">;</span>
     <span class="token comment">// 日志</span>
     <span class="token function">sol_info</span><span class="token punctuation">(</span><span class="token string">"New connection from %s on port %s"</span><span class="token punctuation">,</span> conn<span class="token punctuation">.</span>ip<span class="token punctuation">,</span> conf<span class="token operator">-></span>port<span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>正如你所见，我定义了两个静态函数（在C语言中，当我们不严格的追究术语时，由于这种静态函数只能被同样.c文件里的函数访问，我们可以把这种函数看作是其他OOP语言中的私有方法。）</p>
 <p><code>accept_new_client</code> 函数使用了上一篇文中 <code>network</code> 模块定义的 <code>accept_connection</code> 函数，得以从操作系统层级接收新连接并进行一些设置。<code>on_accept</code> 则是实际负责处理新链接的回调函数，他依赖 <code>accept_new_client</code> 函数。</p>
@@ -609,7 +607,7 @@ errdc<span class="token operator">:</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>我们又添加了三个静态函数，<code>recv_packet</code> 函数就像他的名字一样，依赖 <code>mqtt</code> 模块，负责持续接收数据流直到足够一个完整的 MQTT 包。另外两个分别是 <code>on_read</code> 和 <code>on_write</code>。</p>
-<p>请注意，<code>on_read</code> 和 <code>on_write</code> 使用我们之前定义的函数不停的重置对 <code>socket</code> 的监听，就像来回打乒乓球一样。例如， <code>on_read</code> 可以通过 <code>handler</code> 的返回值来决定下一次的操作是 <code>read</code> 还是 <code>write</code>，然后把客户端链接的下一个回调函数设置为 <code>on_read</code> 或者 <code>on_write</code>，当然也有可能是断开链接。比如说客户端发来的数据出现了错误，或者当客户端发来了 <code>DISCONNECT</code> 包，那么此时对应的 <code>handler</code> 返回的值就既不是 <code>REARM_W</code> 也不是 <code>REARM_R</code>。</p>
+<p>请注意，<code>on_read</code> 和 <code>on_write</code> 使用我们之前定义的函数不停的重置对 <code>socket</code> 的监听，就像来回打乒乓球一样。例如， <code>on_read</code> 可以通过 <code>处理器</code> 的返回值来决定下一次的操作是 <code>read</code> 还是 <code>write</code>，然后把客户端链接的下一个回调函数设置为 <code>on_read</code> 或者 <code>on_write</code>，当然也有可能是断开链接。比如说客户端发来的数据出现了错误，或者当客户端发来了 <code>DISCONNECT</code> 包，那么此时对应的 <code>处理器</code> 返回的值就既不是 <code>REARM_W</code> 也不是 <code>REARM_R</code>。</p>
 <p>在 <code>on_write</code> 中我们看到 <code>send_bytes</code> 传入了一个带有大小和内容的 <code>payload</code>，这里使用了我定义的一个方便的工具结构 <code>bytestring</code>，我们现在就在 <code>src/pack.h</code> and <code>src/pack.c</code> 中添加他。</p>
 <h1 id="工具-bytestring"><a href="#工具-bytestring" class="headerlink" title="工具 bytestring"></a>工具 bytestring</h1><figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/pack.h</span></div><code class="language-c"><span class="token comment">// bytestring 结构体, 提供了一个便携的保存 bytes 的方法</span>
 <span class="token comment">// 他本质上提供了一个指向最后编辑位置的指针, 和 bytes 的总长度</span>
@@ -834,7 +832,7 @@ errdc<span class="token operator">:</span>
     <span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span>
 
-<span class="token comment">// 清理哈希表中客户端链接</span>
+<span class="token comment">// 在全局哈希表中删除客户端时触发回调释放资源</span>
 <span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">client_destructor</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token operator">*</span>entry<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>entry<span class="token punctuation">)</span>
         <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
@@ -845,7 +843,7 @@ errdc<span class="token operator">:</span>
     <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
 <span class="token punctuation">&#125;</span>
 
-<span class="token comment">// 清理哈希表中的 closures</span>
+<span class="token comment">// 在全局哈希表中删除闭包时触发回调释放资源</span>
 <span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">closure_destructor</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token operator">*</span>entry<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>entry<span class="token punctuation">)</span>
         <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
@@ -860,6 +858,7 @@ errdc<span class="token operator">:</span>
 <span class="token keyword">int</span> <span class="token function">start_server</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>addr<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>port<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token comment">// 初始化 sol 全局实例</span>
     <span class="token function">trie_init</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>sol<span class="token punctuation">.</span>topics<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 确保所有的客户端和闭包都在哈希表中, 这样从哈希表删除时就可以使用回调释放资源</span>
     sol<span class="token punctuation">.</span>clients <span class="token operator">=</span> <span class="token function">hashtable_create</span><span class="token punctuation">(</span>client_destructor<span class="token punctuation">)</span><span class="token punctuation">;</span>
     sol<span class="token punctuation">.</span>closures <span class="token operator">=</span> <span class="token function">hashtable_create</span><span class="token punctuation">(</span>closure_destructor<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -902,7 +901,7 @@ errdc<span class="token operator">:</span>
     <span class="token function">hashtable_release</span><span class="token punctuation">(</span>sol<span class="token punctuation">.</span>closures<span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token function">sol_info</span><span class="token punctuation">(</span><span class="token string">"Sol v%s exiting"</span><span class="token punctuation">,</span> VERSION<span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h1 id="定时通报服务器状态"><a href="#定时通报服务器状态" class="headerlink" title="定时通报服务器状态"></a>定时通报服务器状态</h1><p>好的，我们现在有了一个（几乎）功能齐全的服务器，它使用我们的回调系统来处理流量。 接下来我们需要在头文件上添加一些代码，例如我们刚才使用的 <code>info</code> 结构体，还有全局的名为 <code>sol</code> 的实例，这些我们都还没有定义。</p>
 <figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/server.h</span></div><code class="language-c"><span class="token comment">// 全局 info</span>
@@ -1036,7 +1035,7 @@ errdc<span class="token operator">:</span>
 <span class="token keyword">static</span> <span class="token keyword">struct</span> <span class="token class-name">sol</span> sol<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h1 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h1><p>我们还需要补充一些代码，才能使我们上面的代码能够运行。比如，<code>struct sol</code> 的定义、<code>closure_destructor</code> 函数，哈希表的定义，比如 <code>topic</code> 的存储和解析方法。这一切我们都需要去完成。</p>
-<p>在下一部分我们会编写处理各种MQTT数据包的<code>handler</code>，根据数据包的类型和内容不同，服务器会表现出不同的行为。</p>
+<p>在下一部分我们会编写处理各种MQTT数据包的 <code>处理器</code>，根据数据包的类型和内容不同，服务器会表现出不同的行为。</p>
 
                 
               </div>
