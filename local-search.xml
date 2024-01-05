@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>go轻量级事件库：gookit-event</title>
+    <link href="/2024/01/04/gookit-event.html"/>
+    <url>/2024/01/04/gookit-event.html</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>项目链接 <a href="https://github.com/gookit/event">gookit&#x2F;event</a></p></blockquote><span id="more"></span><p>项目介绍：</p><blockquote><p>Go实现的轻量级的事件管理、调度程序库, 支持设置监听器的优先级, 支持使用通配符来进行一组事件的监听</p><ul><li>支持自定义创建预定义的事件对象</li><li>支持对一个事件添加多个监听器</li><li>支持设置事件监听器的优先级，优先级越高越先触发</li><li>支持通过通配符 * 来进行一组事件的匹配监听.</li><li>ModeSimple - 注册 app.* 事件的监听，触发 app.run app.end 时，都将同时会触发 app.* 监听器</li><li>ModePath - NEW * 只匹配一段非 . 的字符,可以进行更精细的监听; ** 匹配任意多个字符,只能用于开头或结尾</li><li>支持直接使用通配符 * 来监听全部事件的触发</li><li>支持触发事件时投递到 chan, 异步进行消费处理. 触发: Async(), FireAsync()</li><li>完善的单元测试，单元覆盖率 &gt; 95%</li></ul></blockquote><p>我非常喜欢这种类型的项目，小巧、专注、恰到好处的feature。</p><p>当前这个项目可能没有经过足够的检验，可能存在一些bug，但是没有关系，他的代码足够简单，即便他产生了问题也可以轻松修复。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>golang</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>golang</tag>
+      
+      <tag>库</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>[翻译]Sol - 从零开始的MQTT broker - 特别篇：重构与事件循环</title>
     <link href="/2024/01/03/translate-sol-bonus.html"/>
     <url>/2024/01/03/translate-sol-bonus.html</url>
