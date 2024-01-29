@@ -282,7 +282,11 @@
 
 <h1 id="SSH数据包基本格式"><a href="#SSH数据包基本格式" class="headerlink" title="SSH数据包基本格式"></a>SSH数据包基本格式</h1><p>SSH的数据包加密后分块传输，每次传输的实际包长度都应为密码块大小的整数倍或8</p>
 <p>每个加密后的数据包都由如下结构构成</p>
-<figure class="highlight c"><figcaption><span>c</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c">uint32    packet_length;<br>byte      padding_length;<br>byte[n1]  payload; <span class="hljs-comment">// n1 = packet_length - padding_length - 1</span><br>byte[n2]  random_padding; <span class="hljs-comment">// n2 = padding_length</span><br>byte[m]   mac(Message_Authentication_Code - MAC); <span class="hljs-comment">// m = mac_length</span><br></code></pre></td></tr></table></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>c</span></div><code class="language-c">uint32    packet_length<span class="token punctuation">;</span>
+byte      padding_length<span class="token punctuation">;</span>
+byte<span class="token punctuation">[</span>n1<span class="token punctuation">]</span>  payload<span class="token punctuation">;</span> <span class="token comment">// n1 = packet_length - padding_length - 1</span>
+byte<span class="token punctuation">[</span>n2<span class="token punctuation">]</span>  random_padding<span class="token punctuation">;</span> <span class="token comment">// n2 = padding_length</span>
+byte<span class="token punctuation">[</span>m<span class="token punctuation">]</span>   <span class="token function">mac</span><span class="token punctuation">(</span>Message_Authentication_Code <span class="token operator">-</span> MAC<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// m = mac_length</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <ul>
 <li><p>packet_length：数据载荷的长度，不包括<code>mac</code>部分和<code>packet_length</code>本身。在进行加密协商完成后，传输的<code>packet_length</code>也会被加密</p>
