@@ -16,25 +16,27 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="开始一个新的项目总是让人兴奋，虽然能意识到这意味着之后几个月甚至几年的努力，但是还是忍不住去幻想一个项目蓬勃发展，枝繁叶茂后带给人的满足感。">
+    <meta name="description" content="首先我们要按照既定思路搭建基本的软件框架：两个仓库，一个是 MQTT 客户端，另一个是图形化测试工具，图形化测试工具需要依赖我们的客户端。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="vmq-从零开始的MQTT客户端-1-简介">
-<meta property="og:url" content="https://vitsumoc.github.io/2024/02/04/vmq-mqttclient-1.html">
+<meta property="og:title" content="vmq-从零开始的MQTT客户端-2-框架">
+<meta property="og:url" content="https://vitsumoc.github.io/2024/02/05/vmq-mqttclient-2.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="开始一个新的项目总是让人兴奋，虽然能意识到这意味着之后几个月甚至几年的努力，但是还是忍不住去幻想一个项目蓬勃发展，枝繁叶茂后带给人的满足感。">
+<meta property="og:description" content="首先我们要按照既定思路搭建基本的软件框架：两个仓库，一个是 MQTT 客户端，另一个是图形化测试工具，图形化测试工具需要依赖我们的客户端。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-02-04T08:43:01.000Z">
-<meta property="article:modified_time" content="2024-02-05T05:35:33.333Z">
+<meta property="og:image" content="https://vitsumoc.github.io/2024/02/05/vmq-mqttclient-2/test.png">
+<meta property="article:published_time" content="2024-02-05T07:21:20.000Z">
+<meta property="article:modified_time" content="2024-02-06T01:44:31.308Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="网络编程">
 <meta property="article:tag" content="golang">
 <meta property="article:tag" content="MQTT">
 <meta property="article:tag" content="vmq">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://vitsumoc.github.io/2024/02/05/vmq-mqttclient-2/test.png">
   
   
   
-  <title>vmq-从零开始的MQTT客户端-1-简介 - Thinking...</title>
+  <title>vmq-从零开始的MQTT客户端-2-框架 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -202,7 +204,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">vmq-从零开始的MQTT客户端-1-简介</span>
+            <span id="subtitle">vmq-从零开始的MQTT客户端-2-框架</span>
           
         </div>
 
@@ -213,8 +215,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-02-04 16:43" pubdate>
-          2024年2月4日 下午
+        <time datetime="2024-02-05 15:21" pubdate>
+          2024年2月5日 下午
         </time>
       </span>
     
@@ -225,7 +227,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          822 字
+          417 字
         
       </span>
     
@@ -236,7 +238,7 @@
         
         
         
-          7 分钟
+          4 分钟
         
       </span>
     
@@ -273,30 +275,44 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">vmq-从零开始的MQTT客户端-1-简介</h1>
+            <h1 id="seo-header">vmq-从零开始的MQTT客户端-2-框架</h1>
             
             
               <div class="markdown-body">
                 
-                <p>开始一个新的项目总是让人兴奋，虽然能意识到这意味着之后几个月甚至几年的努力，但是还是忍不住去幻想一个项目蓬勃发展，枝繁叶茂后带给人的满足感。</p>
+                <p>首先我们要按照既定思路搭建基本的软件框架：两个仓库，一个是 MQTT 客户端，另一个是图形化测试工具，图形化测试工具需要依赖我们的客户端。</p>
 <span id="more"></span>
 
-<h1 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h1><p>近四年来我一直在一家物联网公司工作，少不了与 golang 和 MQTT 打交道。在进行每一个项目的复盘和总结时，我总是会说这几句话：“这个项目其实这样设计会更好”、“如果一开始就知道，那么这个项目应该这样去设计”、“下个项目我们要尽量使用这样的设计”。</p>
-<p>我认为这种现象是一种被动学习，因为我对技术了解的不够广泛，或者不够深刻彻底，所以才会在项目中频频遇到预料之外的问题，然后在解决的过程中学习到很多。虽然这样也解决了项目问题，也获得了学习进步，但是实际上浪费了一些公司的资源（用于陪我走弯路）。</p>
-<p>所以，我需要更深入的了解我正在做的事情，无论是为了我自己的成长还是为了降低公司的成本。这篇 <a href="https://vitsumoc.github.io/2024/01/06/mqtt-v5-0-chinese.html">MQTT 5.0 中文文档</a> 就是我做的尝试之一，而对文档进行实现就是我要做的尝试之二，也就是如本文标题所说的，<strong>从零开始的 MQTT 客户端</strong>。</p>
-<h1 id="为什么是vmq"><a href="#为什么是vmq" class="headerlink" title="为什么是vmq"></a>为什么是vmq</h1><p>vmq 是一个从零开始的，纯 golang 编写的 MQTT 客户端。好吧，那么为什么是这个选择？</p>
-<p>为什么是 MQTT 客户端？</p>
-<ul>
-<li>虽然是个业余时间制作的，半教学性质的项目，但我仍希望有一天 vmq 成长为工业级的软件。对于这样级别的目标来说，MQTT broker 显然需要投入更多的资源，从客户端开始则要简单许多。</li>
-</ul>
-<p>为什么叫 vmq？</p>
-<ul>
-<li>我喜欢三个字母的软件，例如 vue。</li>
-</ul>
-<h1 id="vmq的将来会如何"><a href="#vmq的将来会如何" class="headerlink" title="vmq的将来会如何"></a>vmq的将来会如何</h1><p>老实说，我现在也不知道 vmq 将来会如何。也许有一天我无法继续坚持，vmq 在诞生之前就消失了、也可能我完成了 vmq，然后在我的项目中不断的使用，最后成为了我们公司的基础库之一、也有可能 vmq 被更多人使用，我的虚荣心获得了极大的满足。总之现在谈论这些实在是为时尚早，此时此刻的 vmq 只是一个计划。</p>
-<p>此刻的 vmq 将由三个部分组成，<a target="_blank" rel="noopener" href="https://github.com/vitsumoc/vmq">vmq</a> 是我即将要实现的 MQTT 客户端，<a target="_blank" rel="noopener" href="https://github.com/vitsumoc/vmq-test-gui">vmq-test-gui</a> 是配套的图形化测试工具，<a href="https://vitsumoc.github.io/">此博客</a> 中的系列文档则是对实现过程的教学。</p>
-<p>vmq 预期会出一个教学版本，只对 MQTT 协议做最基本的支持，例如建立连接、断开、订阅、发布、会话等此类最基本的功能，此后的功能实现不会再有按步骤的教学博文，但仍会有一些讨论和总结性质的博文。</p>
-<h1 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h1><p>本章没有实质的代码，从下一个篇章开始，我们会做一个 Hello World 的项目，完成项目的创建、引用、基础的图形化界面，最终在控制台输出一段文本，我很喜欢以此作为一个项目的起点。</p>
+<h1 id="最初的vmq"><a href="#最初的vmq" class="headerlink" title="最初的vmq"></a>最初的vmq</h1><p>我们已经有了两个仓库，vmq 和 vmq-test-gui。首先让我们的 vmq 提供一个可以被外部访问的函数：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>test.go</span></div><code class="language-go"><span class="token keyword">func</span> <span class="token function">HelloVmq</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">&#123;</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"I'm vmq"</span><span class="token punctuation">)</span>
+	<span class="token keyword">return</span> <span class="token string">"I'm vmq"</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>现在只是一个 Hello World，但是以后他可以是一个创建连接的函数、创建客户端的函数、执行订阅的函数等等。总之原理是一样的，这是一个可以被 vmq-test-gui 调用的函数。</p>
+<h1 id="最初的gui"><a href="#最初的gui" class="headerlink" title="最初的gui"></a>最初的gui</h1><p>接下来是 vmq-test-gui 项目，既然是 gui，代表着我们需要一个图形化库来显示窗口，我没有这方面的经验，凭感觉选择了 <a target="_blank" rel="noopener" href="https://fyne.io/">fyne</a>。</p>
+<p>参考 fyne 中的 Hello World 示例，只不过是把 vmq 塞进去：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>test.go</span></div><code class="language-go"><span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	a <span class="token operator">:=</span> app<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	w <span class="token operator">:=</span> a<span class="token punctuation">.</span><span class="token function">NewWindow</span><span class="token punctuation">(</span><span class="token string">"Hello"</span><span class="token punctuation">)</span>
+
+	hello <span class="token operator">:=</span> widget<span class="token punctuation">.</span><span class="token function">NewLabel</span><span class="token punctuation">(</span><span class="token string">"Hello Fyne!"</span><span class="token punctuation">)</span>
+	w<span class="token punctuation">.</span><span class="token function">SetContent</span><span class="token punctuation">(</span>container<span class="token punctuation">.</span><span class="token function">NewVBox</span><span class="token punctuation">(</span>
+		hello<span class="token punctuation">,</span>
+		widget<span class="token punctuation">.</span><span class="token function">NewButton</span><span class="token punctuation">(</span><span class="token string">"Hi!"</span><span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			hello<span class="token punctuation">.</span><span class="token function">SetText</span><span class="token punctuation">(</span>vmq<span class="token punctuation">.</span><span class="token function">HelloVmq</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+	<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+	w<span class="token punctuation">.</span><span class="token function">ShowAndRun</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>到这一步的结果符合我们的预期：</p>
+<p><img src="/2024/02/05/vmq-mqttclient-2/test.png" srcset="/img/loading.gif" lazyload></p>
+<h1 id="接下来"><a href="#接下来" class="headerlink" title="接下来"></a>接下来</h1><p>至此为止我们做的事情都非常简单，而接下来的事情会开始有一些挑战性。</p>
+<p>我比较喜欢用需求来推动软件的功能，因为我觉得合理的软件设计是很难凭空产生的，但是合理的需求是易于理解和提出的，一旦有了合理的需求，那么能够实现需求的设计就可以视为合理的软件设计。</p>
+<p>对于 vmq 也是一样，vmq-test-gui 就是 vmq 的需求方，我们的开发总是会从 gui 开始，先做出需要功能的界面，再在 vmq 中实现功能。</p>
+<p>图形化界面开发会有一些难度，fyne 的学习应该也会有一些成本，但这些都会是值得的。</p>
 
                 
               </div>
@@ -348,8 +364,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>vmq-从零开始的MQTT客户端-1-简介</div>
-      <div>https://vitsumoc.github.io/2024/02/04/vmq-mqttclient-1.html</div>
+      <div>vmq-从零开始的MQTT客户端-2-框架</div>
+      <div>https://vitsumoc.github.io/2024/02/05/vmq-mqttclient-2.html</div>
     </div>
     <div class="license-meta">
       
@@ -361,7 +377,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年2月4日</div>
+          <div>2024年2月5日</div>
         </div>
       
       
@@ -393,18 +409,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/02/05/vmq-mqttclient-2.html" title="vmq-从零开始的MQTT客户端-2-框架">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">vmq-从零开始的MQTT客户端-2-框架</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/01/06/mqtt-v5-0-chinese.html" title="MQTT 5.0 中文文档">
-                        <span class="hidden-mobile">MQTT 5.0 中文文档</span>
+                      <a href="/2024/02/04/vmq-mqttclient-1.html" title="vmq-从零开始的MQTT客户端-1-简介">
+                        <span class="hidden-mobile">vmq-从零开始的MQTT客户端-1-简介</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
