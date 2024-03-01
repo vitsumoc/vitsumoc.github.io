@@ -1,0 +1,750 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="vc">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言目的是想在办公室使用家里的服务器 家里有不固定的公网IP，办公室有固定的公网IP，因此打算使用办公室服务器做Server 为什么不用frp？：因为想获得一个完整的网络服务，而frp只能做端口映射，如果开发过程中新增端口，需要修改frp就很麻烦">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用n2n连接不同局域网设备">
+<meta property="og:url" content="https://vitsumoc.github.io/n2nBeginner.html">
+<meta property="og:site_name" content="Thinking...">
+<meta property="og:description" content="前言目的是想在办公室使用家里的服务器 家里有不固定的公网IP，办公室有固定的公网IP，因此打算使用办公室服务器做Server 为什么不用frp？：因为想获得一个完整的网络服务，而frp只能做端口映射，如果开发过程中新增端口，需要修改frp就很麻烦">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://vitsumoc.github.io/n2nBeginner/installVerify.png">
+<meta property="og:image" content="https://vitsumoc.github.io/n2nBeginner/supernodeVerify.png">
+<meta property="og:image" content="https://vitsumoc.github.io/n2nBeginner/edgeVerify.png">
+<meta property="og:image" content="https://vitsumoc.github.io/n2nBeginner/gwRoute.png">
+<meta property="og:image" content="https://vitsumoc.github.io/n2nBeginner/trace.png">
+<meta property="og:image" content="https://vitsumoc.github.io/n2nBeginner/trace2.png">
+<meta property="og:image" content="https://vitsumoc.github.io/n2nBeginner/trace3.png">
+<meta property="article:published_time" content="2023-12-06T06:37:00.000Z">
+<meta property="article:modified_time" content="2024-03-01T09:12:43.764Z">
+<meta property="article:author" content="vc">
+<meta property="article:tag" content="网络编程">
+<meta property="article:tag" content="网络工具">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://vitsumoc.github.io/n2nBeginner/installVerify.png">
+  
+  
+  
+  <title>使用n2n连接不同局域网设备 - Thinking...</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"vitsumoc.github.io","root":"/","version":"1.9.6","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Thinking...</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">使用n2n连接不同局域网设备</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-12-06 14:37" pubdate>
+          2023年12月6日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          9 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">使用n2n连接不同局域网设备</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>目的是想在办公室使用家里的服务器</p>
+<p>家里有不固定的公网IP，办公室有固定的公网IP，因此打算使用办公室服务器做Server</p>
+<p>为什么不用frp？：因为想获得一个完整的网络服务，而frp只能做端口映射，如果开发过程中新增端口，需要修改frp就很麻烦</p>
+<span id="more"></span>
+
+<h1 id="n2n简介"><a href="#n2n简介" class="headerlink" title="n2n简介"></a>n2n简介</h1><p><code>n2n</code> 是一个开源项目，地址在这里：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/ntop/n2n">https://github.com/ntop/n2n</a></p>
+<p><code>n2n</code> 是一个二层VPN技术，他能在家里的服务器和办公室的服务器之间创建一个局域网链接</p>
+<p><code>n2n</code> 网络由 <code>supernode</code> 和 <code>edge</code> 组成，可以简单理解为同一 <code>supernode</code> 下的所有 <code>edge</code> 都处在同一个局域网中。</p>
+<h1 id="网络环境"><a href="#网络环境" class="headerlink" title="网络环境"></a>网络环境</h1><h2 id="办公室网络："><a href="#办公室网络：" class="headerlink" title="办公室网络："></a>办公室网络：</h2><ul>
+<li>网段：192.168.34.0&#x2F;24</li>
+<li>网关：192.168.34.1</li>
+<li>网关公网地址：88.88.88.88</li>
+<li>服务器地址：192.168.34.194</li>
+</ul>
+<h2 id="家庭网络"><a href="#家庭网络" class="headerlink" title="家庭网络"></a>家庭网络</h2><ul>
+<li>网段：192.168.0.0&#x2F;24</li>
+<li>网关：192.168.0.1</li>
+<li>网关公网地址：不固定</li>
+<li>服务器地址：192.168.0.12</li>
+</ul>
+<h2 id="规划n2n网络"><a href="#规划n2n网络" class="headerlink" title="规划n2n网络"></a>规划n2n网络</h2><p>由于办公室有固定的公网地址，就由办公室服务器充当 <code>supernode</code>，同时家庭服务器和办公室服务器都是此 <code>supernode</code> 下的 <code>edge</code><br><code>n2n</code> 会形成一个新的局域网，规划如下：</p>
+<ul>
+<li>网段：10.0.34.0&#x2F;24</li>
+<li>网关：无</li>
+<li>办公室服务器：10.0.34.21</li>
+<li>家庭服务器：10.0.34.41</li>
+</ul>
+<h1 id="实施"><a href="#实施" class="headerlink" title="实施"></a>实施</h1><h2 id="下载安装n2n"><a href="#下载安装n2n" class="headerlink" title="下载安装n2n"></a>下载安装n2n</h2><p>在办公室服务器和家庭服务器都下载并安装 <code>n2n</code>：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/ntop/n2n/releases">https://github.com/ntop/n2n/releases</a></p>
+<p>安装完成后，服务器中会自动生成两个服务 <code>supernode</code> 和 <code>edge</code></p>
+<p>配置文件位于 <code>/etc/n2n/</code></p>
+<p><img src="/n2nBeginner/installVerify.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="配置办公室服务器"><a href="#配置办公室服务器" class="headerlink" title="配置办公室服务器"></a>配置办公室服务器</h2><p>办公室服务器需要承担三个职能：充当 <code>supernode</code>，充当 <code>edge</code>，转发其他办公室设备到家庭服务器的网络包</p>
+<h3 id="配置supernode"><a href="#配置supernode" class="headerlink" title="配置supernode"></a>配置supernode</h3><p>配置 <code>/etc/n2n/community.list</code> 文件，指定community名称</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><div class="caption"><span>community.list</span></div><code class="language-text">com8888 # community名称<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+
+<p>复制 <code>supernode.conf.sample</code> 文件，并修改配置内容</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><div class="caption"><span>bash</span></div><code class="language-bash"><span class="token function">cp</span> /etc/n2n/supernode.conf.sample /etc/n2n/supernode.conf<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><div class="caption"><span>bash</span></div><code class="language-bash"><span class="token function">vi</span> /etc/n2n/supernode.conf  <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+
+<figure><div class="code-wrapper"><pre class="line-numbers language-conf" data-language="conf"><div class="caption"><span>supernode.conf</span></div><code class="language-conf">-p&#x3D;7777 # 指定supernode服务端口
+-c&#x3D;&#x2F;etc&#x2F;n2n&#x2F;community.list # 指定引用的community文件<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+
+<p>启动supernode</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><div class="caption"><span>shell</span></div><code class="language-bash">systemctl <span class="token builtin class-name">enable</span> supernode
+systemctl start supernode<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+
+<p>之后可以看到 <code>supernode</code> 已经启动，并且在7777端口提供服务：</p>
+<p><img src="/n2nBeginner/supernodeVerify.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="配置edge"><a href="#配置edge" class="headerlink" title="配置edge"></a>配置edge</h3><p>配置 <code>edge</code> 使办公室服务器成为 <code>n2n</code> 网络的成员</p>
+<p>复制 <code>edge.conf.sample</code> 文件，并修改配置内容</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><div class="caption"><span>bash</span></div><code class="language-bash"><span class="token function">cp</span> /etc/n2n/edge.conf.sample /etc/n2n/edge.conf<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><div class="caption"><span>bash</span></div><code class="language-bash"><span class="token function">vi</span> /etc/n2n/edge.conf  <span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+
+<figure><div class="code-wrapper"><pre class="line-numbers language-conf" data-language="conf"><div class="caption"><span>edge.conf</span></div><code class="language-conf">-d&#x3D;n2n0 # 指定虚拟网卡名称
+-c&#x3D;com8888 # community名称
+-k&#x3D;888888 # 通讯加密密钥
+-a&#x3D;10.0.34.21 # 在n2n网络中的地址
+-l&#x3D;127.0.0.1:7777 # supernode服务地址
+-r # 允许通过n2n转发数据包<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>启动edge</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><div class="caption"><span>shell</span></div><code class="language-bash">systemctl <span class="token builtin class-name">enable</span> edge
+systemctl start edge<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+
+<p>启动后，可以看到 <code>n2n</code> 已经添加了虚拟网卡：</p>
+<p><img src="/n2nBeginner/edgeVerify.png" srcset="/img/loading.gif" lazyload></p>
+<h3 id="开启数据包转发功能"><a href="#开启数据包转发功能" class="headerlink" title="开启数据包转发功能"></a>开启数据包转发功能</h3><p>需要通过办公室服务器转发办公室其他电脑到家庭服务器的流量，因此需要在办公室服务器上开启数据包转发功能</p>
+<p>需要将 <code>/etc/sysctl.conf</code> 文件中的 <code>net.ipv4.ip_forward</code> 修改为 1</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><div class="caption"><span>bash</span></div><code class="language-bash"><span class="token function">vi</span> /etc/sysctl.conf<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+
+<figure><div class="code-wrapper"><pre class="line-numbers language-conf" data-language="conf"><div class="caption"><span>sysctl.conf</span></div><code class="language-conf">...
+net.ipv4.ip_forward&#x3D;1
+...<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h2 id="配置办公室网关"><a href="#配置办公室网关" class="headerlink" title="配置办公室网关"></a>配置办公室网关</h2><h3 id="添加静态路由"><a href="#添加静态路由" class="headerlink" title="添加静态路由"></a>添加静态路由</h3><p>其他办公室电脑没有到 <code>n2n</code> 网络的路由，因此数据包会发送到办公室网关</p>
+<p>此时需要配置办公室网关，添加一条指向 <code>n2n</code> 网络的静态路由，下一条为办公室服务器的办公网地址</p>
+<p><img src="/n2nBeginner/gwRoute.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="配置家庭服务器"><a href="#配置家庭服务器" class="headerlink" title="配置家庭服务器"></a>配置家庭服务器</h2><h3 id="配置edge，设置自动添加路由"><a href="#配置edge，设置自动添加路由" class="headerlink" title="配置edge，设置自动添加路由"></a>配置edge，设置自动添加路由</h3><p>家庭服务器的 <code>edge</code> 安装配置过程与办公室服务器的 <code>edge</code> 大致相同，但有两点需要注意：</p>
+<ol>
+<li>无需添加<code>-r</code>参数，因为家庭服务器不需要将来自其他设备的包转发到<code>n2n</code>网络</li>
+<li>需要添加<code>-n</code>参数，这样<code>edge</code>启动时会自动产生一条通过<code>n2n</code>网络到达办公室网络的路由</li>
+</ol>
+<figure><div class="code-wrapper"><pre class="line-numbers language-conf" data-language="conf"><div class="caption"><span>edge.conf</span></div><code class="language-conf">-d&#x3D;n2n0 # 指定虚拟网卡名称
+-c&#x3D;com8888 # community名称
+-k&#x3D;888888 # 通讯加密密钥
+-a&#x3D;10.0.34.41 # 在n2n网络中的地址
+-l&#x3D;88.88.88.88:17777 # supernode公网地址
+-n&#x3D;192.168.34.0&#x2F;24:10.0.34.21<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h1 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h1><h2 id="n2n网络验证"><a href="#n2n网络验证" class="headerlink" title="n2n网络验证"></a>n2n网络验证</h2><p>使用 <code>n2n</code> 网络地址从办公室服务器ping家庭服务器，或从家庭服务器ping办公室服务器，成功</p>
+<p>此时数据包的实际流向是 办公室服务器-&gt;办公室网关-&gt;运营商网络-&gt;家庭网关-&gt;家庭服务器</p>
+<p>由于 <code>n2n</code> vpn的配置，此时可以认为办公室服务器和家庭服务器处在同一局域网下，tracert也仅一跳可达</p>
+<p><img src="/n2nBeginner/trace.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="办公室电脑到家庭服务器网络验证"><a href="#办公室电脑到家庭服务器网络验证" class="headerlink" title="办公室电脑到家庭服务器网络验证"></a>办公室电脑到家庭服务器网络验证</h2><p>办公室电脑ping家庭服务器，成功</p>
+<p>此时数据包流向是 办公室电脑-&gt;办公室网关-&gt;办公室服务器-&gt;家庭服务器，其中办公室服务器到家庭服务器是 <code>n2n</code> 虚拟链路</p>
+<p>tracert三跳可达</p>
+<p><img src="/n2nBeginner/trace2.png" srcset="/img/loading.gif" lazyload></p>
+<h2 id="家庭服务器到办公室电脑"><a href="#家庭服务器到办公室电脑" class="headerlink" title="家庭服务器到办公室电脑"></a>家庭服务器到办公室电脑</h2><p>家庭服务器ping办公室电脑，成功</p>
+<p>此时数据包流向是 家庭服务器-&gt;办公室服务器-&gt;办公室电脑，其中家庭服务器到办公室服务器是 <code>n2n</code> 虚拟链路</p>
+<p>tracert两跳可达</p>
+<p><img src="/n2nBeginner/trace3.png" srcset="/img/loading.gif" lazyload></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%BD%91%E7%BB%9C%E5%B7%A5%E5%85%B7/" class="category-chain-item">网络工具</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="print-no-link">#网络编程</a>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E5%B7%A5%E5%85%B7/" class="print-no-link">#网络工具</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>使用n2n连接不同局域网设备</div>
+      <div>https://vitsumoc.github.io/n2nBeginner.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>vc</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年12月6日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/translate-n2n-faq.html" title="[翻译] n2n 常见问题">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">[翻译] n2n 常见问题</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/weekreport2chart.html" title="工作周报可视化">
+                        <span class="hidden-mobile">工作周报可视化</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>vitusmoc Blog, Powered by </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script  src="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

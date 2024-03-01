@@ -1,0 +1,781 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="vc">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="需求简述硬件设备使用485Modbus通讯，需使用golang编写采集程序，将数据采集至平台。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="golang与串口设备在项目中的运用">
+<meta property="og:url" content="https://vitsumoc.github.io/golangSerial.html">
+<meta property="og:site_name" content="Thinking...">
+<meta property="og:description" content="需求简述硬件设备使用485Modbus通讯，需使用golang编写采集程序，将数据采集至平台。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-11-22T03:06:28.000Z">
+<meta property="article:modified_time" content="2024-03-01T09:17:50.491Z">
+<meta property="article:author" content="vc">
+<meta property="article:tag" content="网络编程">
+<meta property="article:tag" content="golang">
+<meta property="article:tag" content="项目实践">
+<meta property="article:tag" content="串口通讯">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>golang与串口设备在项目中的运用 - Thinking...</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"vitsumoc.github.io","root":"/","version":"1.9.6","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Thinking...</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">golang与串口设备在项目中的运用</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-11-22 11:06" pubdate>
+          2023年11月22日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          520 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          5 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">golang与串口设备在项目中的运用</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="需求简述"><a href="#需求简述" class="headerlink" title="需求简述"></a>需求简述</h1><p>硬件设备使用485Modbus通讯，需使用golang编写采集程序，将数据采集至平台。</p>
+<span id="more"></span>
+
+<h1 id="方案简述"><a href="#方案简述" class="headerlink" title="方案简述"></a>方案简述</h1><p>使用串口服务器将485Modbus通讯转为TCPModbus，并将串口服务器设置为TCPserver。</p>
+<p>使用golang编写采集器，定期向串口服务器建立TCP链接，采集数据。</p>
+<h1 id="技术点与实现"><a href="#技术点与实现" class="headerlink" title="技术点与实现"></a>技术点与实现</h1><h2 id="点表"><a href="#点表" class="headerlink" title="点表"></a>点表</h2><p>通过<code>struct</code>实现点位表</p>
+<p>这里使用Raw表示原始点表数据，和通讯协议一一对应</p>
+<p>后续可将Raw结构封装至更高层的业务结构，用来实现业务数据的表示、嵌套能其他功能</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>go</span></div><code class="language-go"><span class="token keyword">type</span> StructMcuRaw <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	Ver               <span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token builtin">uint8</span> <span class="token string">`json:"ver"`</span>                                                                               <span class="token comment">// 软件版本[4]char</span>
+	Id                <span class="token builtin">uint16</span>   <span class="token string">`json:"id"`</span>                                                                                <span class="token comment">// 通信箱id</span>
+	TargetAngle       <span class="token builtin">uint16</span>   <span class="token string">`json:"targetAngle" IEC104:"yc" IEC104Name:"子阵目标角度" IEC104Unit:"°" IEC104Factor:"0.1"`</span> <span class="token comment">// 对整个子阵设置目标角度</span>
+	InitSnowDepth     <span class="token builtin">uint16</span>   <span class="token string">`json:"initSnowDepth" IEC104:"yx" IEC104Name:"标定初始雪深标志"`</span>                              <span class="token comment">// 标定初始雪深标志</span>
+	PrecipitationType <span class="token builtin">uint16</span>   <span class="token string">`json:"precipitationType"`</span>                                                                 <span class="token comment">// 降水类型</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h2 id="读取二进制数据"><a href="#读取二进制数据" class="headerlink" title="读取二进制数据"></a>读取二进制数据</h2><p>通过<code>binary</code>包，可以实现从buffer中读取数据向<code>struct</code>赋值</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>go</span></div><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>p <span class="token operator">*</span>StructMcuRaw<span class="token punctuation">)</span> <span class="token function">MCUFromByte</span><span class="token punctuation">(</span>res <span class="token operator">*</span>bytes<span class="token punctuation">.</span>Buffer<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token comment">// 软件版本[4]char</span>
+	<span class="token keyword">for</span> x <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> x <span class="token operator">&lt;</span> <span class="token number">4</span><span class="token punctuation">;</span> x<span class="token operator">++</span> <span class="token punctuation">&#123;</span>
+		binary<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>res<span class="token punctuation">,</span> binary<span class="token punctuation">.</span>BigEndian<span class="token punctuation">,</span> p<span class="token punctuation">.</span>Ver<span class="token punctuation">[</span>x<span class="token punctuation">]</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token comment">// 通信箱id</span>
+	binary<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>res<span class="token punctuation">,</span> binary<span class="token punctuation">.</span>BigEndian<span class="token punctuation">,</span> <span class="token operator">&amp;</span>p<span class="token punctuation">.</span>Id<span class="token punctuation">)</span>
+	<span class="token comment">// 对整个子阵设置目标角度</span>
+	binary<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>res<span class="token punctuation">,</span> binary<span class="token punctuation">.</span>BigEndian<span class="token punctuation">,</span> <span class="token operator">&amp;</span>p<span class="token punctuation">.</span>TargetAngle<span class="token punctuation">)</span>
+	<span class="token comment">// 标定初始雪深标志</span>
+	binary<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>res<span class="token punctuation">,</span> binary<span class="token punctuation">.</span>BigEndian<span class="token punctuation">,</span> <span class="token operator">&amp;</span>p<span class="token punctuation">.</span>InitSnowDepth<span class="token punctuation">)</span>
+	<span class="token comment">// 降水类型</span>
+	binary<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>res<span class="token punctuation">,</span> binary<span class="token punctuation">.</span>BigEndian<span class="token punctuation">,</span> <span class="token operator">&amp;</span>p<span class="token punctuation">.</span>PrecipitationType<span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h2 id="封装为query"><a href="#封装为query" class="headerlink" title="封装为query"></a>封装为query</h2><p>在本项目中，query指对单个设备的采集方法</p>
+<p>将数据读取封装成query方法，包括TCP采集过程、日志记录、包格式处理等</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>go</span></div><code class="language-go"><span class="token keyword">func</span> <span class="token function">MCUQuery</span><span class="token punctuation">(</span>conn <span class="token operator">*</span>net<span class="token punctuation">.</span>Conn<span class="token punctuation">,</span> reader <span class="token operator">*</span>bufio<span class="token punctuation">.</span>Reader<span class="token punctuation">,</span> buffer <span class="token operator">*</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> cb <span class="token operator">*</span>rs<span class="token punctuation">.</span>StructCommBox<span class="token punctuation">,</span> mcu <span class="token operator">*</span>rs<span class="token punctuation">.</span>StructMcu<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+	<span class="token comment">// 查询地址</span>
+	addInt<span class="token punctuation">,</span> err <span class="token operator">:=</span> strconv<span class="token punctuation">.</span><span class="token function">Atoi</span><span class="token punctuation">(</span>mcu<span class="token punctuation">.</span>Addr<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> err
+	<span class="token punctuation">&#125;</span>
+	<span class="token comment">// 包编号</span>
+	tcpSeq <span class="token operator">:=</span> <span class="token function">TcpSeq</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">var</span> query <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">&#123;</span>
+		<span class="token function">uint8</span><span class="token punctuation">(</span>tcpSeq <span class="token operator">/</span> <span class="token number">0x100</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">uint8</span><span class="token punctuation">(</span>tcpSeq <span class="token operator">%</span> <span class="token number">0x100</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token comment">// 编号</span>
+		<span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x06</span><span class="token punctuation">,</span> <span class="token comment">// 长度</span>
+		<span class="token function">byte</span><span class="token punctuation">(</span>addInt<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">0x03</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0xa0</span><span class="token punctuation">,</span> <span class="token number">0x00</span><span class="token punctuation">,</span> <span class="token number">0x29</span><span class="token punctuation">&#125;</span> <span class="token comment">// 指令</span>
+	<span class="token punctuation">(</span><span class="token operator">*</span>conn<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">SetWriteDeadline</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span>rs<span class="token punctuation">.</span>QUERY_DEFAULT_TIMEOUT<span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token operator">*</span>conn<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>query<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Log</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">,</span> cb<span class="token punctuation">.</span>IpAddr<span class="token punctuation">,</span> cb<span class="token punctuation">.</span>Port<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+		<span class="token keyword">return</span> err
+	<span class="token punctuation">&#125;</span>
+	<span class="token comment">// 日志</span>
+	log<span class="token punctuation">.</span><span class="token function">Log</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">,</span> cb<span class="token punctuation">.</span>IpAddr<span class="token punctuation">,</span> cb<span class="token punctuation">.</span>Port<span class="token punctuation">,</span> query<span class="token punctuation">)</span>
+	<span class="token comment">// 接收</span>
+	<span class="token punctuation">(</span><span class="token operator">*</span>conn<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">SetReadDeadline</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span>rs<span class="token punctuation">.</span>QUERY_DEFAULT_TIMEOUT<span class="token punctuation">)</span><span class="token punctuation">)</span>
+	n<span class="token punctuation">,</span> err <span class="token operator">:=</span> <span class="token punctuation">(</span><span class="token operator">*</span>reader<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span><span class="token operator">*</span>buffer<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Log</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">,</span> cb<span class="token punctuation">.</span>IpAddr<span class="token punctuation">,</span> cb<span class="token punctuation">.</span>Port<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+		<span class="token keyword">return</span> err
+	<span class="token punctuation">&#125;</span>
+	<span class="token comment">// 日志</span>
+	log<span class="token punctuation">.</span><span class="token function">Log</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">,</span> cb<span class="token punctuation">.</span>IpAddr<span class="token punctuation">,</span> cb<span class="token punctuation">.</span>Port<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token operator">*</span>buffer<span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token punctuation">:</span>n<span class="token punctuation">]</span><span class="token punctuation">)</span>
+	<span class="token comment">// 解析</span>
+	res <span class="token operator">:=</span> bytes<span class="token punctuation">.</span><span class="token function">NewBuffer</span><span class="token punctuation">(</span><span class="token operator">*</span>buffer<span class="token punctuation">)</span>
+	<span class="token comment">// TCP头</span>
+	<span class="token keyword">var</span> tcpHeader rs<span class="token punctuation">.</span>StructTCPHeader
+	tcpHeader<span class="token punctuation">.</span><span class="token function">TCPHeaderFromByte</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> tcpHeader<span class="token punctuation">.</span>Seq <span class="token operator">!=</span> tcpSeq <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> errors<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span><span class="token string">"TCP异常"</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">if</span> tcpHeader<span class="token punctuation">.</span>Len <span class="token operator">!=</span> <span class="token number">85</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> errors<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span><span class="token string">"TCP长度异常"</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token comment">// modbus头</span>
+	<span class="token keyword">var</span> mbHeader rs<span class="token punctuation">.</span>StructMudbusHeader
+	mbHeader<span class="token punctuation">.</span><span class="token function">MudbusHeaderFromByte</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span>
+	<span class="token comment">// mcu内容</span>
+	mcu<span class="token punctuation">.</span>Raw<span class="token punctuation">.</span><span class="token function">MCUFromByte</span><span class="token punctuation">(</span>res<span class="token punctuation">)</span>
+	mcu<span class="token punctuation">.</span>VUpdate <span class="token operator">=</span> <span class="token boolean">true</span> <span class="token comment">// 标记更新</span>
+	<span class="token keyword">return</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h2 id="封装为采集过程"><a href="#封装为采集过程" class="headerlink" title="封装为采集过程"></a>封装为采集过程</h2><p>最后需要将所有的采集query放置在统一的采集过程中</p>
+<p>在一次采集过程中，创建一条TCP链接，完成所有采集动作，最后断开链接</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>go</span></div><code class="language-go"><span class="token keyword">func</span> <span class="token function">Collect</span><span class="token punctuation">(</span>cb <span class="token operator">*</span>rs<span class="token punctuation">.</span>StructCommBox<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token comment">// 记录网络占用</span>
+	NetCh <span class="token operator">&lt;-</span> <span class="token boolean">true</span>
+	<span class="token keyword">defer</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token operator">&lt;-</span>NetCh
+	<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token comment">// 初始化采集标识</span>
+	<span class="token function">eraseFlag</span><span class="token punctuation">(</span>cb<span class="token punctuation">)</span>
+	<span class="token comment">// 采集结束后更新时标</span>
+	<span class="token keyword">defer</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token function">updateTs</span><span class="token punctuation">(</span>cb<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token comment">// 建链</span>
+	conn<span class="token punctuation">,</span> err <span class="token operator">:=</span> net<span class="token punctuation">.</span><span class="token function">DialTimeout</span><span class="token punctuation">(</span><span class="token string">"tcp"</span><span class="token punctuation">,</span> cb<span class="token punctuation">.</span>IpAddr<span class="token operator">+</span><span class="token string">":"</span><span class="token operator">+</span>cb<span class="token punctuation">.</span>Port<span class="token punctuation">,</span> rs<span class="token punctuation">.</span>QUERY_DEFAULT_TIMEOUT<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Log</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">,</span> cb<span class="token punctuation">.</span>IpAddr<span class="token punctuation">,</span> cb<span class="token punctuation">.</span>Port<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+		<span class="token keyword">return</span>
+	<span class="token punctuation">&#125;</span>
+	cb<span class="token punctuation">.</span>VUpdate <span class="token operator">=</span> <span class="token boolean">true</span>
+	<span class="token keyword">defer</span> conn<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token comment">// 读写缓存</span>
+	readBuf <span class="token operator">:=</span> bufio<span class="token punctuation">.</span><span class="token function">NewReader</span><span class="token punctuation">(</span>conn<span class="token punctuation">)</span>
+	buffer <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> <span class="token number">256</span><span class="token punctuation">)</span>
+	<span class="token comment">// 按mcu查询</span>
+	<span class="token keyword">for</span> x <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> x <span class="token operator">&lt;</span> <span class="token function">len</span><span class="token punctuation">(</span>cb<span class="token punctuation">.</span>Mcus<span class="token punctuation">)</span><span class="token punctuation">;</span> x<span class="token operator">++</span> <span class="token punctuation">&#123;</span>
+		<span class="token comment">// 切换MCU预留时间, 提高成功率</span>
+		time<span class="token punctuation">.</span><span class="token function">Sleep</span><span class="token punctuation">(</span>rs<span class="token punctuation">.</span>QUERY_MCU_INTERVAL<span class="token punctuation">)</span>
+		<span class="token comment">// 查mcu信息</span>
+		mcu <span class="token operator">:=</span> cb<span class="token punctuation">.</span>Mcus<span class="token punctuation">[</span>x<span class="token punctuation">]</span>
+		err <span class="token operator">=</span> cmd<span class="token punctuation">.</span><span class="token function">MCUQuery</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>conn<span class="token punctuation">,</span> readBuf<span class="token punctuation">,</span> <span class="token operator">&amp;</span>buffer<span class="token punctuation">,</span> cb<span class="token punctuation">,</span> mcu<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">return</span>
+		<span class="token punctuation">&#125;</span>
+		<span class="token comment">// 分次查跟踪器信息</span>
+		<span class="token keyword">for</span> y <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> y <span class="token operator">&lt;</span> mcu<span class="token punctuation">.</span>TracerNum<span class="token punctuation">;</span> <span class="token punctuation">&#123;</span>
+			<span class="token comment">// 切换Tracer预留时间, 提高成功率</span>
+			time<span class="token punctuation">.</span><span class="token function">Sleep</span><span class="token punctuation">(</span>rs<span class="token punctuation">.</span>QUERY_TRACER_INTERVAL<span class="token punctuation">)</span>
+			<span class="token comment">// 查询长度</span>
+			tracerLen <span class="token operator">:=</span> rs<span class="token punctuation">.</span>QUERY_TRACER_COUNT
+			<span class="token keyword">if</span> mcu<span class="token punctuation">.</span>TracerNum<span class="token operator">-</span>y <span class="token operator">&lt;</span> rs<span class="token punctuation">.</span>QUERY_TRACER_COUNT <span class="token punctuation">&#123;</span>
+				tracerLen <span class="token operator">=</span> mcu<span class="token punctuation">.</span>TracerNum <span class="token operator">-</span> y
+			<span class="token punctuation">&#125;</span>
+			err <span class="token operator">=</span> cmd<span class="token punctuation">.</span><span class="token function">TracerQuery</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>conn<span class="token punctuation">,</span> readBuf<span class="token punctuation">,</span> <span class="token operator">&amp;</span>buffer<span class="token punctuation">,</span> cb<span class="token punctuation">,</span> mcu<span class="token punctuation">,</span> y<span class="token punctuation">,</span> tracerLen<span class="token punctuation">)</span>
+			<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+				<span class="token keyword">return</span>
+			<span class="token punctuation">&#125;</span>
+			y <span class="token operator">+=</span> tracerLen
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>使用golang+串口服务器进行串口通讯，非常的简单、直观，易于开发维护。</p>
+<p>在本次项目实践中，由于golang提供了方便的并发编程与控制机制，高负载环境下的性能也得到了充分保障。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" class="category-chain-item">项目实践</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="print-no-link">#网络编程</a>
+      
+        <a href="/tags/golang/" class="print-no-link">#golang</a>
+      
+        <a href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" class="print-no-link">#项目实践</a>
+      
+        <a href="/tags/%E4%B8%B2%E5%8F%A3%E9%80%9A%E8%AE%AF/" class="print-no-link">#串口通讯</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>golang与串口设备在项目中的运用</div>
+      <div>https://vitsumoc.github.io/golangSerial.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>vc</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年11月22日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/SSHInSubSocks.html" title="使用SSH包装Socks5代理">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">使用SSH包装Socks5代理</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/SSH.html" title="SSH握手过程">
+                        <span class="hidden-mobile">SSH握手过程</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>vitusmoc Blog, Powered by </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script  src="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
