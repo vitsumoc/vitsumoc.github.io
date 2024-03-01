@@ -25,7 +25,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://vitsumoc.github.io/SSHInSubSocks/wireshark.png">
 <meta property="article:published_time" content="2023-11-22T09:38:25.000Z">
-<meta property="article:modified_time" content="2024-03-01T09:19:26.372Z">
+<meta property="article:modified_time" content="2024-03-01T09:58:13.852Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="网络编程">
 <meta property="article:tag" content="SSH">
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          370 字
+          674 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          4 分钟
+          6 分钟
         
       </span>
     
@@ -290,26 +290,53 @@
 <p>之后需要对SSH的<a href="/SSH.html">通讯过程</a>，<code>Session</code> <code>Channel</code> <code>Request</code>等等各种概念有基础的了解。</p>
 <p>使用ssh包中的代码，在服务端使用TCP链接，创建SSH服务器，等待客户端链接后获取Channel，将Channel包装为Stripper。</p>
 <p>客户端与服务端相似，需要使用TCP链接，向服务端完成握手过程，之后可获得Session，将Session包装成Wrapper。</p>
-<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>服务端必须配置密钥，可使用自己生成的密钥：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-toml" data-language="toml"><div class="caption"><span>toml</span></div><code class="language-toml"><span class="token punctuation">[</span><span class="token table class-name">server</span><span class="token punctuation">]</span> <span class="token comment"># server configuration</span>
+<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>改动的源码请参考我 fork 的<a target="_blank" rel="noopener" href="https://github.com/vitsumoc/subsocks">仓库</a></p>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>为了能够使用ssh协议进行代理，并且能支持密码和密钥认证，配置文件添加了一些字段</p>
+<h3 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h3><figure><div class="code-wrapper"><pre class="line-numbers language-toml" data-language="toml"><div class="caption"><span>client.toml</span></div><code class="language-toml"><span class="token punctuation">[</span><span class="token table class-name">client</span><span class="token punctuation">]</span> <span class="token comment"># client configuration</span>
+
+<span class="token key property">listen</span> <span class="token punctuation">=</span> <span class="token string">"127.0.0.1:1080"</span>
+<span class="token key property">username</span> <span class="token punctuation">=</span> <span class="token string">"subsocks"</span>
+<span class="token key property">password</span> <span class="token punctuation">=</span> <span class="token string">"subsocks"</span>
+
+<span class="token key property">server.protocol</span> <span class="token punctuation">=</span> <span class="token string">"ssh"</span>
+<span class="token key property">server.address</span> <span class="token punctuation">=</span> <span class="token string">"127.0.0.1:22"</span>
+
+<span class="token key property">ssh.key</span> <span class="token punctuation">=</span> <span class="token string">"./ssWithPass"</span>
+<span class="token key property">ssh.passphrase</span> <span class="token punctuation">=</span> <span class="token string">"123123"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<ul>
+<li>server.protocol：当配置为 ssh 时使用 ssh 协议代理流量</li>
+<li>username，password：这两个字段配置后，ssh协议可以使用账号密码的方式向服务端认证</li>
+<li>ssh.key：配置后客户端可以使用密钥方式向服务端认证，这里配置客户端私钥文件，并把公钥文件存放在服务端</li>
+<li>ssh.passphrase：如果私钥有密码的话，在这里配置</li>
+<li>账号密码验证和密钥验证是选配的，配置其中一种或两者皆配置都可以。</li>
+</ul>
+<p>服务端</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-toml" data-language="toml"><div class="caption"><span>server.toml</span></div><code class="language-toml"><span class="token punctuation">[</span><span class="token table class-name">server</span><span class="token punctuation">]</span> <span class="token comment"># server configuration</span>
 
 <span class="token key property">protocol</span> <span class="token punctuation">=</span> <span class="token string">"ssh"</span>
 <span class="token key property">listen</span> <span class="token punctuation">=</span> <span class="token string">"0.0.0.0:22"</span>
 
-<span class="token key property">ssh.cert</span> <span class="token punctuation">=</span> <span class="token string">"./id_rsa.pub"</span>
-<span class="token key property">ssh.key</span> <span class="token punctuation">=</span> <span class="token string">"./id_rsa"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<span class="token key property">ssh.key</span> <span class="token punctuation">=</span> <span class="token string">"./ssWithPass"</span>
+<span class="token key property">ssh.passphrase</span> <span class="token punctuation">=</span> <span class="token string">"123123"</span>
+<span class="token key property">ssh.cert</span> <span class="token punctuation">=</span> <span class="token string">"./ssWithPass.pub"</span>
 
-<p>客户端只需将协议设置为ssh，其他与subsocks相同:</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-toml" data-language="toml"><div class="caption"><span>toml</span></div><code class="language-toml"><span class="token punctuation">[</span><span class="token table class-name">client</span><span class="token punctuation">]</span> <span class="token comment"># client configuration</span>
+<span class="token punctuation">[</span><span class="token table class-name">server.users</span><span class="token punctuation">]</span>
+<span class="token key property">"subsocks"</span> <span class="token punctuation">=</span> <span class="token string">"subsocks"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
-<span class="token key property">listen</span> <span class="token punctuation">=</span> <span class="token string">"127.0.0.1:1080"</span>
-
-<span class="token key property">server.protocol</span> <span class="token punctuation">=</span> <span class="token string">"ssh"</span>
-<span class="token key property">server.address</span> <span class="token punctuation">=</span> <span class="token string">"serverIP:22"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-
-<p>通过抓包验证，握手过程正常，通讯过程与SSH相同，多条链接使用正常，所有数据均经过加密：</p>
+<ul>
+<li>protocol ：当配置为 ssh 时使用 ssh 协议代理流量</li>
+<li>ssh.key：服务端的 ssh 私钥路径，必填</li>
+<li>ssh.passphrase：服务端 ssh 私钥的密码，有密码就填</li>
+<li>[server.users]：支持的账号密码对，配合客户端的账号密码校验</li>
+<li>ssh.cert： 客户端 ssh 公钥路径，用来支持客户端和服务端之间的密钥认证</li>
+</ul>
+<h1 id="SSH私钥加密的说明"><a href="#SSH私钥加密的说明" class="headerlink" title="SSH私钥加密的说明"></a>SSH私钥加密的说明</h1><p>由于golang中的ssh暂时还没有支持加密的PKCS#8 format，如果想要使用加密的私钥，需要选择PEM格式。可以用如下命令生成：</p>
+<p>ssh-keygen -t rsa -b 4096 -m PEM<br>使用 ssh-keygen 的默认参数生成的带密码的私钥，在 ssh.ParsePrivateKeyWithPassphrase 过程中会报错。</p>
+<p>情况参考：<a target="_blank" rel="noopener" href="https://github.com/gaia-pipeline/gaia/issues/182#issuecomment-502120516">gaia-pipeline&#x2F;gaia#182 (comment)</a></p>
+<h1 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h1><p>通过抓包验证，握手过程正常，通讯过程与SSH相同，多条链接使用正常，所有数据均经过加密：</p>
 <p><img src="/SSHInSubSocks/wireshark.png" srcset="/img/loading.gif" lazyload></p>
-<p>通过观看视频网站验证，视频加载流畅，体验很好。</p>
+<p>使用 SSH 代理看了一会视频网站，效果也不错，很流畅。</p>
 
                 
               </div>
