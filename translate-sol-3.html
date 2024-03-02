@@ -1,0 +1,1404 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="vc">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="原文 Sol - An MQTT broker from scratch. Part 3 - Server">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[翻译]Sol - 从零开始的MQTT broker - 第三部分：服务">
+<meta property="og:url" content="https://vitsumoc.github.io/translate-sol-3.html">
+<meta property="og:site_name" content="Thinking...">
+<meta property="og:description" content="原文 Sol - An MQTT broker from scratch. Part 3 - Server">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-12-22T01:44:08.000Z">
+<meta property="article:modified_time" content="2024-03-02T00:55:07.973Z">
+<meta property="article:author" content="vc">
+<meta property="article:tag" content="网络编程">
+<meta property="article:tag" content="翻译">
+<meta property="article:tag" content="C">
+<meta property="article:tag" content="MQTT">
+<meta property="article:tag" content="物联网">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>[翻译]Sol - 从零开始的MQTT broker - 第三部分：服务 - Thinking...</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"vitsumoc.github.io","root":"/","version":"1.9.6","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Thinking...</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">[翻译]Sol - 从零开始的MQTT broker - 第三部分：服务</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-12-22 09:44" pubdate>
+          2023年12月22日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          25 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">[翻译]Sol - 从零开始的MQTT broker - 第三部分：服务</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>原文 <a target="_blank" rel="noopener" href="https://codepr.github.io/posts/sol-mqtt-broker-p3/">Sol - An MQTT broker from scratch. Part 3 - Server</a></p>
+</blockquote>
+<span id="more"></span>
+
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>这一部分我们会实现我们程序中的服务功能，通过之前在 <a target="_blank" rel="noopener" href="https://codepr.github.io/posts/sol-mqtt-broker-p2/">part-2</a> 中实现的 <code>network</code> 模块，我们可以比较轻松的接收并处理在 <a target="_blank" rel="noopener" href="https://codepr.github.io/posts/sol-mqtt-broker/">part-1</a> 中定义好的各种 <code>MQTT</code> 数据包。</p>
+<h1 id="服务端定义"><a href="#服务端定义" class="headerlink" title="服务端定义"></a>服务端定义</h1><p>我们的头文件非常简单，唯一向外提供的函数只有 <code>start_server</code>，他也只需要接收两个参数：</p>
+<ul>
+<li>一个IP地址</li>
+<li>一个监听端口</li>
+</ul>
+<p>我们还需要定义创建 <strong>epoll</strong> 时使用的两个常量，一个是单次监听的最大事件数量，另一个是 <strong>epoll</strong> 监听的超时时间。这两个常量的定义以后我们也可以轻松的移动到配置模块里，暂时就先放在 <code>server</code> 的头文件。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/server.h</span></div><code class="language-c"><span class="token comment">// epoll 的默认配置</span>
+<span class="token comment">// 最大监听 256 事件</span>
+<span class="token comment">// -1 表示不超时, epoll 可以无限期的阻塞并监听</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">EPOLL_MAX_EVENTS</span>    <span class="token expression"><span class="token number">256</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">EPOLL_TIMEOUT</span>       <span class="token expression"><span class="token operator">-</span><span class="token number">1</span></span></span>
+
+<span class="token comment">// 不同类型的错误码</span>
+<span class="token comment">// client disconnection 客户端断开</span>
+<span class="token comment">// error reading packet 读包错误</span>
+<span class="token comment">// error packet sent exceeds size defined by configuration 包过大 (限制默认 2M)</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">ERRCLIENTDC</span>         <span class="token expression"><span class="token number">1</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">ERRPACKETERR</span>        <span class="token expression"><span class="token number">2</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">ERRMAXREQSIZE</span>       <span class="token expression"><span class="token number">3</span></span></span>
+
+<span class="token comment">// handler 的返回值, 表示对客户端读取后的下一个动作是读还是写</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">REARM_R</span>             <span class="token expression"><span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">REARM_W</span>             <span class="token expression"><span class="token number">1</span></span></span>
+
+<span class="token comment">// 启动服务的函数</span>
+<span class="token keyword">int</span> <span class="token function">start_server</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h1 id="服务端实现"><a href="#服务端实现" class="headerlink" title="服务端实现"></a>服务端实现</h1><p>实现的部分比我一开始预想的要庞大一些，所有我们所需的 <code>处理器(handler)</code> 和 回调函数都会在这里定义。所以我们首先来实现三个最基础的回调函数，这三个函数是任何服务器都必不可少的：</p>
+<ul>
+<li>用于建立连接的 <code>on_accept</code></li>
+<li>用于读取事件的 <code>on_read</code></li>
+<li>用于发送数据的 <code>on_write</code></li>
+</ul>
+<p>我们还需要定义一些关于MQTT包处理的 <code>handler</code>，同样使用一个数组保存，并且使 <code>handler</code> 在其中的序号等于包类型码。（这个方式我们已经用过好几次了）</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/server.c</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">_POSIX_C_SOURCE</span> <span class="token expression"><span class="token number">200809L</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;time.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;errno.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;arpa/inet.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/epoll.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/socket.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"pack.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"util.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"mqtt.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"core.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"network.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"hashtable.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"config.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"server.h"</span></span>
+
+<span class="token comment">/* Seconds in a Sol, easter egg */</span>
+<span class="token keyword">static</span> <span class="token keyword">const</span> <span class="token keyword">double</span> SOL_SECONDS <span class="token operator">=</span> <span class="token number">88775.24</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 服务器本身状态信息</span>
+<span class="token comment">// 所有数据都会通过一个周期性回调发布</span>
+<span class="token keyword">static</span> <span class="token keyword">struct</span> <span class="token class-name">sol_info</span> info<span class="token punctuation">;</span>
+
+<span class="token comment">// broker 的全局实例, 包括了主题树和客户端的哈希表</span>
+<span class="token keyword">static</span> <span class="token keyword">struct</span> <span class="token class-name">sol</span> sol<span class="token punctuation">;</span>
+
+<span class="token comment">// 处理器接口</span>
+<span class="token comment">// 内含客户端的 closure 与数据包 mqtt_packet</span>
+<span class="token keyword">typedef</span> <span class="token keyword">int</span> <span class="token function">handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 包处理器, 每个函数负责处理对应名称的包</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">connect_handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">disconnect_handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">subscribe_handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">unsubscribe_handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">publish_handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">puback_handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">pubrec_handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">pubrel_handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">pubcomp_handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">pingreq_handler</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">union</span> mqtt_packet <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 处理器数组, 同样使用 type 的值作为索引</span>
+<span class="token keyword">static</span> handler <span class="token operator">*</span>handlers<span class="token punctuation">[</span><span class="token number">15</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    <span class="token constant">NULL</span><span class="token punctuation">,</span>
+    connect_handler<span class="token punctuation">,</span>
+    <span class="token constant">NULL</span><span class="token punctuation">,</span>
+    publish_handler<span class="token punctuation">,</span>
+    puback_handler<span class="token punctuation">,</span>
+    pubrec_handler<span class="token punctuation">,</span>
+    pubrel_handler<span class="token punctuation">,</span>
+    pubcomp_handler<span class="token punctuation">,</span>
+    subscribe_handler<span class="token punctuation">,</span>
+    <span class="token constant">NULL</span><span class="token punctuation">,</span>
+    unsubscribe_handler<span class="token punctuation">,</span>
+    <span class="token constant">NULL</span><span class="token punctuation">,</span>
+    pingreq_handler<span class="token punctuation">,</span>
+    <span class="token constant">NULL</span><span class="token punctuation">,</span>
+    disconnect_handler
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 本 module 内部使用的 conn 结构体, 用来接收新连接</span>
+<span class="token keyword">struct</span> <span class="token class-name">connection</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">char</span> ip<span class="token punctuation">[</span>INET_ADDRSTRLEN <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> fd<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// I/O closures, 关于三个服务器主要操作的回调</span>
+<span class="token comment">// - 读取客户端发来的数据</span>
+<span class="token comment">// - 向客户端写数据</span>
+<span class="token comment">// - 接收新的客户端连接</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">on_read</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">evloop</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">on_write</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">evloop</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">on_accept</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">evloop</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 定时回调, 周期性发布服务器状态</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">publish_stats</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">evloop</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 从 sfd 接收一条新链接, 将他的 ip 和 fd 存入conn中</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">accept_new_client</span><span class="token punctuation">(</span><span class="token keyword">int</span> fd<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">connection</span> <span class="token operator">*</span>conn<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>conn<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token comment">// 获得新链接</span>
+    <span class="token keyword">int</span> clientsock <span class="token operator">=</span> <span class="token function">accept_connection</span><span class="token punctuation">(</span>fd<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 没有获取成功的话</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>clientsock <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token comment">// 就是检查一些新连接的属性</span>
+    <span class="token keyword">struct</span> <span class="token class-name">sockaddr_in</span> addr<span class="token punctuation">;</span>
+    <span class="token class-name">socklen_t</span> addrlen <span class="token operator">=</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>addr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">getpeername</span><span class="token punctuation">(</span>clientsock<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">sockaddr</span> <span class="token operator">*</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>addr<span class="token punctuation">,</span> <span class="token operator">&amp;</span>addrlen<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">char</span> ip_buff<span class="token punctuation">[</span>INET_ADDRSTRLEN <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">inet_ntop</span><span class="token punctuation">(</span>AF_INET<span class="token punctuation">,</span> <span class="token operator">&amp;</span>addr<span class="token punctuation">.</span>sin_addr<span class="token punctuation">,</span> ip_buff<span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>ip_buff<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token constant">NULL</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">sockaddr_in</span> sin<span class="token punctuation">;</span>
+    <span class="token class-name">socklen_t</span> sinlen <span class="token operator">=</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>sin<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">getsockname</span><span class="token punctuation">(</span>fd<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">sockaddr</span> <span class="token operator">*</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>sin<span class="token punctuation">,</span> <span class="token operator">&amp;</span>sinlen<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token comment">// 赋值我们要的 ip 和 fd</span>
+    conn<span class="token operator">-></span>fd <span class="token operator">=</span> clientsock<span class="token punctuation">;</span>
+    <span class="token function">strcpy</span><span class="token punctuation">(</span>conn<span class="token operator">-></span>ip<span class="token punctuation">,</span> ip_buff<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// accept 的回调, 通过 sfd 获得 cfd, 然后对 cfd 添加 EPOLLIN 监听</span>
+<span class="token comment">// loop evloop实例</span>
+<span class="token comment">// arg server closure, 包括了 sfd 在其中, on_accept 其实就是 server closure 的 call 参数</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">on_accept</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">evloop</span> <span class="token operator">*</span>loop<span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span>arg<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// arg 是 server closure</span>
+    <span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span>server <span class="token operator">=</span> arg<span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">connection</span> conn<span class="token punctuation">;</span>
+    <span class="token comment">// 获得 conn</span>
+    <span class="token function">accept_new_client</span><span class="token punctuation">(</span>server<span class="token operator">-></span>fd<span class="token punctuation">,</span> <span class="token operator">&amp;</span>conn<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 创建这个客户端的 closure</span>
+    <span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span>client_closure <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token operator">*</span>client_closure<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>client_closure<span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token comment">// 填充内容</span>
+    client_closure<span class="token operator">-></span>fd <span class="token operator">=</span> conn<span class="token punctuation">.</span>fd<span class="token punctuation">;</span>
+    client_closure<span class="token operator">-></span>obj <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>                 <span class="token comment">// 闭包的主要对象, 这个项目中是 client 对象, 在第六部分定义</span>
+    client_closure<span class="token operator">-></span>payload <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    client_closure<span class="token operator">-></span>args <span class="token operator">=</span> client_closure<span class="token punctuation">;</span>      <span class="token comment">// 拿自己当回调参数</span>
+    client_closure<span class="token operator">-></span>call <span class="token operator">=</span> on_read<span class="token punctuation">;</span>             <span class="token comment">// 数据来时触发 on_read</span>
+    <span class="token function">generate_uuid</span><span class="token punctuation">(</span>client_closure<span class="token operator">-></span>closure_id<span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment">// 生成uuid</span>
+    <span class="token comment">// 保存在一个哈希表里</span>
+    <span class="token function">hashtable_put</span><span class="token punctuation">(</span>sol<span class="token punctuation">.</span>closures<span class="token punctuation">,</span> client_closure<span class="token operator">-></span>closure_id<span class="token punctuation">,</span> client_closure<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 将这个 closure 注册到 evloop, 事件是 EPOLLIN</span>
+    <span class="token function">evloop_add_callback</span><span class="token punctuation">(</span>loop<span class="token punctuation">,</span> client_closure<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 重置 server fd, 让其可以继续接收新链接</span>
+    <span class="token function">evloop_rearm_callback_read</span><span class="token punctuation">(</span>loop<span class="token punctuation">,</span> server<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 记录新链接</span>
+    info<span class="token punctuation">.</span>nclients<span class="token operator">++</span><span class="token punctuation">;</span>
+    info<span class="token punctuation">.</span>nconnections<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token comment">// 日志</span>
+    <span class="token function">sol_info</span><span class="token punctuation">(</span><span class="token string">"New connection from %s on port %s"</span><span class="token punctuation">,</span> conn<span class="token punctuation">.</span>ip<span class="token punctuation">,</span> conf<span class="token operator">-></span>port<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>正如你所见，我定义了两个静态函数（在C语言中，当我们不严格的追究术语时，由于这种静态函数只能被同样.c文件里的函数访问，我们可以把这种函数看作是其他OOP语言中的私有方法。）</p>
+<p><code>accept_new_client</code> 函数使用了上一篇文中 <code>network</code> 模块定义的 <code>accept_connection</code> 函数，得以从操作系统层级接收新连接并进行一些设置。<code>on_accept</code> 则是实际负责处理新链接的回调函数，他依赖 <code>accept_new_client</code> 函数。</p>
+<p><code>accept_new_client</code> 函数所需的参数结构 <code>connection</code> 是我从我其他项目的代码库复制过来的，并不是说必须要用这种方式。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/server.c</span></div><code class="language-c"><span class="token comment">// 接收数据流组装成数据包的函数, 被 on_read 回调使用</span>
+<span class="token comment">// 解析数据包头, 至少会包括 Fixed Header, 因为每个数据包都至少有 2byte 的 Fixed Header, 其中会包括包类型和剩余长度</span>
+<span class="token comment">// 入参包括</span>
+<span class="token comment">// clientfd 客户端fd</span>
+<span class="token comment">// buf 放置所有输入数据流</span>
+<span class="token comment">// command 表示mqtt包的第一个字节</span>
+<span class="token keyword">static</span> <span class="token class-name">ssize_t</span> <span class="token function">recv_packet</span><span class="token punctuation">(</span><span class="token keyword">int</span> clientfd<span class="token punctuation">,</span> <span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span>buf<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span>command<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 总计读取的字节数</span>
+    <span class="token class-name">ssize_t</span> nbytes <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 读取一个字节, 这里会包括 MQTT 类型字段</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>nbytes <span class="token operator">=</span> <span class="token function">recv_bytes</span><span class="token punctuation">(</span>clientfd<span class="token punctuation">,</span> buf<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&lt;=</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span>ERRCLIENTDC<span class="token punctuation">;</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">char</span> byte <span class="token operator">=</span> <span class="token operator">*</span>buf<span class="token punctuation">;</span>
+    buf<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token comment">// 译者没有明白为何可以这样比较, 第一个byte应该是包括了 MQTT type 和 Flags 才对?</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>DISCONNECT <span class="token operator">&lt;</span> byte <span class="token operator">||</span> CONNECT <span class="token operator">></span> byte<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span>ERRPACKETERR<span class="token punctuation">;</span>
+
+    <span class="token comment">// 逐字节读取变长的 Remaining Length</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">char</span> buff<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> n <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">do</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">// 使用 buf 读取</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>n <span class="token operator">=</span> <span class="token function">recv_bytes</span><span class="token punctuation">(</span>clientfd<span class="token punctuation">,</span> buf<span class="token operator">+</span>count<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&lt;=</span> <span class="token number">0</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> <span class="token operator">-</span>ERRCLIENTDC<span class="token punctuation">;</span>
+        <span class="token comment">// 并为 buff 赋值</span>
+        buff<span class="token punctuation">[</span>count<span class="token punctuation">]</span> <span class="token operator">=</span> buf<span class="token punctuation">[</span>count<span class="token punctuation">]</span><span class="token punctuation">;</span>
+        nbytes <span class="token operator">+=</span> n<span class="token punctuation">;</span>
+        <span class="token comment">// 根据高位判断是否有后续</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">while</span> <span class="token punctuation">(</span>buff<span class="token punctuation">[</span>count<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">&lt;&lt;</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 获得剩余长度的值</span>
+    <span class="token keyword">const</span> <span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span>pbuf <span class="token operator">=</span> <span class="token operator">&amp;</span>buff<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">long</span> <span class="token keyword">long</span> tlen <span class="token operator">=</span> <span class="token function">mqtt_decode_length</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>pbuf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 判断是否过长</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>tlen <span class="token operator">></span> conf<span class="token operator">-></span>max_request_size<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        nbytes <span class="token operator">=</span> <span class="token operator">-</span>ERRMAXREQSIZE<span class="token punctuation">;</span>
+        <span class="token keyword">goto</span> exit<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token comment">// 读取所有剩余的字节数, 获得完整数据包字节流</span>
+    <span class="token comment">// 译者认为这里 buf + 1 只考虑了 Remaining Length 长度为 1 的情况, 应改为 buf + count</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>n <span class="token operator">=</span> <span class="token function">recv_bytes</span><span class="token punctuation">(</span>clientfd<span class="token punctuation">,</span> buf <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> tlen<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token keyword">goto</span> err<span class="token punctuation">;</span>
+    nbytes <span class="token operator">+=</span> n<span class="token punctuation">;</span>
+    <span class="token comment">// 第一个字节赋值为 command</span>
+    <span class="token operator">*</span>command <span class="token operator">=</span> byte<span class="token punctuation">;</span>
+exit<span class="token operator">:</span>
+    <span class="token keyword">return</span> nbytes<span class="token punctuation">;</span>
+err<span class="token operator">:</span>
+    <span class="token function">shutdown</span><span class="token punctuation">(</span>clientfd<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">close</span><span class="token punctuation">(</span>clientfd<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> nbytes<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 客户端输入数据的回调, 当 accepted 或 reply 之后等待</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">on_read</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">evloop</span> <span class="token operator">*</span>loop<span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span>arg<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 这里带着一些客户端信息</span>
+    <span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span>cb <span class="token operator">=</span> arg<span class="token punctuation">;</span>
+
+    <span class="token comment">// 使用最大数据包尺寸准备接收数据 默认2M</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span>buffer <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span>conf<span class="token operator">-></span>max_request_size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">ssize_t</span> bytes <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">char</span> command <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 在此处必须完整的接收一个数据包的所有数据</span>
+    <span class="token comment">// 通过数据包的 Remaining Length 我们可以了解这个数据包的长度到底应该是多少</span>
+    bytes <span class="token operator">=</span> <span class="token function">recv_packet</span><span class="token punctuation">(</span>cb<span class="token operator">-></span>fd<span class="token punctuation">,</span> buffer<span class="token punctuation">,</span> <span class="token operator">&amp;</span>command<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 链接断开处理</span>
+    <span class="token comment">// TODO: 使用一个 error_handler 来处理 ERRMAXREQSIZE 将错误码返回给客户端</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>bytes <span class="token operator">==</span> <span class="token operator">-</span>ERRCLIENTDC <span class="token operator">||</span> bytes <span class="token operator">==</span> <span class="token operator">-</span>ERRMAXREQSIZE<span class="token punctuation">)</span>
+        <span class="token keyword">goto</span> exit<span class="token punctuation">;</span>
+
+    <span class="token comment">// 当我们收到一个错误的包时, 我们需要清理 buffer, 并断开这个客户端连接</span>
+    <span class="token comment">// 等客户端下次重连上来再处理</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>bytes <span class="token operator">==</span> <span class="token operator">-</span>ERRPACKETERR<span class="token punctuation">)</span>
+        <span class="token keyword">goto</span> errdc<span class="token punctuation">;</span>
+
+    <span class="token comment">// 收包计数器</span>
+    info<span class="token punctuation">.</span>bytes_recv<span class="token operator">++</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 将数据流解码为正确类型的mqtt包</span>
+    <span class="token keyword">union</span> mqtt_packet packet<span class="token punctuation">;</span>
+    <span class="token function">unpack_mqtt_packet</span><span class="token punctuation">(</span>buffer<span class="token punctuation">,</span> <span class="token operator">&amp;</span>packet<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">union</span> mqtt_header hdr <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token punctuation">.</span>byte <span class="token operator">=</span> command <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 然后找到对应的 hander 来处理这个包</span>
+    <span class="token comment">// 处理完的rc表示</span>
+    <span class="token keyword">int</span> rc <span class="token operator">=</span> handlers<span class="token punctuation">[</span>hdr<span class="token punctuation">.</span>bits<span class="token punctuation">.</span>type<span class="token punctuation">]</span><span class="token punctuation">(</span>cb<span class="token punctuation">,</span> <span class="token operator">&amp;</span>packet<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 如果处理结果是需要发送一个包作为响应</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>rc <span class="token operator">==</span> REARM_W<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">// 重置写入监听</span>
+        <span class="token comment">// 当 fd 可写入时 epoll 就会触发 EPOLLOUT 事件</span>
+        <span class="token comment">// cb 中的 call 会被执行, 也就是 on_write</span>
+        <span class="token comment">// 写入需要的参数, 会在 handlers 中会处理好, 之后由 cb 携带 </span>
+        cb<span class="token operator">-></span>call <span class="token operator">=</span> on_write<span class="token punctuation">;</span>
+        <span class="token function">evloop_rearm_callback_write</span><span class="token punctuation">(</span>loop<span class="token punctuation">,</span> cb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>rc <span class="token operator">==</span> REARM_R<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">// 重置读取监听, 后面有数据接着读</span>
+        cb<span class="token operator">-></span>call <span class="token operator">=</span> on_read<span class="token punctuation">;</span>
+        <span class="token function">evloop_rearm_callback_read</span><span class="token punctuation">(</span>loop<span class="token punctuation">,</span> cb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token comment">// Disconnect packet received</span>
+exit<span class="token operator">:</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span><span class="token punctuation">;</span>
+errdc<span class="token operator">:</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 把客户端丢弃了</span>
+    <span class="token function">sol_error</span><span class="token punctuation">(</span><span class="token string">"Dropping client"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">shutdown</span><span class="token punctuation">(</span>cb<span class="token operator">-></span>fd<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">close</span><span class="token punctuation">(</span>cb<span class="token operator">-></span>fd<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 清理哈希表</span>
+    <span class="token function">hashtable_del</span><span class="token punctuation">(</span>sol<span class="token punctuation">.</span>clients<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">sol_client</span> <span class="token operator">*</span><span class="token punctuation">)</span> cb<span class="token operator">-></span>obj<span class="token punctuation">)</span><span class="token operator">-></span>client_id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">hashtable_del</span><span class="token punctuation">(</span>sol<span class="token punctuation">.</span>closures<span class="token punctuation">,</span> cb<span class="token operator">-></span>closure_id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 记录信息</span>
+    info<span class="token punctuation">.</span>nclients<span class="token operator">--</span><span class="token punctuation">;</span>
+    info<span class="token punctuation">.</span>nconnections<span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 写入回调, 当有需要写入的数据且 fd 可被写入时触发</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">on_write</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">evloop</span> <span class="token operator">*</span>loop<span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span>arg<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span>cb <span class="token operator">=</span> arg<span class="token punctuation">;</span>
+    <span class="token class-name">ssize_t</span> sent<span class="token punctuation">;</span>
+    <span class="token comment">// cb 里包括了所有需要发送的内容</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>sent <span class="token operator">=</span> <span class="token function">send_bytes</span><span class="token punctuation">(</span>cb<span class="token operator">-></span>fd<span class="token punctuation">,</span> cb<span class="token operator">-></span>payload<span class="token operator">-></span>data<span class="token punctuation">,</span> cb<span class="token operator">-></span>payload<span class="token operator">-></span>size<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token function">sol_error</span><span class="token punctuation">(</span><span class="token string">"Error writing on socket to client %s: %s"</span><span class="token punctuation">,</span>
+                  <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">sol_client</span> <span class="token operator">*</span><span class="token punctuation">)</span> cb<span class="token operator">-></span>obj<span class="token punctuation">)</span><span class="token operator">-></span>client_id<span class="token punctuation">,</span> <span class="token function">strerror</span><span class="token punctuation">(</span>errno<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 发包计数器</span>
+    info<span class="token punctuation">.</span>bytes_sent <span class="token operator">+=</span> sent<span class="token punctuation">;</span>
+    <span class="token comment">// 释放</span>
+    <span class="token function">bytestring_release</span><span class="token punctuation">(</span>cb<span class="token operator">-></span>payload<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    cb<span class="token operator">-></span>payload <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 客户端的下一次触发肯定是 read (业务上来说服务端不可能连续发两个包)</span>
+    cb<span class="token operator">-></span>call <span class="token operator">=</span> on_read<span class="token punctuation">;</span>
+    <span class="token function">evloop_rearm_callback_read</span><span class="token punctuation">(</span>loop<span class="token punctuation">,</span> cb<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>我们又添加了三个静态函数，<code>recv_packet</code> 函数就像他的名字一样，依赖 <code>mqtt</code> 模块，负责持续接收数据流直到足够一个完整的 MQTT 包。另外两个分别是 <code>on_read</code> 和 <code>on_write</code>。</p>
+<p>请注意，<code>on_read</code> 和 <code>on_write</code> 使用我们之前定义的函数不停的重置对 <code>socket</code> 的监听，就像来回打乒乓球一样。例如， <code>on_read</code> 可以通过 <code>处理器</code> 的返回值来决定下一次的操作是 <code>read</code> 还是 <code>write</code>，然后把客户端链接的下一个回调函数设置为 <code>on_read</code> 或者 <code>on_write</code>，当然也有可能是断开链接。比如说客户端发来的数据出现了错误，或者当客户端发来了 <code>DISCONNECT</code> 包，那么此时对应的 <code>处理器</code> 返回的值就既不是 <code>REARM_W</code> 也不是 <code>REARM_R</code>。</p>
+<p>在 <code>on_write</code> 中我们看到 <code>send_bytes</code> 传入了一个带有大小和内容的 <code>payload</code>，这里使用了我定义的一个方便的工具结构 <code>bytestring</code>，我们现在就在 <code>src/pack.h</code> and <code>src/pack.c</code> 中添加他。</p>
+<h1 id="工具-bytestring"><a href="#工具-bytestring" class="headerlink" title="工具 bytestring"></a>工具 bytestring</h1><figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/pack.h</span></div><code class="language-c"><span class="token comment">// bytestring 结构体, 提供了一个便携的保存 bytes 的方法</span>
+<span class="token comment">// 他本质上提供了一个指向最后编辑位置的指针, 和 bytes 的总长度</span>
+<span class="token keyword">struct</span> <span class="token class-name">bytestring</span> <span class="token punctuation">&#123;</span>
+    <span class="token class-name">size_t</span> size<span class="token punctuation">;</span>
+    <span class="token class-name">size_t</span> last<span class="token punctuation">;</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span>data<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// bytestring 的初始化函数, 需要一个长度作为参数</span>
+<span class="token comment">// 为了简化, 我们直接采用固定长度, 并且不会再后续使用过程中扩容</span>
+<span class="token keyword">struct</span> <span class="token class-name">bytestring</span> <span class="token operator">*</span><span class="token function">bytestring_create</span><span class="token punctuation">(</span><span class="token class-name">size_t</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">bytestring_init</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">bytestring</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token class-name">size_t</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">bytestring_release</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">bytestring</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">bytestring_reset</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">bytestring</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>这里是关于 <code>bytestring</code> 的实现。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/pack.c</span></div><code class="language-c"><span class="token comment">// 创建</span>
+<span class="token keyword">struct</span> <span class="token class-name">bytestring</span> <span class="token operator">*</span><span class="token function">bytestring_create</span><span class="token punctuation">(</span><span class="token class-name">size_t</span> len<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">bytestring</span> <span class="token operator">*</span>bstring <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token operator">*</span>bstring<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">bytestring_init</span><span class="token punctuation">(</span>bstring<span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> bstring<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 初始化内部结构</span>
+<span class="token keyword">void</span> <span class="token function">bytestring_init</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">bytestring</span> <span class="token operator">*</span>bstring<span class="token punctuation">,</span> <span class="token class-name">size_t</span> size<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>bstring<span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    bstring<span class="token operator">-></span>size <span class="token operator">=</span> size<span class="token punctuation">;</span>
+    bstring<span class="token operator">-></span>data <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">char</span><span class="token punctuation">)</span> <span class="token operator">*</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">bytestring_reset</span><span class="token punctuation">(</span>bstring<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 释放</span>
+<span class="token keyword">void</span> <span class="token function">bytestring_release</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">bytestring</span> <span class="token operator">*</span>bstring<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>bstring<span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>bstring<span class="token operator">-></span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>bstring<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 清空数据</span>
+<span class="token keyword">void</span> <span class="token function">bytestring_reset</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">bytestring</span> <span class="token operator">*</span>bstring<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>bstring<span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    bstring<span class="token operator">-></span>last <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token function">memset</span><span class="token punctuation">(</span>bstring<span class="token operator">-></span>data<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> bstring<span class="token operator">-></span>size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h1 id="日志和通用工具"><a href="#日志和通用工具" class="headerlink" title="日志和通用工具"></a>日志和通用工具</h1><p>让我们稍微打断一下主线，按照我的经验，到这个阶段我们往往会需要一些工具函数，我一般会把他们统一放在 <code>util</code> 包中。我们刚才已经看到了一些 <code>sol_info</code>, <code>sol_debug</code> 或者 <code>sol_error</code> 这样的函数，其实就是 <code>util</code> 包中的定义。</p>
+<p>我们的日志需求很简单，所以不需要专门做一个日志模块，就先放到 <code>util</code> 包里。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/util.h</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdint.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdbool.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;strings.h></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">UUID_LEN</span>     <span class="token expression"><span class="token number">37</span>  </span><span class="token comment">// 36 + nul char</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">MAX_LOG_SIZE</span> <span class="token expression"><span class="token number">119</span></span></span>
+
+<span class="token keyword">enum</span> <span class="token class-name">log_level</span> <span class="token punctuation">&#123;</span> DEBUG<span class="token punctuation">,</span> INFORMATION<span class="token punctuation">,</span> WARNING<span class="token punctuation">,</span> ERROR <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">int</span> <span class="token function">number_len</span><span class="token punctuation">(</span><span class="token class-name">size_t</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> <span class="token function">parse_int</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">int</span> <span class="token function">generate_uuid</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">char</span> <span class="token operator">*</span><span class="token function">remove_occur</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">char</span><span class="token punctuation">)</span> <span class="token punctuation">;</span>
+<span class="token keyword">char</span> <span class="token operator">*</span><span class="token function">append_string</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token class-name">size_t</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 日志相关</span>
+<span class="token keyword">void</span> <span class="token function">sol_log_init</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">sol_log_close</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">void</span> <span class="token function">sol_log</span><span class="token punctuation">(</span><span class="token keyword">int</span><span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">log</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span> <span class="token function">sol_log</span><span class="token punctuation">(</span> __VA_ARGS__ <span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">sol_debug</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span> <span class="token function">log</span><span class="token punctuation">(</span>DEBUG<span class="token punctuation">,</span> __VA_ARGS__<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">sol_warning</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span> <span class="token function">log</span><span class="token punctuation">(</span>WARNING<span class="token punctuation">,</span> __VA_ARGS__<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">sol_error</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span> <span class="token function">log</span><span class="token punctuation">(</span>ERROR<span class="token punctuation">,</span> __VA_ARGS__<span class="token punctuation">)</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">sol_info</span><span class="token expression"><span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span> <span class="token function">log</span><span class="token punctuation">(</span>INFORMATION<span class="token punctuation">,</span> __VA_ARGS__<span class="token punctuation">)</span></span></span>
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name function">STREQ</span><span class="token expression"><span class="token punctuation">(</span>s1<span class="token punctuation">,</span> s2<span class="token punctuation">,</span> len<span class="token punctuation">)</span> <span class="token function">strncasecmp</span><span class="token punctuation">(</span>s1<span class="token punctuation">,</span> s2<span class="token punctuation">,</span> len<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">?</span> true <span class="token operator">:</span> false</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>log函数设置了一些宏定义，方便我们使用不同级别的日志。我们还做了一个 <code>STREQ</code> 用来比较两个字符串是否相等。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/util.c</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;time.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;ctype.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;errno.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;assert.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdarg.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;uuid/uuid.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"util.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"config.h"</span></span>
+
+<span class="token keyword">static</span> FILE <span class="token operator">*</span>fh <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 通过文件保存日志</span>
+<span class="token keyword">void</span> <span class="token function">sol_log_init</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>file<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>file<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    fh <span class="token operator">=</span> <span class="token function">fopen</span><span class="token punctuation">(</span>file<span class="token punctuation">,</span> <span class="token string">"a+"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>fh<span class="token punctuation">)</span>
+        <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%lu * WARNING: Unable to open file %s\n"</span><span class="token punctuation">,</span>
+               <span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">long</span><span class="token punctuation">)</span> <span class="token function">time</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">,</span> file<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">void</span> <span class="token function">sol_log_close</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>fh<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token function">fflush</span><span class="token punctuation">(</span>fh<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">fclose</span><span class="token punctuation">(</span>fh<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 按级别写入内容</span>
+<span class="token keyword">void</span> <span class="token function">sol_log</span><span class="token punctuation">(</span><span class="token keyword">int</span> level<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>fmt<span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>fmt<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    va_list ap<span class="token punctuation">;</span>
+    <span class="token keyword">char</span> msg<span class="token punctuation">[</span>MAX_LOG_SIZE <span class="token operator">+</span> <span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>level <span class="token operator">&lt;</span> conf<span class="token operator">-></span>loglevel<span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token function">va_start</span><span class="token punctuation">(</span>ap<span class="token punctuation">,</span> fmt<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">vsnprintf</span><span class="token punctuation">(</span>msg<span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span>msg<span class="token punctuation">)</span><span class="token punctuation">,</span> fmt<span class="token punctuation">,</span> ap<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">va_end</span><span class="token punctuation">(</span>ap<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 过长的信息会被截取, 然后加 ...</span>
+    <span class="token function">memcpy</span><span class="token punctuation">(</span>msg <span class="token operator">+</span> MAX_LOG_SIZE<span class="token punctuation">,</span> <span class="token string">"..."</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    msg<span class="token punctuation">[</span>MAX_LOG_SIZE <span class="token operator">+</span> <span class="token number">3</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token char">'\0'</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// Distinguish message level prefix</span>
+    <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>mark <span class="token operator">=</span> <span class="token string">"#i*!"</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 同时写向标准输出和日志文件</span>
+    FILE <span class="token operator">*</span>fp <span class="token operator">=</span> <span class="token constant">stdout</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>fp<span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token function">fprintf</span><span class="token punctuation">(</span>fp<span class="token punctuation">,</span> <span class="token string">"%lu %c %s\n"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">long</span><span class="token punctuation">)</span> <span class="token function">time</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">,</span> mark<span class="token punctuation">[</span>level<span class="token punctuation">]</span><span class="token punctuation">,</span> msg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>fh<span class="token punctuation">)</span>
+        <span class="token function">fprintf</span><span class="token punctuation">(</span>fh<span class="token punctuation">,</span> <span class="token string">"%lu %c %s\n"</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">long</span><span class="token punctuation">)</span> <span class="token function">time</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">,</span> mark<span class="token punctuation">[</span>level<span class="token punctuation">]</span><span class="token punctuation">,</span> msg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">fflush</span><span class="token punctuation">(</span>fp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>fh<span class="token punctuation">)</span>
+        <span class="token function">fflush</span><span class="token punctuation">(</span>fh<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 获得一个数字的字符串长度 如 number_len(321) => 3</span>
+<span class="token keyword">int</span> <span class="token function">number_len</span><span class="token punctuation">(</span><span class="token class-name">size_t</span> number<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">int</span> len <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span>number<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        len<span class="token operator">++</span><span class="token punctuation">;</span>
+        number <span class="token operator">/=</span> <span class="token number">10</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">return</span> len<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 解析字符串中的数字, 返回数字的值</span>
+<span class="token keyword">int</span> <span class="token function">parse_int</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>string<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">int</span> n <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">*</span>string <span class="token operator">&amp;&amp;</span> <span class="token function">isdigit</span><span class="token punctuation">(</span><span class="token operator">*</span>string<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        n <span class="token operator">=</span> <span class="token punctuation">(</span>n <span class="token operator">*</span> <span class="token number">10</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">(</span><span class="token operator">*</span>string <span class="token operator">-</span> <span class="token char">'0'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        string<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">return</span> n<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 去除字符串中的某个字符</span>
+<span class="token keyword">char</span> <span class="token operator">*</span><span class="token function">remove_occur</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span>str<span class="token punctuation">,</span> <span class="token keyword">char</span> c<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">char</span> <span class="token operator">*</span>p <span class="token operator">=</span> str<span class="token punctuation">;</span>
+    <span class="token keyword">char</span> <span class="token operator">*</span>pp <span class="token operator">=</span> str<span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">*</span>p<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>          <span class="token comment">// 当 p 指向内容</span>
+        <span class="token operator">*</span>pp <span class="token operator">=</span> <span class="token operator">*</span>p<span class="token operator">++</span><span class="token punctuation">;</span>       <span class="token comment">// 1. 使用 *p 赋值 *pp 2. p右移 (保证每次原字符串读取下一个字符)</span>
+        pp <span class="token operator">+=</span> <span class="token punctuation">(</span><span class="token operator">*</span>pp <span class="token operator">!=</span> c<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// 仅当 *pp != c 时, pp 右移 (意味着如果时c则会被下一次写入覆盖)</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token operator">*</span>pp <span class="token operator">=</span> <span class="token char">'\0'</span><span class="token punctuation">;</span> <span class="token comment">// pp的最新位置作为结尾</span>
+    <span class="token keyword">return</span> str<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 将一个字符串添加到另一个字符串后面</span>
+<span class="token comment">// 前面是 src 后面是 chunk</span>
+<span class="token keyword">char</span> <span class="token operator">*</span><span class="token function">append_string</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span>src<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span>chunk<span class="token punctuation">,</span> <span class="token class-name">size_t</span> chunklen<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token class-name">size_t</span> srclen <span class="token operator">=</span> <span class="token function">strlen</span><span class="token punctuation">(</span>src<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">char</span> <span class="token operator">*</span>ret <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span>srclen <span class="token operator">+</span> chunklen <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">memcpy</span><span class="token punctuation">(</span>ret<span class="token punctuation">,</span> src<span class="token punctuation">,</span> srclen<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">memcpy</span><span class="token punctuation">(</span>ret <span class="token operator">+</span> srclen<span class="token punctuation">,</span> chunk<span class="token punctuation">,</span> chunklen<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    ret<span class="token punctuation">[</span>srclen <span class="token operator">+</span> chunklen<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token char">'\0'</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> ret<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 创建 uuid</span>
+<span class="token keyword">int</span> <span class="token function">generate_uuid</span><span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span>uuid_placeholder<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+
+    <span class="token comment">/* Generate random uuid */</span>
+    <span class="token class-name">uuid_t</span> binuuid<span class="token punctuation">;</span>
+    <span class="token function">uuid_generate_random</span><span class="token punctuation">(</span>binuuid<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">uuid_unparse</span><span class="token punctuation">(</span>binuuid<span class="token punctuation">,</span> uuid_placeholder<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>这些简单的函数足以支撑我们的日志系统，如果在启动时调用 <code>sol_log_init</code> 我们还能将日志存入日志文件。</p>
+<h1 id="服务入口实现"><a href="#服务入口实现" class="headerlink" title="服务入口实现"></a>服务入口实现</h1><p>终于我们要开始写 <code>start_server</code> 函数了，这个函数会调用所有我们之前写过的内容。他将作为程序的入口点，完成各种设置和全局实例的初始化，然后等待着客户端链接。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/server.c</span></div><code class="language-c"><span class="token comment">// 系统状态主题, 根据配置文件每 n 秒发布一次</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">SYS_TOPICS</span> <span class="token expression"><span class="token number">14</span></span></span>
+
+<span class="token keyword">static</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>sys_topics<span class="token punctuation">[</span>SYS_TOPICS<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    <span class="token string">"$SOL/"</span><span class="token punctuation">,</span>
+    <span class="token string">"$SOL/broker/"</span><span class="token punctuation">,</span>
+    <span class="token string">"$SOL/broker/clients/"</span><span class="token punctuation">,</span>
+    <span class="token string">"$SOL/broker/bytes/"</span><span class="token punctuation">,</span>
+    <span class="token string">"$SOL/broker/messages/"</span><span class="token punctuation">,</span>
+    <span class="token string">"$SOL/broker/uptime/"</span><span class="token punctuation">,</span>
+    <span class="token string">"$SOL/broker/uptime/sol"</span><span class="token punctuation">,</span>
+    <span class="token string">"$SOL/broker/clients/connected/"</span><span class="token punctuation">,</span>
+    <span class="token string">"$SOL/broker/clients/disconnected/"</span><span class="token punctuation">,</span>
+    <span class="token string">"$SOL/broker/bytes/sent/"</span><span class="token punctuation">,</span>
+    <span class="token string">"$SOL/broker/bytes/received/"</span><span class="token punctuation">,</span>
+    <span class="token string">"$SOL/broker/messages/sent/"</span><span class="token punctuation">,</span>
+    <span class="token string">"$SOL/broker/messages/received/"</span><span class="token punctuation">,</span>
+    <span class="token string">"$SOL/broker/memory/used"</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 一个阻塞的循环</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">evloop</span> <span class="token operator">*</span>loop<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">evloop_wait</span><span class="token punctuation">(</span>loop<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token function">sol_error</span><span class="token punctuation">(</span><span class="token string">"Event loop exited unexpectedly: %s"</span><span class="token punctuation">,</span> <span class="token function">strerror</span><span class="token punctuation">(</span>loop<span class="token operator">-></span>status<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">evloop_free</span><span class="token punctuation">(</span>loop<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 在全局哈希表中删除客户端时触发回调释放资源</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">client_destructor</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token operator">*</span>entry<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>entry<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">sol_client</span> <span class="token operator">*</span>client <span class="token operator">=</span> entry<span class="token operator">-></span>val<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>client<span class="token operator">-></span>client_id<span class="token punctuation">)</span>
+        <span class="token function">free</span><span class="token punctuation">(</span>client<span class="token operator">-></span>client_id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>client<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 在全局哈希表中删除闭包时触发回调释放资源</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">closure_destructor</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token operator">*</span>entry<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>entry<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">closure</span> <span class="token operator">*</span>closure <span class="token operator">=</span> entry<span class="token operator">-></span>val<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>closure<span class="token operator">-></span>payload<span class="token punctuation">)</span>
+        <span class="token function">bytestring_release</span><span class="token punctuation">(</span>closure<span class="token operator">-></span>payload<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>closure<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 启动服务器</span>
+<span class="token keyword">int</span> <span class="token function">start_server</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>addr<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>port<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 初始化 sol 全局实例</span>
+    <span class="token function">trie_init</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>sol<span class="token punctuation">.</span>topics<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 确保所有的客户端和闭包都在哈希表中, 这样从哈希表删除时就可以使用回调释放资源</span>
+    sol<span class="token punctuation">.</span>clients <span class="token operator">=</span> <span class="token function">hashtable_create</span><span class="token punctuation">(</span>client_destructor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    sol<span class="token punctuation">.</span>closures <span class="token operator">=</span> <span class="token function">hashtable_create</span><span class="token punctuation">(</span>closure_destructor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 服务端 closure</span>
+    <span class="token keyword">struct</span> <span class="token class-name">closure</span> server_closure<span class="token punctuation">;</span>
+    <span class="token comment">// 开启端口监听</span>
+    server_closure<span class="token punctuation">.</span>fd <span class="token operator">=</span> <span class="token function">make_listen</span><span class="token punctuation">(</span>addr<span class="token punctuation">,</span> port<span class="token punctuation">,</span> conf<span class="token operator">-></span>socket_family<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    server_closure<span class="token punctuation">.</span>payload <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    server_closure<span class="token punctuation">.</span>args <span class="token operator">=</span> <span class="token operator">&amp;</span>server_closure<span class="token punctuation">;</span>
+    <span class="token comment">// 唯一事件是接受客户端链接</span>
+    server_closure<span class="token punctuation">.</span>call <span class="token operator">=</span> on_accept<span class="token punctuation">;</span>
+    <span class="token function">generate_uuid</span><span class="token punctuation">(</span>server_closure<span class="token punctuation">.</span>closure_id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 创建输出状态的基础 topic</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> SYS_TOPICS<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+        <span class="token function">sol_topic_put</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>sol<span class="token punctuation">,</span> <span class="token function">topic_create</span><span class="token punctuation">(</span><span class="token function">strdup</span><span class="token punctuation">(</span>sys_topics<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 创建 evloop</span>
+    <span class="token keyword">struct</span> <span class="token class-name">evloop</span> <span class="token operator">*</span>event_loop <span class="token operator">=</span> <span class="token function">evloop_create</span><span class="token punctuation">(</span>EPOLL_MAX_EVENTS<span class="token punctuation">,</span> EPOLL_TIMEOUT<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 将服务端 closure 放入 evloop</span>
+    <span class="token function">evloop_add_callback</span><span class="token punctuation">(</span>event_loop<span class="token punctuation">,</span> <span class="token operator">&amp;</span>server_closure<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 添加周期性事件 汇报服务器状态</span>
+    <span class="token comment">// TODO 实现</span>
+    <span class="token keyword">struct</span> <span class="token class-name">closure</span> sys_closure <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+        <span class="token punctuation">.</span>fd <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span>
+        <span class="token punctuation">.</span>payload <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">,</span>
+        <span class="token punctuation">.</span>args <span class="token operator">=</span> <span class="token operator">&amp;</span>sys_closure<span class="token punctuation">,</span>
+        <span class="token punctuation">.</span>call <span class="token operator">=</span> publish_stats
+    <span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+    <span class="token function">generate_uuid</span><span class="token punctuation">(</span>sys_closure<span class="token punctuation">.</span>closure_id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">evloop_add_periodic_task</span><span class="token punctuation">(</span>event_loop<span class="token punctuation">,</span> conf<span class="token operator">-></span>stats_pub_interval<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>sys_closure<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 初始化完成</span>
+    <span class="token function">sol_info</span><span class="token punctuation">(</span><span class="token string">"Server start"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    info<span class="token punctuation">.</span>start_time <span class="token operator">=</span> <span class="token function">time</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 进入事件循环</span>
+    <span class="token function">run</span><span class="token punctuation">(</span>event_loop<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 释放资源</span>
+    <span class="token function">hashtable_release</span><span class="token punctuation">(</span>sol<span class="token punctuation">.</span>clients<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">hashtable_release</span><span class="token punctuation">(</span>sol<span class="token punctuation">.</span>closures<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">sol_info</span><span class="token punctuation">(</span><span class="token string">"Sol v%s exiting"</span><span class="token punctuation">,</span> VERSION<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h1 id="定时通报服务器状态"><a href="#定时通报服务器状态" class="headerlink" title="定时通报服务器状态"></a>定时通报服务器状态</h1><p>好的，我们现在有了一个（几乎）功能齐全的服务器，它使用我们的回调系统来处理流量。 接下来我们需要在头文件上添加一些代码，例如我们刚才使用的 <code>info</code> 结构体，还有全局的名为 <code>sol</code> 的实例，这些我们都还没有定义。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/server.h</span></div><code class="language-c"><span class="token comment">// 全局 info</span>
+<span class="token keyword">struct</span> <span class="token class-name">sol_info</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">int</span> nclients<span class="token punctuation">;</span>               <span class="token comment">// 当前客户端数</span>
+    <span class="token keyword">int</span> nconnections<span class="token punctuation">;</span>           <span class="token comment">// 历史客户端总数</span>
+    <span class="token keyword">long</span> <span class="token keyword">long</span> start_time<span class="token punctuation">;</span>       <span class="token comment">// 服务启动时间</span>
+    <span class="token keyword">long</span> <span class="token keyword">long</span> bytes_recv<span class="token punctuation">;</span>       <span class="token comment">// 接收字节总数</span>
+    <span class="token keyword">long</span> <span class="token keyword">long</span> bytes_sent<span class="token punctuation">;</span>       <span class="token comment">// 发送字节总数</span>
+    <span class="token keyword">long</span> <span class="token keyword">long</span> messages_sent<span class="token punctuation">;</span>    <span class="token comment">// 发送消息总数</span>
+    <span class="token keyword">long</span> <span class="token keyword">long</span> messages_recv<span class="token punctuation">;</span>    <span class="token comment">// 接收消息总数</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>这是刚才的 <code>start_server</code> 函数中我们添加的一个周期性任务。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token comment">// 添加周期性事件 汇报服务器状态</span>
+<span class="token comment">// TODO 实现</span>
+<span class="token keyword">struct</span> <span class="token class-name">closure</span> sys_closure <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    <span class="token punctuation">.</span>fd <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">,</span>
+    <span class="token punctuation">.</span>payload <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">,</span>
+    <span class="token punctuation">.</span>args <span class="token operator">=</span> <span class="token operator">&amp;</span>sys_closure<span class="token punctuation">,</span>
+    <span class="token punctuation">.</span>call <span class="token operator">=</span> publish_stats
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+<span class="token function">generate_uuid</span><span class="token punctuation">(</span>sys_closure<span class="token punctuation">.</span>closure_id<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token function">evloop_add_periodic_task</span><span class="token punctuation">(</span>event_loop<span class="token punctuation">,</span> conf<span class="token operator">-></span>stats_pub_interval<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>sys_closure<span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p><code>publish_stats</code> 函数会每隔 <code>conf-&gt;stats_pub_interval</code> 秒被调用一次， <code>conf-&gt;stats_pub_interval</code> 是一个全局的配置值，配置相关的内容我们稍后会去实现。</p>
+<p>现在，让我们先实现这个回调函数：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/server.c</span></div><code class="language-c"><span class="token comment">// 发送消息的工具方法</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">publish_message</span><span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">short</span> pkt_id<span class="token punctuation">,</span>
+                            <span class="token keyword">unsigned</span> <span class="token keyword">short</span> topiclen<span class="token punctuation">,</span>
+                            <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>topic<span class="token punctuation">,</span>
+                            <span class="token keyword">unsigned</span> <span class="token keyword">short</span> payloadlen<span class="token punctuation">,</span>
+                            <span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span>payload<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+
+    <span class="token comment">// 从全局的 topic 表中获得我们需发送的 topic, 如果不存在则退出</span>
+    <span class="token keyword">struct</span> <span class="token class-name">topic</span> <span class="token operator">*</span>t <span class="token operator">=</span> <span class="token function">sol_topic_get</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>sol<span class="token punctuation">,</span> topic<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>t<span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 制作一个 PUBLISH 包</span>
+    <span class="token keyword">union</span> mqtt_packet pkt<span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">mqtt_publish</span> <span class="token operator">*</span>p <span class="token operator">=</span> <span class="token function">mqtt_packet_publish</span><span class="token punctuation">(</span>PUBLISH_BYTE<span class="token punctuation">,</span>
+                                                 pkt_id<span class="token punctuation">,</span>
+                                                 topiclen<span class="token punctuation">,</span>
+                                                 <span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span> topic<span class="token punctuation">,</span>
+                                                 payloadlen<span class="token punctuation">,</span>
+                                                 payload<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    pkt<span class="token punctuation">.</span>publish <span class="token operator">=</span> <span class="token operator">*</span>p<span class="token punctuation">;</span>
+    <span class="token class-name">size_t</span> len<span class="token punctuation">;</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span>packed<span class="token punctuation">;</span>
+
+    <span class="token comment">// 通过TCP向所有订阅了该主题的客户端发送 payload</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>cur <span class="token operator">=</span> t<span class="token operator">-></span>subscribers<span class="token operator">-></span>head<span class="token punctuation">;</span>
+    <span class="token class-name">size_t</span> sent <span class="token operator">=</span> <span class="token number">0L</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span> cur<span class="token punctuation">;</span> cur <span class="token operator">=</span> cur<span class="token operator">-></span>next<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token function">sol_debug</span><span class="token punctuation">(</span><span class="token string">"Sending PUBLISH (d%i, q%u, r%i, m%u, %s, ... (%i bytes))"</span><span class="token punctuation">,</span>
+                  pkt<span class="token punctuation">.</span>publish<span class="token punctuation">.</span>header<span class="token punctuation">.</span>bits<span class="token punctuation">.</span>dup<span class="token punctuation">,</span>
+                  pkt<span class="token punctuation">.</span>publish<span class="token punctuation">.</span>header<span class="token punctuation">.</span>bits<span class="token punctuation">.</span>qos<span class="token punctuation">,</span>
+                  pkt<span class="token punctuation">.</span>publish<span class="token punctuation">.</span>header<span class="token punctuation">.</span>bits<span class="token punctuation">.</span>retain<span class="token punctuation">,</span>
+                  pkt<span class="token punctuation">.</span>publish<span class="token punctuation">.</span>pkt_id<span class="token punctuation">,</span>
+                  pkt<span class="token punctuation">.</span>publish<span class="token punctuation">.</span>topic<span class="token punctuation">,</span>
+                  pkt<span class="token punctuation">.</span>publish<span class="token punctuation">.</span>payloadlen<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        len <span class="token operator">=</span> MQTT_HEADER_LEN <span class="token operator">+</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token class-name">uint16_t</span><span class="token punctuation">)</span> <span class="token operator">+</span>
+            pkt<span class="token punctuation">.</span>publish<span class="token punctuation">.</span>topiclen <span class="token operator">+</span> pkt<span class="token punctuation">.</span>publish<span class="token punctuation">.</span>payloadlen<span class="token punctuation">;</span>
+        <span class="token keyword">struct</span> <span class="token class-name">subscriber</span> <span class="token operator">*</span>sub <span class="token operator">=</span> cur<span class="token operator">-></span>data<span class="token punctuation">;</span>
+        <span class="token keyword">struct</span> <span class="token class-name">sol_client</span> <span class="token operator">*</span>sc <span class="token operator">=</span> sub<span class="token operator">-></span>client<span class="token punctuation">;</span>
+
+        <span class="token comment">// 根据订阅者设置的 qos 更改包中的 qos</span>
+        pkt<span class="token punctuation">.</span>publish<span class="token punctuation">.</span>header<span class="token punctuation">.</span>bits<span class="token punctuation">.</span>qos <span class="token operator">=</span> sub<span class="token operator">-></span>qos<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>pkt<span class="token punctuation">.</span>publish<span class="token punctuation">.</span>header<span class="token punctuation">.</span>bits<span class="token punctuation">.</span>qos <span class="token operator">></span> AT_MOST_ONCE<span class="token punctuation">)</span>
+            len <span class="token operator">+=</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token class-name">uint16_t</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">int</span> remaininglen_offset <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>len <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0x200000</span><span class="token punctuation">)</span>
+            remaininglen_offset <span class="token operator">=</span> <span class="token number">3</span><span class="token punctuation">;</span>
+        <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>len <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0x4000</span><span class="token punctuation">)</span>
+            remaininglen_offset <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span>
+        <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>len <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0x80</span><span class="token punctuation">)</span>
+            remaininglen_offset <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        len <span class="token operator">+=</span> remaininglen_offset<span class="token punctuation">;</span>
+        
+        <span class="token comment">// 实际打包发送</span>
+        packed <span class="token operator">=</span> <span class="token function">pack_mqtt_packet</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>pkt<span class="token punctuation">,</span> PUBLISH<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>sent <span class="token operator">=</span> <span class="token function">send_bytes</span><span class="token punctuation">(</span>sc<span class="token operator">-></span>fd<span class="token punctuation">,</span> packed<span class="token punctuation">,</span> len<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span>
+            <span class="token function">sol_error</span><span class="token punctuation">(</span><span class="token string">"Error publishing to %s: %s"</span><span class="token punctuation">,</span>
+                      sc<span class="token operator">-></span>client_id<span class="token punctuation">,</span> <span class="token function">strerror</span><span class="token punctuation">(</span>errno<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 统计信息</span>
+        info<span class="token punctuation">.</span>bytes_sent <span class="token operator">+=</span> sent<span class="token punctuation">;</span>
+        info<span class="token punctuation">.</span>messages_sent<span class="token operator">++</span><span class="token punctuation">;</span>
+        <span class="token function">free</span><span class="token punctuation">(</span>packed<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>p<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 发送服务器状态的周期性任务</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">publish_stats</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">evloop</span> <span class="token operator">*</span>loop<span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span>args<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">char</span> cclients<span class="token punctuation">[</span><span class="token function">number_len</span><span class="token punctuation">(</span>info<span class="token punctuation">.</span>nclients<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">sprintf</span><span class="token punctuation">(</span>cclients<span class="token punctuation">,</span> <span class="token string">"%d"</span><span class="token punctuation">,</span> info<span class="token punctuation">.</span>nclients<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">char</span> bsent<span class="token punctuation">[</span><span class="token function">number_len</span><span class="token punctuation">(</span>info<span class="token punctuation">.</span>bytes_sent<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">sprintf</span><span class="token punctuation">(</span>bsent<span class="token punctuation">,</span> <span class="token string">"%lld"</span><span class="token punctuation">,</span> info<span class="token punctuation">.</span>bytes_sent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">char</span> msent<span class="token punctuation">[</span><span class="token function">number_len</span><span class="token punctuation">(</span>info<span class="token punctuation">.</span>messages_sent<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">sprintf</span><span class="token punctuation">(</span>msent<span class="token punctuation">,</span> <span class="token string">"%lld"</span><span class="token punctuation">,</span> info<span class="token punctuation">.</span>messages_sent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">char</span> mrecv<span class="token punctuation">[</span><span class="token function">number_len</span><span class="token punctuation">(</span>info<span class="token punctuation">.</span>messages_recv<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">sprintf</span><span class="token punctuation">(</span>mrecv<span class="token punctuation">,</span> <span class="token string">"%lld"</span><span class="token punctuation">,</span> info<span class="token punctuation">.</span>messages_recv<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">long</span> <span class="token keyword">long</span> uptime <span class="token operator">=</span> <span class="token function">time</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token operator">-</span> info<span class="token punctuation">.</span>start_time<span class="token punctuation">;</span>
+    <span class="token keyword">char</span> utime<span class="token punctuation">[</span><span class="token function">number_len</span><span class="token punctuation">(</span>uptime<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">sprintf</span><span class="token punctuation">(</span>utime<span class="token punctuation">,</span> <span class="token string">"%lld"</span><span class="token punctuation">,</span> uptime<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">double</span> sol_uptime <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">double</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token function">time</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token operator">-</span> info<span class="token punctuation">.</span>start_time<span class="token punctuation">)</span> <span class="token operator">/</span> SOL_SECONDS<span class="token punctuation">;</span>
+    <span class="token keyword">char</span> sutime<span class="token punctuation">[</span><span class="token number">16</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token function">sprintf</span><span class="token punctuation">(</span>sutime<span class="token punctuation">,</span> <span class="token string">"%.4f"</span><span class="token punctuation">,</span> sol_uptime<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">publish_message</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span>sys_topics<span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> sys_topics<span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                    <span class="token function">strlen</span><span class="token punctuation">(</span>utime<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>utime<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">publish_message</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span>sys_topics<span class="token punctuation">[</span><span class="token number">6</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> sys_topics<span class="token punctuation">[</span><span class="token number">6</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                    <span class="token function">strlen</span><span class="token punctuation">(</span>sutime<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>sutime<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">publish_message</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span>sys_topics<span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> sys_topics<span class="token punctuation">[</span><span class="token number">7</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                    <span class="token function">strlen</span><span class="token punctuation">(</span>cclients<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>cclients<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">publish_message</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span>sys_topics<span class="token punctuation">[</span><span class="token number">9</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> sys_topics<span class="token punctuation">[</span><span class="token number">9</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                    <span class="token function">strlen</span><span class="token punctuation">(</span>bsent<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>bsent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">publish_message</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span>sys_topics<span class="token punctuation">[</span><span class="token number">11</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> sys_topics<span class="token punctuation">[</span><span class="token number">11</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                    <span class="token function">strlen</span><span class="token punctuation">(</span>msent<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>msent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">publish_message</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span>sys_topics<span class="token punctuation">[</span><span class="token number">12</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> sys_topics<span class="token punctuation">[</span><span class="token number">12</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+                    <span class="token function">strlen</span><span class="token punctuation">(</span>mrecv<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">unsigned</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span>mrecv<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>我们已经注册了我们第一个周期性回调，他会定时的发送 <code>sys_topics</code> 数组中主题的消息，</p>
+<p>下面是一些我们需要的全局实例：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/server.c</span></div><code class="language-c"><span class="token comment">// info 实例, 其内容会被周期性回调发送</span>
+<span class="token keyword">static</span> <span class="token keyword">struct</span> <span class="token class-name">sol_info</span> info<span class="token punctuation">;</span>
+
+<span class="token comment">// sol 实例, 包括 主题树 和 客户端哈希表</span>
+<span class="token keyword">static</span> <span class="token keyword">struct</span> <span class="token class-name">sol</span> sol<span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h1 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h1><p>我们还需要补充一些代码，才能使我们上面的代码能够运行。比如，<code>struct sol</code> 的定义、<code>closure_destructor</code> 函数，哈希表的定义，比如 <code>topic</code> 的存储和解析方法。这一切我们都需要去完成。</p>
+<p>在下一部分我们会编写处理各种MQTT数据包的 <code>处理器</code>，根据数据包的类型和内容不同，服务器会表现出不同的行为。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/MQTT/" class="category-chain-item">MQTT</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="print-no-link">#网络编程</a>
+      
+        <a href="/tags/%E7%BF%BB%E8%AF%91/" class="print-no-link">#翻译</a>
+      
+        <a href="/tags/C/" class="print-no-link">#C</a>
+      
+        <a href="/tags/MQTT/" class="print-no-link">#MQTT</a>
+      
+        <a href="/tags/%E7%89%A9%E8%81%94%E7%BD%91/" class="print-no-link">#物联网</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>[翻译]Sol - 从零开始的MQTT broker - 第三部分：服务</div>
+      <div>https://vitsumoc.github.io/translate-sol-3.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>vc</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年12月22日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/translate-sol-4.html" title="[翻译]Sol - 从零开始的MQTT broker - 第四部分：数据结构">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">[翻译]Sol - 从零开始的MQTT broker - 第四部分：数据结构</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/translate-epoll-in-3-steps.html" title="[翻译]通过三个步骤简单理解epoll">
+                        <span class="hidden-mobile">[翻译]通过三个步骤简单理解epoll</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>vitusmoc Blog, Powered by </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script  src="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

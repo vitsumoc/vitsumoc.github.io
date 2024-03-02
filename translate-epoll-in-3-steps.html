@@ -1,0 +1,823 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="vc">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="原文 epoll() Tutorial – epoll() In 3 Easy Steps!">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[翻译]通过三个步骤简单理解epoll">
+<meta property="og:url" content="https://vitsumoc.github.io/translate-epoll-in-3-steps.html">
+<meta property="og:site_name" content="Thinking...">
+<meta property="og:description" content="原文 epoll() Tutorial – epoll() In 3 Easy Steps!">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://vitsumoc.github.io/translate-epoll-in-3-steps/poll-times.png">
+<meta property="article:published_time" content="2023-12-20T07:46:49.000Z">
+<meta property="article:modified_time" content="2024-03-02T00:55:07.971Z">
+<meta property="article:author" content="vc">
+<meta property="article:tag" content="网络编程">
+<meta property="article:tag" content="翻译">
+<meta property="article:tag" content="C">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://vitsumoc.github.io/translate-epoll-in-3-steps/poll-times.png">
+  
+  
+  
+  <title>[翻译]通过三个步骤简单理解epoll - Thinking...</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"vitsumoc.github.io","root":"/","version":"1.9.6","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Thinking...</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">[翻译]通过三个步骤简单理解epoll</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-12-20 15:46" pubdate>
+          2023年12月20日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          10 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">[翻译]通过三个步骤简单理解epoll</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>原文 <a target="_blank" rel="noopener" href="https://suchprogramming.com/epoll-in-3-easy-steps/">epoll() Tutorial – epoll() In 3 Easy Steps!</a></p>
+</blockquote>
+<span id="more"></span>
+
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>就在不久前，能够让一台服务器<a target="_blank" rel="noopener" href="http://www.kegel.com/c10k.html">支持10000个并发连接</a>还是一个很了不起的事情。有很多因素让这个行为成为可能，例如 <a target="_blank" rel="noopener" href="https://www.nginx.com/">nginx</a>，他可以比他的前辈们更高效的处理更多连接。不过其中最大的因素应该还是大部分操作系统引入了恒定时间的轮询机制<a target="_blank" rel="noopener" href="https://robbell.io/2009/06/a-beginners-guide-to-big-o-notation">O1</a>，用来监视系统中的文件描述符。</p>
+<p>在 <a target="_blank" rel="noopener" href="https://nostarch.com/">No Starch Press</a> 的书<a target="_blank" rel="noopener" href="https://nostarch.com/tlpi">《Linux 编程接口》</a>中，第 63.4.5 节提供了一个表格，描述了通过一些最常见的轮询方法检查不同数量的文件描述符所需的时间。</p>
+<p><img src="/translate-epoll-in-3-steps/poll-times.png" srcset="/img/loading.gif" lazyload></p>
+<p>如图所示，在10个文件描述符时，epoll 已经体现出了他的性能优势。随着描述符数量的增加，相比于 <a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/poll.2.html">poll()</a> 或 <a target="_blank" rel="noopener" href="https://man7.org/linux/man-pages/man2/select.2.html">select()</a>，这种性能优势体现的越来越大。</p>
+<p>本教程将介绍在 Linux 2.6.27+ 上使用 epoll() 的一些基础知识。</p>
+<h2 id="预备知识"><a href="#预备知识" class="headerlink" title="预备知识"></a>预备知识</h2><p>本教程假设您熟悉并熟悉 Linux、C 语法以及类 UNIX 系统中文件描述符的使用。</p>
+<h1 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h1><p>创建一个新文件夹来开始我们的教程， Makefile 如下：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-makefile" data-language="makefile"><code class="language-makefile"><span class="token target symbol">all</span><span class="token punctuation">:</span> epoll_example
+
+<span class="token target symbol">epoll_example</span><span class="token punctuation">:</span> epoll_example.c
+	gcc -Wall -Werror -o <span class="token variable">$@</span> epoll_example.c
+
+<span class="token target symbol">clean</span><span class="token punctuation">:</span>
+	<span class="token operator">@</span>rm -v epoll_example<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>在这篇文章中，需要使用这些库：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>epoll_example.c</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span>     <span class="token comment">// for fprintf()</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span>    <span class="token comment">// for close(), read()</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/epoll.h></span> <span class="token comment">// for epoll_create1(), epoll_ctl(), struct epoll_event</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span>    <span class="token comment">// for strncmp</span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h1 id="第一步：创建-epoll-文件描述符"><a href="#第一步：创建-epoll-文件描述符" class="headerlink" title="第一步：创建 epoll 文件描述符"></a>第一步：创建 epoll 文件描述符</h1><p>从最基础开始，先尝试创建和关闭 epoll 实例。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>epoll_example.c</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span>     <span class="token comment">// for fprintf()</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span>    <span class="token comment">// for close()</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/epoll.h></span> <span class="token comment">// for epoll_create1()</span></span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+	<span class="token keyword">int</span> epoll_fd <span class="token operator">=</span> <span class="token function">epoll_create1</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	
+	<span class="token keyword">if</span> <span class="token punctuation">(</span>epoll_fd <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Failed to create epoll file descriptor\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">close</span><span class="token punctuation">(</span>epoll_fd<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Failed to close epoll file descriptor\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>运行这段代码，正常来说应该直接返回并且不产生任何输出，如果你看到了错误消息，那么也许你可能正在运行一个非常旧的 Linux 内核。</p>
+<p>第一个例子是使用 <a target="_blank" rel="noopener" href="https://linux.die.net/man/2/epoll_create1">epoll_create1()</a> 创建 <code>epoll</code> 实例，并且获得他的文件描述符。虽然我们没有用这个文件描述符做任何事情，我们仍然要记得在关闭程序之前清理他。就像和其他的 <code>Linux</code> 文件描述符一样，使用 <code>close()</code>。</p>
+<h2 id="电平触发（Level-triggered）和边沿触发（edge-triggered）"><a href="#电平触发（Level-triggered）和边沿触发（edge-triggered）" class="headerlink" title="电平触发（Level triggered）和边沿触发（edge triggered）"></a>电平触发（Level triggered）和边沿触发（edge triggered）</h2><p><a target="_blank" rel="noopener" href="https://www.quora.com/What-are-the-key-differences-between-edge-triggered-and-level-triggered-interrupts">电平触发和边沿触发</a> 是从电子工程师那边借来的术语，但当我们使用 <code>epoll</code> 时，我们需要注意这两者的差别。在边沿触发模式下，我们只会在被监控文件描述符的状态变化时接收到事件；而在电平触发模式下，我们会持续接收事件，直到被监控的文件描述符不再处于 ready 状态。一般来说电平触发时默认状态，而且更加容易上手，我们的教程也会使用电平触发。但是我们也需要直到有边沿触发这回事。</p>
+<h1 id="第二步：添加被-epoll-监控的文件描述符"><a href="#第二步：添加被-epoll-监控的文件描述符" class="headerlink" title="第二步：添加被 epoll 监控的文件描述符"></a>第二步：添加被 epoll 监控的文件描述符</h1><p>接下来要做的事情就是，告诉 epoll 需要监控哪些文件描述符，以及需要监控哪种类型的事件。在这个例子里，我会使用Linux中我最爱的文件描述符，亲爱的 <code>file descriptor 0</code>（就是标准输入）。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>epoll_example.c</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span>     <span class="token comment">// for fprintf()</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span>    <span class="token comment">// for close()</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/epoll.h></span> <span class="token comment">// for epoll_create1(), epoll_ctl(), struct epoll_event</span></span>
+	
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+	<span class="token keyword">struct</span> <span class="token class-name">epoll_event</span> event<span class="token punctuation">;</span>
+	<span class="token keyword">int</span> epoll_fd <span class="token operator">=</span> <span class="token function">epoll_create1</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	
+	<span class="token keyword">if</span> <span class="token punctuation">(</span>epoll_fd <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Failed to create epoll file descriptor\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span>
+	
+	event<span class="token punctuation">.</span>events <span class="token operator">=</span> EPOLLIN<span class="token punctuation">;</span>
+	event<span class="token punctuation">.</span>data<span class="token punctuation">.</span>fd <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+	
+	<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">epoll_ctl</span><span class="token punctuation">(</span>epoll_fd<span class="token punctuation">,</span> EPOLL_CTL_ADD<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>event<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Failed to add file descriptor to epoll\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token function">close</span><span class="token punctuation">(</span>epoll_fd<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span>
+	
+	<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">close</span><span class="token punctuation">(</span>epoll_fd<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Failed to close epoll file descriptor\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>这里我们创建了 <code>epoll_event</code> 的实例 <code>event</code>，并使用 <a target="_blank" rel="noopener" href="https://linux.die.net/man/2/epoll_ctl">epoll_ctl()</a> 将 <code>fd0</code> 添加到 epoll 的实例 <code>epoll_fd</code> 中。最后一个参数 <code>event</code> 是为了让 epoll 知道我们只想关注输入事件（<code>EPOLLIN</code>），而且还能为事件提供一些我们自定义的数据（本例中 <code>event.data.fd = 0</code>）。</p>
+<h1 id="第三步：完整例子"><a href="#第三步：完整例子" class="headerlink" title="第三步：完整例子"></a>第三步：完整例子</h1><p>现在，让 epoll 发挥他的魔力吧</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>epoll_example.c</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">MAX_EVENTS</span> <span class="token expression"><span class="token number">5</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">READ_SIZE</span> <span class="token expression"><span class="token number">10</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span>     <span class="token comment">// for fprintf()</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span>    <span class="token comment">// for close(), read()</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;sys/epoll.h></span> <span class="token comment">// for epoll_create1(), epoll_ctl(), struct epoll_event</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span>    <span class="token comment">// for strncmp</span></span>
+
+<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#123;</span>
+  <span class="token comment">// 是否运行中、当前并发事件数、计数器</span>
+	<span class="token keyword">int</span> running <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">,</span> event_count<span class="token punctuation">,</span> i<span class="token punctuation">;</span>
+  <span class="token comment">// 接收数据长度</span>
+	<span class="token class-name">size_t</span> bytes_read<span class="token punctuation">;</span>
+  <span class="token comment">// 接收输入 buffer</span>
+	<span class="token keyword">char</span> read_buffer<span class="token punctuation">[</span>READ_SIZE <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token comment">// event 是一个事件结构 events 是事件数组, 最多5个</span>
+	<span class="token keyword">struct</span> <span class="token class-name">epoll_event</span> event<span class="token punctuation">,</span> events<span class="token punctuation">[</span>MAX_EVENTS<span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token comment">// epoll 实例</span>
+	<span class="token keyword">int</span> epoll_fd <span class="token operator">=</span> <span class="token function">epoll_create1</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+	<span class="token keyword">if</span> <span class="token punctuation">(</span>epoll_fd <span class="token operator">==</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Failed to create epoll file descriptor\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// 监听 EPOLLIN</span>
+	event<span class="token punctuation">.</span>events <span class="token operator">=</span> EPOLLIN<span class="token punctuation">;</span>
+	<span class="token comment">// 用户数据 fd = 0</span>
+  event<span class="token punctuation">.</span>data<span class="token punctuation">.</span>fd <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// 使用 epoll_ctl 添加监听</span>
+	<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token function">epoll_ctl</span><span class="token punctuation">(</span>epoll_fd<span class="token punctuation">,</span> EPOLL_CTL_ADD<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>event<span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#123;</span>
+		<span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Failed to add file descriptor to epoll\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token function">close</span><span class="token punctuation">(</span>epoll_fd<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">while</span> <span class="token punctuation">(</span>running<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token comment">// 等待输入</span>
+    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"\nPolling for input...\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// epoll_wait 等待事件发生</span>
+    <span class="token comment">// 返回值：接收并发事件数</span>
+    <span class="token comment">// 参数：epoll实例, 事件容器, 并发数, 超时时间</span>
+		event_count <span class="token operator">=</span> <span class="token function">epoll_wait</span><span class="token punctuation">(</span>epoll_fd<span class="token punctuation">,</span> events<span class="token punctuation">,</span> MAX_EVENTS<span class="token punctuation">,</span> <span class="token number">30</span> <span class="token operator">*</span> <span class="token number">1000</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%d ready events\n"</span><span class="token punctuation">,</span> event_count<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> event_count<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			<span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Reading file descriptor '%d' -- "</span><span class="token punctuation">,</span> events<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>data<span class="token punctuation">.</span>fd<span class="token punctuation">)</span><span class="token punctuation">;</span>
+			bytes_read <span class="token operator">=</span> <span class="token function">read</span><span class="token punctuation">(</span>events<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>data<span class="token punctuation">.</span>fd<span class="token punctuation">,</span> read_buffer<span class="token punctuation">,</span> READ_SIZE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+			<span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%zd bytes read.\n"</span><span class="token punctuation">,</span> bytes_read<span class="token punctuation">)</span><span class="token punctuation">;</span>
+			read_buffer<span class="token punctuation">[</span>bytes_read<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token char">'\0'</span><span class="token punctuation">;</span>
+			<span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"Read '%s'"</span><span class="token punctuation">,</span> read_buffer<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token comment">// 输入为 stop 时结束</span>
+			<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span><span class="token function">strncmp</span><span class="token punctuation">(</span>read_buffer<span class="token punctuation">,</span> <span class="token string">"stop\n"</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+			running <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">close</span><span class="token punctuation">(</span>epoll_fd<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token function">fprintf</span><span class="token punctuation">(</span><span class="token constant">stderr</span><span class="token punctuation">,</span> <span class="token string">"Failed to close epoll file descriptor\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>我们添加了一些变量，用来支撑这个例子，同时使用了一个循环，持续读取标准输入直到读取内容为 <code>stop</code>。我们使用 <a href="">epoll_wait()</a> 来等待事件的发生，每个发生的事件都会被存储在 <code>events</code> 中，最大支持 <code>MAX_EVENTS</code> 个事件，并将超时事件设置为30秒。<code>epoll_wait()</code> 返回了本次触发了多少事件，然后我们只是在一个循环中打印这些事件而已。</p>
+<h1 id="使用实例"><a href="#使用实例" class="headerlink" title="使用实例"></a>使用实例</h1><p>接下来是一些使用示例：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><div class="caption"><span>example</span></div><code class="language-text">:~/epoll_example$ ./epoll_example
+
+Polling for input...
+hello
+1 ready events
+Reading file descriptor '0' -- 6 bytes read.
+Read 'hello
+'
+Polling for input...
+to looooooooooooong
+1 ready events
+Reading file descriptor '0' -- 10 bytes read.
+Read 'to loooooo'
+Polling for input...
+1 ready events
+Reading file descriptor '0' -- 10 bytes read.
+Read 'ooooooong
+'
+Polling for input...
+stop
+1 ready events
+Reading file descriptor '0' -- 5 bytes read.
+Read 'stop
+'<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>可以看到，第一次我们输入 <code>hello</code>，程序正确输出而且继续循环。</p>
+<p>第二次当我们输入一个超过长度限制的输入 <code>to looooooooooooong</code> 时，电平触发机制帮助了我们。因为输入缓冲区一直有值，所以我们的事件就一直触发，直到读取完毕。在这种情况下，如果我们使用的是边沿触发，那么我们就只能收到一次通知，直到下次再有内容写入输入缓冲区时才会执行下一次事件了。</p>
+<p>希望这篇文档能够帮助你使用 <code>epoll()</code>！</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="category-chain-item">网络编程</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="print-no-link">#网络编程</a>
+      
+        <a href="/tags/%E7%BF%BB%E8%AF%91/" class="print-no-link">#翻译</a>
+      
+        <a href="/tags/C/" class="print-no-link">#C</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>[翻译]通过三个步骤简单理解epoll</div>
+      <div>https://vitsumoc.github.io/translate-epoll-in-3-steps.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>vc</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年12月20日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/translate-sol-3.html" title="[翻译]Sol - 从零开始的MQTT broker - 第三部分：服务">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">[翻译]Sol - 从零开始的MQTT broker - 第三部分：服务</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/translate-sol-2.html" title="[翻译]Sol - 从零开始的MQTT broker - 第二部分：网络">
+                        <span class="hidden-mobile">[翻译]Sol - 从零开始的MQTT broker - 第二部分：网络</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>vitusmoc Blog, Powered by </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script  src="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

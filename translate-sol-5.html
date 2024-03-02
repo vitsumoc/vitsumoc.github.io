@@ -1,0 +1,1116 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="vc">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="原文 Sol - An MQTT broker from scratch. Part 5 - Topic abstraction">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[翻译]Sol - 从零开始的MQTT broker - 第五部分：主题树">
+<meta property="og:url" content="https://vitsumoc.github.io/translate-sol-5.html">
+<meta property="og:site_name" content="Thinking...">
+<meta property="og:description" content="原文 Sol - An MQTT broker from scratch. Part 5 - Topic abstraction">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-12-28T02:43:27.000Z">
+<meta property="article:modified_time" content="2024-03-02T00:55:07.974Z">
+<meta property="article:author" content="vc">
+<meta property="article:tag" content="网络编程">
+<meta property="article:tag" content="翻译">
+<meta property="article:tag" content="C">
+<meta property="article:tag" content="MQTT">
+<meta property="article:tag" content="物联网">
+<meta property="article:tag" content="数据结构">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>[翻译]Sol - 从零开始的MQTT broker - 第五部分：主题树 - Thinking...</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"vitsumoc.github.io","root":"/","version":"1.9.6","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Thinking...</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">[翻译]Sol - 从零开始的MQTT broker - 第五部分：主题树</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-12-28 10:43" pubdate>
+          2023年12月28日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          18 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">[翻译]Sol - 从零开始的MQTT broker - 第五部分：主题树</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>原文 <a target="_blank" rel="noopener" href="https://codepr.github.io/posts/sol-mqtt-broker-p5/">Sol - An MQTT broker from scratch. Part 5 - Topic abstraction</a></p>
+</blockquote>
+<span id="more"></span>
+
+<h1 id="主题"><a href="#主题" class="headerlink" title="主题"></a>主题</h1><p>在<a href="%5B../sol-mqtt-broker-p4%5D(https://codepr.github.io/posts/sol-mqtt-broker-p4/)">第四部分</a>中，我们已经实现了两个数据结构，<strong>哈希表</strong>和<strong>列表</strong>。</p>
+<p>在MQTT协议中，有一种名为 <strong>主题(topic)</strong> 的路由方式，主题本质上是一个字符串，用来将消息匹配到符合规则的客户端中。主题使用分层模型，遵守以下规则：</p>
+<ul>
+<li>主题是一个UTF-8编码的字符串，最大长度为65535个字节</li>
+<li><code>/</code> 用来区分不同的层级，就像文件系统一样</li>
+<li><code>*</code> 是多层匹配通配符，例如使用 <strong>foo&#x2F;bar&#x2F;*</strong> 可以匹配下列主题：<ul>
+<li>foo&#x2F;bar</li>
+<li>foo&#x2F;bar&#x2F;baz</li>
+<li>foo&#x2F;bar&#x2F;bat&#x2F;yop</li>
+</ul>
+</li>
+<li><code>+</code> 是单层匹配通配符，例如使用 <strong>foo&#x2F;+&#x2F;baz</strong> 可以匹配下列主题：<ul>
+<li>foo&#x2F;bar&#x2F;baz</li>
+<li>foo&#x2F;zod&#x2F;baz</li>
+<li>foo&#x2F;nop&#x2F;baz</li>
+</ul>
+</li>
+</ul>
+<p>主题和消息队列有一些类似的特性，但是主题更简单，更加轻量级，同时功能也更弱。</p>
+<h1 id="特里树定义"><a href="#特里树定义" class="headerlink" title="特里树定义"></a>特里树定义</h1><p>现在，我们开始定义我们的 <strong>特里树(trie)</strong> ，这将是我们用来存储主题的数据结构。特里树是这样一种结构，他的每一个节点都带有一个字符，从根到节点的所有字符就组成一个key，数据则是关联在key对应的位置上，在最糟糕的情况下，插入和查找的复杂度为 O(m)，其中 m 是键的长度。特里树的主要优点是可以方便的进行前缀匹配。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/trie.h</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdbool.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"list.h"</span></span>
+
+<span class="token comment">// 向用户提供类型 Trie</span>
+<span class="token keyword">typedef</span> <span class="token keyword">struct</span> <span class="token class-name">trie</span> Trie<span class="token punctuation">;</span>
+
+<span class="token comment">// 树节点, 包括一个子节点列表 children</span>
+<span class="token comment">// 如果是终端节点, 会在data中存储数据</span>
+<span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">char</span> chr<span class="token punctuation">;</span>
+    List <span class="token operator">*</span>children<span class="token punctuation">;</span>
+    <span class="token keyword">void</span> <span class="token operator">*</span>data<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 特里树类型, 包括根节点和数据数量</span>
+<span class="token keyword">struct</span> <span class="token class-name">trie</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>root<span class="token punctuation">;</span>
+    <span class="token class-name">size_t</span> size<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 创建一个新的字符节点</span>
+<span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span><span class="token function">trie_create_node</span><span class="token punctuation">(</span><span class="token keyword">char</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 创建一个新的特里树</span>
+<span class="token keyword">struct</span> <span class="token class-name">trie</span> <span class="token operator">*</span><span class="token function">trie_create</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 特里树初始化</span>
+<span class="token keyword">void</span> <span class="token function">trie_init</span><span class="token punctuation">(</span>Trie <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 当前大小</span>
+<span class="token class-name">size_t</span> <span class="token function">trie_size</span><span class="token punctuation">(</span><span class="token keyword">const</span> Trie <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">/*
+ * 叶子代表有关联数据的节点
+ *           .
+ *          / \
+ *         h   s: s -> value
+ *        / \
+ *       e   k: hk -> value
+ *      /
+ *     l: hel -> value
+ *
+ * 上例中有三个键值对：
+ * - s   -> value
+ * - hk  -> value
+ * - hel -> value
+ */</span>
+<span class="token keyword">void</span> <span class="token operator">*</span><span class="token function">trie_insert</span><span class="token punctuation">(</span>Trie <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+bool <span class="token function">trie_delete</span><span class="token punctuation">(</span>Trie <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 查找节点, 查找成功时返回 true, 否则 false</span>
+<span class="token comment">// 第三个参数作为返回值, 提供指向查找结果的指针, 未找到时值为NULL</span>
+bool <span class="token function">trie_find</span><span class="token punctuation">(</span><span class="token keyword">const</span> Trie <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 释放一个节点, 同时更新size</span>
+<span class="token keyword">void</span> <span class="token function">trie_node_free</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token class-name">size_t</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">void</span> <span class="token function">trie_release</span><span class="token punctuation">(</span>Trie <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 通过一个前缀删除所有能匹配的节点</span>
+<span class="token keyword">void</span> <span class="token function">trie_prefix_delete</span><span class="token punctuation">(</span>Trie <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 使用 mapfunc 处理树中的所有节点, 第四个参数是 mapfunc 可使用的参数</span>
+<span class="token keyword">void</span> <span class="token function">trie_prefix_map_tuple</span><span class="token punctuation">(</span>Trie <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token punctuation">(</span><span class="token operator">*</span>mapfunc<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h1 id="特里树性能"><a href="#特里树性能" class="headerlink" title="特里树性能"></a>特里树性能</h1><p>关于树节点的实现，其实有很多种不同的方法，最简单的一种就是在每一个节点上使用固定长度的数组，数组的大小就是完整的字母表大小，例如这样：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">ALPHABET_SIZE</span> <span class="token expression"><span class="token number">94</span></span></span>
+
+<span class="token comment">// 使用固定数组大小的树节点</span>
+<span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>children<span class="token punctuation">[</span>ALPHABET_SIZE<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token keyword">void</span> <span class="token operator">*</span>data<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>除了可以对key进行范围查询（用以实现通配符功能）这个最大的优点外，特里树的另一个巨大优点是他基于哈希表或者说 B-Tree 的性能优势，能够在进行插入、删除和搜索时保持最坏为 O(L) 的时间复杂度（L是查询键的长度）。但这是有代价的，最明显的缺陷就是结构体自身的内存消耗。</p>
+<p>在上面的例子中，我们的字母表长度是96，意味着从<code>空格</code> 开始一直到 <code>~</code> 结束的96个代表不同字符的 <code>NULL</code> 指针都会被存在 <code>children</code> 中。在一个64位的机器上，每个指针需要使用8个byte，也就是说一个节点至少需要 96 * 8 &#x3D; 768 个字节的空间。我们举个简单的例子：</p>
+<ul>
+<li>插入一个key <code>foo</code></li>
+<li>插入一个key <code>foot</code></li>
+</ul>
+<p>此时我们的根节点 <code>f</code> 有一个非空指针 <code>o</code>，<code>o</code> 也有一个非空指针 <code>o</code>，这里储存着键 <code>foo</code> 对应的值。第二个 <code>o</code> 还有一个非空指针 <code>t</code>， 他将存储键 <code>foot</code> 对应的值。所以我们总共会有4个节点，这意味着我们会有 4 * 96 &#x3D; 384 个指针，然后只使用了其中的4个，显然造成了很大的空间浪费。</p>
+<p>当然，业界早有解决这个问题的方法，即减少空间浪费又保持着良好的时间复杂度性能，比如压缩特里树（compressed trie）和自适应特里树（adaptive trie）。</p>
+<p>我们不去深入挖掘这些概念，就我们目前情况来看，可以想到三个解决方案：</p>
+<ul>
+<li><p>在特里树结构体本身（非节点）添加一个动态列表，每个节点都必须拥有一个指向该列表的指针，和一个<code>char children_idx[ALPHABET_SIZE]</code>数组，数组中保存了自己的子节点在列表中的索引（这句话译者没有理解，原文：Use a single dynamic array (vector) in the Trie structure, each node must have a pointer to that vector and an array char children_idx[ALPHABET_SIZE] which store the index in the main vector for each children，如果你能理解，请告诉我，感谢）</p>
+</li>
+<li><p>使用基于子节点数量增长存储空间的节点，例如当子节点数量 &lt;&#x3D; 4 时，可以使用固定长度为4的数组，当子节点数量增长时将数组更换为更大的数组并且重新关联子节点。</p>
+</li>
+<li><p>将每个节点上的定长数组更换为 <strong>链表</strong>， 在每次插入操作后保持排序，这样每次搜索的平均性能为 O(n&#x2F;2)，等同于 O(n)。</p>
+</li>
+</ul>
+<p>恰好我们在上个部分中实现了基于链表的列表，接下来就让我们使用第三种方案来实现我们的特里树。</p>
+<h1 id="特里树实现"><a href="#特里树实现" class="headerlink" title="特里树实现"></a>特里树实现</h1><figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/trie.c</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;assert.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"list.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"trie.h"</span></span>
+
+<span class="token comment">// 合并两个输入的链表为一个链表, 并从小到大排序</span>
+<span class="token comment">// 要求输入的两个链表都是已经被从小到大排序</span>
+<span class="token keyword">static</span> <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token function">merge_tnode_list</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>list1<span class="token punctuation">,</span>
+                                          <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>list2<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> dummy_head <span class="token operator">=</span> <span class="token punctuation">&#123;</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token constant">NULL</span> <span class="token punctuation">&#125;</span><span class="token punctuation">,</span> <span class="token operator">*</span>tail <span class="token operator">=</span> <span class="token operator">&amp;</span>dummy_head<span class="token punctuation">;</span>
+    <span class="token comment">// 每次都取 l1 或 l2 中较小的那个, 循环操作</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span>list1 <span class="token operator">&amp;&amp;</span> list2<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+
+        <span class="token comment">// 使用char比较大小</span>
+        <span class="token keyword">char</span> chr1 <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span><span class="token punctuation">)</span> list1<span class="token operator">-></span>data<span class="token punctuation">)</span><span class="token operator">-></span>chr<span class="token punctuation">;</span>
+        <span class="token keyword">char</span> chr2 <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span><span class="token punctuation">)</span> list2<span class="token operator">-></span>data<span class="token punctuation">)</span><span class="token operator">-></span>chr<span class="token punctuation">;</span>
+
+        <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token operator">*</span>min <span class="token operator">=</span> chr1 <span class="token operator">&lt;=</span> chr2 <span class="token operator">?</span> <span class="token operator">&amp;</span>list1 <span class="token operator">:</span> <span class="token operator">&amp;</span>list2<span class="token punctuation">;</span>
+        <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>next <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token operator">*</span>min<span class="token punctuation">)</span><span class="token operator">-></span>next<span class="token punctuation">;</span>
+        tail <span class="token operator">=</span> tail<span class="token operator">-></span>next <span class="token operator">=</span> <span class="token operator">*</span>min<span class="token punctuation">;</span>
+        <span class="token operator">*</span>min <span class="token operator">=</span> next<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    tail<span class="token operator">-></span>next <span class="token operator">=</span> list1 <span class="token operator">?</span> list1 <span class="token operator">:</span> list2<span class="token punctuation">;</span>
+    <span class="token keyword">return</span> dummy_head<span class="token punctuation">.</span>next<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 被递归调用, 将链表按照从小到大顺序排序</span>
+<span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token function">merge_sort_tnode</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>head<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>list1 <span class="token operator">=</span> head<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>list1 <span class="token operator">||</span> <span class="token operator">!</span>list1<span class="token operator">-></span>next<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> list1<span class="token punctuation">;</span>
+    <span class="token comment">// 从中分开</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>list2 <span class="token operator">=</span> <span class="token function">bisect_list</span><span class="token punctuation">(</span>list1<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token function">merge_tnode_list</span><span class="token punctuation">(</span><span class="token function">merge_sort_tnode</span><span class="token punctuation">(</span>list1<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token function">merge_sort_tnode</span><span class="token punctuation">(</span>list2<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 通过给定的 val 搜索链表中的 trie_node, 最糟糕情况下的时间复杂度是 O(n)</span>
+<span class="token keyword">static</span> <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token function">linear_search</span><span class="token punctuation">(</span><span class="token keyword">const</span> List <span class="token operator">*</span>list<span class="token punctuation">,</span> <span class="token keyword">int</span> value<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>list <span class="token operator">||</span> list<span class="token operator">-></span>len <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>cur <span class="token operator">=</span> list<span class="token operator">-></span>head<span class="token punctuation">;</span> cur <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span> cur <span class="token operator">=</span> cur<span class="token operator">-></span>next<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span><span class="token punctuation">)</span> cur<span class="token operator">-></span>data<span class="token punctuation">)</span><span class="token operator">-></span>chr <span class="token operator">==</span> value<span class="token punctuation">)</span>
+            <span class="token keyword">return</span> cur<span class="token punctuation">;</span>
+        <span class="token comment">// 链表内部的节点是按照 chr 排序的，因此当大于 value 时无需继续搜索</span>
+        <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span><span class="token punctuation">)</span> cur<span class="token operator">-></span>data<span class="token punctuation">)</span><span class="token operator">-></span>chr <span class="token operator">></span> value<span class="token punctuation">)</span>
+            <span class="token keyword">break</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 辅助比较函数, 传入两个 list_node, 当其中的 trie_node->chr 相等时返回0, 否则返回1</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">with_char</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span>arg1<span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span>arg2<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>tn1 <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token punctuation">)</span> arg1<span class="token punctuation">)</span><span class="token operator">-></span>data<span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>tn2 <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token punctuation">)</span> arg2<span class="token punctuation">)</span><span class="token operator">-></span>data<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>tn1<span class="token operator">-></span>chr <span class="token operator">==</span> tn2<span class="token operator">-></span>chr<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 判断 trie_node 是否有子节点, 没有则认为 free</span>
+<span class="token keyword">static</span> bool <span class="token function">trie_is_free_node</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>node<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> node<span class="token operator">-></span>children<span class="token operator">-></span>len <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">?</span> true <span class="token operator">:</span> false<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 从 node 开始, 通过传入的 prefix, 找到对应的节点</span>
+<span class="token keyword">static</span> <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span><span class="token function">trie_node_find</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>node<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>prefix<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 结果, 最初指向 node</span>
+    <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>retnode <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span><span class="token punctuation">)</span> node<span class="token punctuation">;</span>
+
+    <span class="token comment">// 遍历 prefix 向下查找</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span> <span class="token operator">*</span>prefix<span class="token punctuation">;</span> prefix<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">// O(n)</span>
+        <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>child <span class="token operator">=</span> <span class="token function">linear_search</span><span class="token punctuation">(</span>retnode<span class="token operator">-></span>children<span class="token punctuation">,</span> <span class="token operator">*</span>prefix<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 没找到</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>child<span class="token punctuation">)</span>
+            <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+        retnode <span class="token operator">=</span> child<span class="token operator">-></span>data<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">return</span> retnode<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 创建一个新节点</span>
+<span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span><span class="token function">trie_create_node</span><span class="token punctuation">(</span><span class="token keyword">char</span> c<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>new_node <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token operator">*</span>new_node<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>new_node<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        new_node<span class="token operator">-></span>chr <span class="token operator">=</span> c<span class="token punctuation">;</span>
+        new_node<span class="token operator">-></span>data <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+        new_node<span class="token operator">-></span>children <span class="token operator">=</span> <span class="token function">list_create</span><span class="token punctuation">(</span><span class="token constant">NULL</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">return</span> new_node<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 创建并初始化特里树, 当前 size 0</span>
+Trie <span class="token operator">*</span><span class="token function">trie_create</span><span class="token punctuation">(</span><span class="token keyword">void</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    Trie <span class="token operator">*</span>trie <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token operator">*</span>trie<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">trie_init</span><span class="token punctuation">(</span>trie<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> trie<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">void</span> <span class="token function">trie_init</span><span class="token punctuation">(</span>Trie <span class="token operator">*</span>trie<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    trie<span class="token operator">-></span>root <span class="token operator">=</span> <span class="token function">trie_create_node</span><span class="token punctuation">(</span><span class="token char">' '</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    trie<span class="token operator">-></span>size <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token class-name">size_t</span> <span class="token function">trie_size</span><span class="token punctuation">(</span><span class="token keyword">const</span> Trie <span class="token operator">*</span>trie<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> trie<span class="token operator">-></span>size<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 插入数据, 插入沿途的所有所需节点, 如果目标节点已经有数据则替换</span>
+<span class="token comment">// return 被插入的数据</span>
+<span class="token comment">// root 一般是根节点</span>
+<span class="token comment">// key 插入位置目标键</span>
+<span class="token comment">// data 要插入的数据内容</span>
+<span class="token comment">// size 带入 size, 如新增数据则+1</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token function">trie_node_insert</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>root<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>key<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">void</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> <span class="token class-name">size_t</span> <span class="token operator">*</span>size<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>cursor <span class="token operator">=</span> root<span class="token punctuation">;</span>   <span class="token comment">// 上级节点</span>
+    <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>cur_node <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span> <span class="token comment">// 当前节点</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>tmp <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>      <span class="token comment">// 包裹当前节点的 list_node</span>
+
+    <span class="token comment">// 逐字符遍历 key</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span> <span class="token operator">*</span>key<span class="token punctuation">;</span> key<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">// 我们使用一个 O(n) 复杂度的线性搜索器来搜索匹配的节点</span>
+        tmp <span class="token operator">=</span> <span class="token function">linear_search</span><span class="token punctuation">(</span>cursor<span class="token operator">-></span>children<span class="token punctuation">,</span> <span class="token operator">*</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 如果没有匹配, 我们会添加一个节点, 然后对所有的节点进行排序</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>tmp<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            cur_node <span class="token operator">=</span> <span class="token function">trie_create_node</span><span class="token punctuation">(</span><span class="token operator">*</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            cursor<span class="token operator">-></span>children <span class="token operator">=</span> <span class="token function">list_push</span><span class="token punctuation">(</span>cursor<span class="token operator">-></span>children<span class="token punctuation">,</span> cur_node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            cursor<span class="token operator">-></span>children<span class="token operator">-></span>head <span class="token operator">=</span> <span class="token function">merge_sort_tnode</span><span class="token punctuation">(</span>cursor<span class="token operator">-></span>children<span class="token operator">-></span>head<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+            <span class="token comment">// 匹配成功, 进入下一层匹配</span>
+            <span class="token comment">// 如果此时 key 已经被阅读完, 后续直接使用此节点</span>
+            cur_node <span class="token operator">=</span> tmp<span class="token operator">-></span>data<span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        cursor <span class="token operator">=</span> cur_node<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token comment">// 如果新节点或此节点没有数据, 则记录size</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>cursor<span class="token operator">-></span>data<span class="token punctuation">)</span>
+        <span class="token punctuation">(</span><span class="token operator">*</span>size<span class="token punctuation">)</span><span class="token operator">++</span><span class="token punctuation">;</span>
+    cursor<span class="token operator">-></span>data <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span> data<span class="token punctuation">;</span>
+    <span class="token keyword">return</span> cursor<span class="token operator">-></span>data<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 删除 key 节点对应的数据, 同时递归的向上删除每一层不需要的节点（指既没有数据也没有子节点）</span>
+<span class="token comment">// return 节点本身是否可被删除(如果没有子节点就可以删除)</span>
+<span class="token comment">// node 寻找的起始节点, 一般用root</span>
+<span class="token comment">// key 匹配键</span>
+<span class="token comment">// size 当前树的大小</span>
+<span class="token comment">// found 返回是否删除成功</span>
+<span class="token keyword">static</span> bool <span class="token function">trie_node_recursive_delete</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>node<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>key<span class="token punctuation">,</span>
+                                       <span class="token class-name">size_t</span> <span class="token operator">*</span>size<span class="token punctuation">,</span> bool <span class="token operator">*</span>found<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>node<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> false<span class="token punctuation">;</span>
+
+    <span class="token comment">// 字符串已经递归到达尾部的情况</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">*</span>key <span class="token operator">==</span> <span class="token char">'\0'</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>node<span class="token operator">-></span>data<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token comment">// 标记成功找到数据</span>
+            <span class="token operator">*</span>found <span class="token operator">=</span> true<span class="token punctuation">;</span>
+            <span class="token comment">// 释放资源（以下为作者原代码，译者觉得这里重复操作了）</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>node<span class="token operator">-></span>data<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+                <span class="token function">free</span><span class="token punctuation">(</span>node<span class="token operator">-></span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                node<span class="token operator">-></span>data <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+            <span class="token function">free</span><span class="token punctuation">(</span>node<span class="token operator">-></span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            node<span class="token operator">-></span>data <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+            <span class="token comment">// 记录size</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">*</span>size <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
+                <span class="token punctuation">(</span><span class="token operator">*</span>size<span class="token punctuation">)</span><span class="token operator">--</span><span class="token punctuation">;</span>
+            <span class="token comment">// 如果没有子节点, 标记需要被删除</span>
+            <span class="token keyword">return</span> <span class="token function">trie_is_free_node</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">// 通过 key 逐字符匹配节点</span>
+        <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>cur <span class="token operator">=</span> <span class="token function">linear_search</span><span class="token punctuation">(</span>node<span class="token operator">-></span>children<span class="token punctuation">,</span> <span class="token operator">*</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>cur<span class="token punctuation">)</span>
+            <span class="token keyword">return</span> false<span class="token punctuation">;</span>
+        <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>child <span class="token operator">=</span> cur<span class="token operator">-></span>data<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">trie_node_recursive_delete</span><span class="token punctuation">(</span>child<span class="token punctuation">,</span> key <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> size<span class="token punctuation">,</span> found<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+
+            <span class="token comment">// 从list中删除和当前剩余key后缀相同的节点</span>
+            <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> t <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token operator">*</span>key<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+            <span class="token keyword">struct</span> <span class="token class-name">list_node</span> tmp <span class="token operator">=</span> <span class="token punctuation">&#123;</span><span class="token operator">&amp;</span>t<span class="token punctuation">,</span> <span class="token constant">NULL</span><span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+            <span class="token function">list_remove</span><span class="token punctuation">(</span>node<span class="token operator">-></span>children<span class="token punctuation">,</span> <span class="token operator">&amp;</span>tmp<span class="token punctuation">,</span> with_char<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token comment">// 把被删除的节点释放掉</span>
+            <span class="token function">trie_node_free</span><span class="token punctuation">(</span>child<span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token comment">// 递归, 逐级向上删除可以被删除的节点</span>
+            <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token operator">!</span>node<span class="token operator">-></span>data <span class="token operator">&amp;&amp;</span> <span class="token function">trie_is_free_node</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">return</span> false<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 从根节点开始寻找目标节点, 提供目标节点的数据</span>
+<span class="token comment">// return 是否查询成功</span>
+<span class="token comment">// root 一般传入根节点</span>
+<span class="token comment">// key 查询的键</span>
+<span class="token comment">// ret 返回值 (使用双指针因此当无数据时 *ret 可以为NULL)</span>
+<span class="token keyword">static</span> bool <span class="token function">trie_node_search</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>root<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>key<span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token operator">*</span>ret<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>cursor <span class="token operator">=</span> <span class="token function">trie_node_find</span><span class="token punctuation">(</span>root<span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token operator">*</span>ret <span class="token operator">=</span> <span class="token punctuation">(</span>cursor <span class="token operator">&amp;&amp;</span> cursor<span class="token operator">-></span>data<span class="token punctuation">)</span> <span class="token operator">?</span> cursor<span class="token operator">-></span>data <span class="token operator">:</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token operator">!</span><span class="token operator">*</span>ret <span class="token operator">?</span> false <span class="token operator">:</span> true<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 插入数据</span>
+<span class="token keyword">void</span> <span class="token operator">*</span><span class="token function">trie_insert</span><span class="token punctuation">(</span>Trie <span class="token operator">*</span>trie<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>key<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">void</span> <span class="token operator">*</span>data<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>trie <span class="token operator">&amp;&amp;</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token function">trie_node_insert</span><span class="token punctuation">(</span>trie<span class="token operator">-></span>root<span class="token punctuation">,</span> key<span class="token punctuation">,</span> data<span class="token punctuation">,</span> <span class="token operator">&amp;</span>trie<span class="token operator">-></span>size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 删除某个节点的数据 (会递归的删除上层不需要的节点)</span>
+bool <span class="token function">trie_delete</span><span class="token punctuation">(</span>Trie <span class="token operator">*</span>trie<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>key<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>trie <span class="token operator">&amp;&amp;</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    bool found <span class="token operator">=</span> false<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">strlen</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token function">trie_node_recursive_delete</span><span class="token punctuation">(</span>trie<span class="token operator">-></span>root<span class="token punctuation">,</span> key<span class="token punctuation">,</span> <span class="token operator">&amp;</span><span class="token punctuation">(</span>trie<span class="token operator">-></span>size<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token operator">&amp;</span>found<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> found<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 获得数据</span>
+bool <span class="token function">trie_find</span><span class="token punctuation">(</span><span class="token keyword">const</span> Trie <span class="token operator">*</span>trie<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>key<span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token operator">*</span>ret<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>trie <span class="token operator">&amp;&amp;</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token function">trie_node_search</span><span class="token punctuation">(</span>trie<span class="token operator">-></span>root<span class="token punctuation">,</span> key<span class="token punctuation">,</span> ret<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 使用前缀删除所有匹配的内容</span>
+<span class="token comment">// 例如 prefix = "hello"</span>
+<span class="token comment">// 会删除这些内容： hello hellot helloworld</span>
+<span class="token keyword">void</span> <span class="token function">trie_prefix_delete</span><span class="token punctuation">(</span>Trie <span class="token operator">*</span>trie<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>prefix<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>trie <span class="token operator">&amp;&amp;</span> prefix<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 找到前缀对应的节点</span>
+    <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>cursor <span class="token operator">=</span> <span class="token function">trie_node_find</span><span class="token punctuation">(</span>trie<span class="token operator">-></span>root<span class="token punctuation">,</span> prefix<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>cursor<span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 如果没有子节点, 就直接删除这个节点即可</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>cursor<span class="token operator">-></span>children<span class="token operator">-></span>len <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token function">trie_delete</span><span class="token punctuation">(</span>trie<span class="token punctuation">,</span> prefix<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token comment">// 如果有子节点</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>cur <span class="token operator">=</span> cursor<span class="token operator">-></span>children<span class="token operator">-></span>head<span class="token punctuation">;</span>
+    <span class="token comment">// 遍历</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span> cur<span class="token punctuation">;</span> cur <span class="token operator">=</span> cur<span class="token operator">-></span>next<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">// 递归的释放所有内容</span>
+        <span class="token function">trie_node_free</span><span class="token punctuation">(</span>cur<span class="token operator">-></span>data<span class="token punctuation">,</span> <span class="token operator">&amp;</span><span class="token punctuation">(</span>trie<span class="token operator">-></span>size<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 并将子节点指针置空</span>
+        cur<span class="token operator">-></span>data <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token function">trie_delete</span><span class="token punctuation">(</span>trie<span class="token punctuation">,</span> prefix<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">list_clear</span><span class="token punctuation">(</span>cursor<span class="token operator">-></span>children<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 使用传入的函数处理每个节点, 将 node 作为首个节点逐层向下遍历, arg 允许作为函数的参数</span>
+<span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">trie_prefix_map_func2</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>node<span class="token punctuation">,</span>
+                                  <span class="token keyword">void</span> <span class="token punctuation">(</span><span class="token operator">*</span>mapfunc<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span>arg<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">trie_is_free_node</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token function">mapfunc</span><span class="token punctuation">(</span>node<span class="token punctuation">,</span> arg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>child <span class="token operator">=</span> node<span class="token operator">-></span>children<span class="token operator">-></span>head<span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span> child<span class="token punctuation">;</span> child <span class="token operator">=</span> child<span class="token operator">-></span>next<span class="token punctuation">)</span>
+        <span class="token function">trie_prefix_map_func2</span><span class="token punctuation">(</span>child<span class="token operator">-></span>data<span class="token punctuation">,</span> mapfunc<span class="token punctuation">,</span> arg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// node 本身也会被应用</span>
+    <span class="token function">mapfunc</span><span class="token punctuation">(</span>node<span class="token punctuation">,</span> arg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 从前缀对应的节点开始调用 trie_prefix_map_func2</span>
+<span class="token keyword">void</span> <span class="token function">trie_prefix_map_tuple</span><span class="token punctuation">(</span>Trie <span class="token operator">*</span>trie<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>prefix<span class="token punctuation">,</span>
+                           <span class="token keyword">void</span> <span class="token punctuation">(</span><span class="token operator">*</span>mapfunc<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span>arg<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>trie<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>prefix<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token function">trie_prefix_map_func2</span><span class="token punctuation">(</span>trie<span class="token operator">-></span>root<span class="token punctuation">,</span> mapfunc<span class="token punctuation">,</span> arg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">// 找到key对应的节点</span>
+        <span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>node <span class="token operator">=</span> <span class="token function">trie_node_find</span><span class="token punctuation">(</span>trie<span class="token operator">-></span>root<span class="token punctuation">,</span> prefix<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// 没有匹配到的节点</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>node<span class="token punctuation">)</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token comment">// 通过递归让node和所有的子节点都应用 mapfunc</span>
+        <span class="token function">trie_prefix_map_func2</span><span class="token punctuation">(</span>node<span class="token punctuation">,</span> mapfunc<span class="token punctuation">,</span> arg<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 递归的, 从node开始向下全部释放并删除</span>
+<span class="token keyword">void</span> <span class="token function">trie_node_free</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">trie_node</span> <span class="token operator">*</span>node<span class="token punctuation">,</span> <span class="token class-name">size_t</span> <span class="token operator">*</span>size<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>node<span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 这里的递归处理删除所有子节点</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>node<span class="token operator">-></span>children<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>cur <span class="token operator">=</span> node<span class="token operator">-></span>children<span class="token operator">-></span>head<span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span> cur<span class="token punctuation">;</span> cur <span class="token operator">=</span> cur<span class="token operator">-></span>next<span class="token punctuation">)</span>
+            <span class="token function">trie_node_free</span><span class="token punctuation">(</span>cur<span class="token operator">-></span>data<span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">list_release</span><span class="token punctuation">(</span>node<span class="token operator">-></span>children<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        node<span class="token operator">-></span>children <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token comment">// 译者并没有看明白这里？也许是某种编程技巧？</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>node<span class="token operator">-></span>data<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token function">free</span><span class="token punctuation">(</span>node<span class="token operator">-></span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">*</span>size <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
+            <span class="token punctuation">(</span><span class="token operator">*</span>size<span class="token punctuation">)</span><span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>node<span class="token operator">-></span>data<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token function">free</span><span class="token punctuation">(</span>node<span class="token operator">-></span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">*</span>size <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
+            <span class="token punctuation">(</span><span class="token operator">*</span>size<span class="token punctuation">)</span><span class="token operator">--</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token comment">// 释放node本身</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 释放整个特里树</span>
+<span class="token keyword">void</span> <span class="token function">trie_release</span><span class="token punctuation">(</span>Trie <span class="token operator">*</span>trie<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>trie<span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token function">trie_node_free</span><span class="token punctuation">(</span>trie<span class="token operator">-></span>root<span class="token punctuation">,</span> <span class="token operator">&amp;</span><span class="token punctuation">(</span>trie<span class="token operator">-></span>size<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>trie<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h1 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h1><p>写到这里，我们的工具基本上够用了。现在我们的项目又多了三个模块：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><code class="language-text">sol/
+ ├── src/
+ │    ├── mqtt.h
+ |    ├── mqtt.c
+ │    ├── network.h
+ │    ├── network.c
+ │    ├── list.h
+ │    ├── list.c
+ │    ├── hashtable.h
+ │    ├── hashtable.c
+ │    ├── trie.h
+ │    ├── trie.c
+ │    ├── util.h
+ │    ├── util.c
+ │    ├── pack.h
+ │    └── pack.c
+ ├── CHANGELOG
+ ├── CMakeLists.txt
+ ├── COPYING
+ └── README.md<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/MQTT/" class="category-chain-item">MQTT</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="print-no-link">#网络编程</a>
+      
+        <a href="/tags/%E7%BF%BB%E8%AF%91/" class="print-no-link">#翻译</a>
+      
+        <a href="/tags/C/" class="print-no-link">#C</a>
+      
+        <a href="/tags/MQTT/" class="print-no-link">#MQTT</a>
+      
+        <a href="/tags/%E7%89%A9%E8%81%94%E7%BD%91/" class="print-no-link">#物联网</a>
+      
+        <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="print-no-link">#数据结构</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>[翻译]Sol - 从零开始的MQTT broker - 第五部分：主题树</div>
+      <div>https://vitsumoc.github.io/translate-sol-5.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>vc</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年12月28日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/translate-sol-6.html" title="[翻译]Sol - 从零开始的MQTT broker - 第六部分：处理器">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">[翻译]Sol - 从零开始的MQTT broker - 第六部分：处理器</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/translate-sol-4.html" title="[翻译]Sol - 从零开始的MQTT broker - 第四部分：数据结构">
+                        <span class="hidden-mobile">[翻译]Sol - 从零开始的MQTT broker - 第四部分：数据结构</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>vitusmoc Blog, Powered by </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script  src="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

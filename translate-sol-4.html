@@ -1,0 +1,1386 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="vc">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="原文 Sol - An MQTT broker from scratch. Part 4 - Data structures">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[翻译]Sol - 从零开始的MQTT broker - 第四部分：数据结构">
+<meta property="og:url" content="https://vitsumoc.github.io/translate-sol-4.html">
+<meta property="og:site_name" content="Thinking...">
+<meta property="og:description" content="原文 Sol - An MQTT broker from scratch. Part 4 - Data structures">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://vitsumoc.github.io/translate-sol-4/hashtable.png">
+<meta property="article:published_time" content="2023-12-27T02:08:27.000Z">
+<meta property="article:modified_time" content="2024-03-02T00:55:07.974Z">
+<meta property="article:author" content="vc">
+<meta property="article:tag" content="网络编程">
+<meta property="article:tag" content="翻译">
+<meta property="article:tag" content="C">
+<meta property="article:tag" content="MQTT">
+<meta property="article:tag" content="物联网">
+<meta property="article:tag" content="数据结构">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://vitsumoc.github.io/translate-sol-4/hashtable.png">
+  
+  
+  
+  <title>[翻译]Sol - 从零开始的MQTT broker - 第四部分：数据结构 - Thinking...</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"vitsumoc.github.io","root":"/","version":"1.9.6","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Thinking...</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">[翻译]Sol - 从零开始的MQTT broker - 第四部分：数据结构</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-12-27 10:08" pubdate>
+          2023年12月27日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          17 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">[翻译]Sol - 从零开始的MQTT broker - 第四部分：数据结构</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>原文 <a target="_blank" rel="noopener" href="https://codepr.github.io/posts/sol-mqtt-broker-p4/">Sol - An MQTT broker from scratch. Part 4 - Data structures</a></p>
+</blockquote>
+<span id="more"></span>
+
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在继续实现所有的 <code>handler</code> 之前，我们先设计和实现一些最常用的数据结构，包括 <strong>哈希表(hashtable)<strong>，</strong>列表(list)</strong> 和 **特里树(trie)**。</p>
+<p><strong>特里树</strong> 不是我们当前就用到的东西，但是在我们后续处理 <strong>主题</strong> 时会用到他。</p>
+<p>也许实现这些数据结构这件事情对于我们这个项目来说有点过于底层了，也确实有很多成熟的实现可以拿来用。但是我个人比较喜欢在稍微有些规模的项目中自己实现数据结构，一方面是这样方便于之后随着项目需求对这些数据结构进行改进，另一方面是，实现数据结构的过程也确实是一个非常好的学习和探索的机会。</p>
+<h1 id="哈希表"><a href="#哈希表" class="headerlink" title="哈希表"></a>哈希表</h1><p>让我们从一个简单的哈希表开始，哈希表本质上是一个数组，他使用哈希值（下图中的Hashval % Bucketsize）作为存储我们信息的索引，并且试图尽可能的减少冲突情况（例如两个key计算出了同样的哈希值）。</p>
+<p><img src="/translate-sol-4/hashtable.png" srcset="/img/loading.gif" lazyload alt="哈希表示意"></p>
+<p><code>Buckets</code> 是一个数组，一般情况下会是个动态扩容的数组，他通过 <code>key</code> 来关联存储的数据。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/hashtable.h</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdint.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdbool.h></span></span>
+
+<span class="token comment">// 状态码</span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">HASHTABLE_OK</span>   <span class="token expression"><span class="token number">0</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">HASHTABLE_ERR</span>  <span class="token expression"><span class="token number">1</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">HASHTABLE_OOM</span>  <span class="token expression"><span class="token number">2</span></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">define</span> <span class="token macro-name">HASHTABLE_FULL</span> <span class="token expression"><span class="token number">3</span></span></span>
+
+<span class="token comment">// 哈希表条目</span>
+<span class="token comment">// key 键</span>
+<span class="token comment">// val 存储的值</span>
+<span class="token comment">// taken 表示此索引是否已经被占用, 如果是则使用 index + 1 的位置存储</span>
+<span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>key<span class="token punctuation">;</span>
+    <span class="token keyword">void</span> <span class="token operator">*</span>val<span class="token punctuation">;</span>
+    bool taken<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 哈希表结构体, 包括最大尺寸、当前尺寸以及存储的数据</span>
+<span class="token keyword">typedef</span> <span class="token keyword">struct</span> <span class="token class-name">hashtable</span> HashTable<span class="token punctuation">;</span>
+
+<span class="token comment">// 创建哈希表的函数</span>
+<span class="token comment">// 可以传入一个析构函数指针, 作为删除条目时释放资源的函数</span>
+<span class="token comment">// 如果资源比较简单(基础类型或数据流), 可以传NULL, 可以采用默认函数释放</span>
+HashTable <span class="token operator">*</span><span class="token function">hashtable_create</span><span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>destructor<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 通过对每个条目调用 `destructor` 来释放所有资源</span>
+<span class="token keyword">void</span> <span class="token function">hashtable_release</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 哈希表当前大小</span>
+<span class="token class-name">size_t</span> <span class="token function">hashtable_size</span><span class="token punctuation">(</span><span class="token keyword">const</span> HashTable <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 查看哈希表中是否已经存在此key</span>
+<span class="token keyword">int</span> <span class="token function">hashtable_exists</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 插入数据, const char * 作为 key, void * 作为 value</span>
+<span class="token keyword">int</span> <span class="token function">hashtable_put</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 通过 key 获取数据</span>
+<span class="token keyword">void</span> <span class="token operator">*</span><span class="token function">hashtable_get</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 通过 key 删除数据</span>
+<span class="token keyword">int</span> <span class="token function">hashtable_del</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 迭代所有的键值对, 使用传入的函数指针进行处理</span>
+<span class="token keyword">int</span> <span class="token function">hashtable_map</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>func<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 迭代所有的键值对, 使用传入的函数指针进行处理, 并且可以额外传入一个参数</span>
+<span class="token keyword">int</span> <span class="token function">hashtable_map2</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>func<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>我们通过 <code>typedef struct hashtable HashTable;</code> 这种方式将实际的哈希表的结构封装到的 <code>.c</code> 文件里，这样可以避免哈希表的使用者不使用我们提供的函数，而是直接访问我们的哈希表。这种方式可以被看作是c语言中的私有类。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/hashtable.c</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdio.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;string.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;unistd.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;assert.h></span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"util.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"hashtable.h"</span></span>
+
+<span class="token comment">// 哈希表结构</span>
+<span class="token keyword">struct</span> <span class="token class-name">hashtable</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 最大容量</span>
+    <span class="token class-name">size_t</span> table_size<span class="token punctuation">;</span>
+    <span class="token comment">// 当前数据量</span>
+    <span class="token class-name">size_t</span> size<span class="token punctuation">;</span>
+    <span class="token comment">// 析构函数指针</span>
+    <span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>destructor<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 条目数组</span>
+    <span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token operator">*</span>entries<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> <span class="token keyword">int</span> INITIAL_SIZE <span class="token operator">=</span> <span class="token number">4</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> <span class="token keyword">int</span> MAX_CHAIN_LENGTH <span class="token operator">=</span> <span class="token number">8</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> <span class="token keyword">unsigned</span> <span class="token keyword">long</span> KNUTH_PRIME <span class="token operator">=</span> <span class="token number">2654435761</span><span class="token punctuation">;</span>
+<span class="token keyword">static</span> <span class="token keyword">unsigned</span> <span class="token keyword">long</span> <span class="token function">crc32</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">unsigned</span> <span class="token keyword">int</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 通过输入的key 计算其在哈希表中的序号</span>
+<span class="token comment">// 此处仅进行数字运算, 不考虑冲突情况</span>
+<span class="token keyword">static</span> <span class="token class-name">uint64_t</span> <span class="token function">hashtable_hash_int</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span>m<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>keystr<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>m <span class="token operator">&amp;&amp;</span> keystr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">uint64_t</span> key <span class="token operator">=</span> <span class="token function">crc32</span><span class="token punctuation">(</span>keystr<span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span> keystr<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">/* Robert Jenkins' 32 bit Mix Function */</span>
+    key <span class="token operator">+=</span> <span class="token punctuation">(</span>key <span class="token operator">&lt;&lt;</span> <span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    key <span class="token operator">^=</span> <span class="token punctuation">(</span>key <span class="token operator">>></span> <span class="token number">22</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    key <span class="token operator">+=</span> <span class="token punctuation">(</span>key <span class="token operator">&lt;&lt;</span> <span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    key <span class="token operator">^=</span> <span class="token punctuation">(</span>key <span class="token operator">>></span> <span class="token number">9</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    key <span class="token operator">+=</span> <span class="token punctuation">(</span>key <span class="token operator">&lt;&lt;</span> <span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    key <span class="token operator">^=</span> <span class="token punctuation">(</span>key <span class="token operator">>></span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    key <span class="token operator">+=</span> <span class="token punctuation">(</span>key <span class="token operator">&lt;&lt;</span> <span class="token number">7</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    key <span class="token operator">^=</span> <span class="token punctuation">(</span>key <span class="token operator">>></span> <span class="token number">12</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">/* Knuth's Multiplicative Method */</span>
+    key <span class="token operator">=</span> <span class="token punctuation">(</span>key <span class="token operator">>></span> <span class="token number">3</span><span class="token punctuation">)</span> <span class="token operator">*</span> KNUTH_PRIME<span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> key <span class="token operator">%</span> m<span class="token operator">-></span>table_size<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 通过输入的key 计算其在哈希表中的序号</span>
+<span class="token comment">// 此处考虑了冲突情况</span>
+<span class="token comment">// 如果哈希表已经满了, 返回 -HASHTABLE_FULL</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">hashtable_hash</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span>table<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>key<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>table <span class="token operator">&amp;&amp;</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 用量超过总额的 1/2 视为满</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>table<span class="token operator">-></span>size <span class="token operator">>=</span> <span class="token punctuation">(</span>table<span class="token operator">-></span>table_size <span class="token operator">/</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span>HASHTABLE_FULL<span class="token punctuation">;</span>
+
+    <span class="token comment">// 计算序号</span>
+    <span class="token class-name">uint64_t</span> curr <span class="token operator">=</span> <span class="token function">hashtable_hash_int</span><span class="token punctuation">(</span>table<span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">char</span> <span class="token operator">*</span>k<span class="token punctuation">,</span> <span class="token operator">*</span>currk<span class="token punctuation">;</span>
+
+    <span class="token comment">// 避免序号冲突的情况</span>
+    <span class="token comment">// 最大重复 MAX_CHAIN_LENGTH 次</span>
+    <span class="token comment">// 意味着视冲突情况, key 被保存在 curr ~ curr + MAX_CHAIN_LENGTH 这个范围中某一点</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> MAX_CHAIN_LENGTH<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">// 序号未被占用直接返回</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>table<span class="token operator">-></span>entries<span class="token punctuation">[</span>curr<span class="token punctuation">]</span><span class="token punctuation">.</span>taken <span class="token operator">==</span> false<span class="token punctuation">)</span>
+            <span class="token keyword">return</span> curr<span class="token punctuation">;</span>
+        k <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span> table<span class="token operator">-></span>entries<span class="token punctuation">[</span>curr<span class="token punctuation">]</span><span class="token punctuation">.</span>key<span class="token punctuation">;</span>
+        currk <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token keyword">char</span> <span class="token operator">*</span><span class="token punctuation">)</span> key<span class="token punctuation">;</span>
+        <span class="token comment">// 传入的 key 已存在的情况, 返回相同 key 的序号</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>table<span class="token operator">-></span>entries<span class="token punctuation">[</span>curr<span class="token punctuation">]</span><span class="token punctuation">.</span>taken <span class="token operator">==</span> true <span class="token operator">&amp;&amp;</span> <span class="token function">STREQ</span><span class="token punctuation">(</span>k<span class="token punctuation">,</span> currk<span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span>k<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">==</span> true<span class="token punctuation">)</span>
+            <span class="token keyword">return</span> curr<span class="token punctuation">;</span>
+        curr <span class="token operator">=</span> <span class="token punctuation">(</span>curr <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">%</span> table<span class="token operator">-></span>table_size<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">return</span> <span class="token operator">-</span>HASHTABLE_FULL<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 扩容, 容量 * 2, 重新排布所有的内容</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">hashtable_rehash</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span>table<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>table<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">size_t</span> old_size<span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token operator">*</span>curr<span class="token punctuation">;</span>
+
+    <span class="token comment">// 新数组空间</span>
+    <span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token operator">*</span>temp <span class="token operator">=</span>
+        <span class="token function">calloc</span><span class="token punctuation">(</span><span class="token number">2</span> <span class="token operator">*</span> table<span class="token operator">-></span>table_size<span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token operator">*</span>temp<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>temp<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span>HASHTABLE_ERR<span class="token punctuation">;</span>
+
+    <span class="token comment">// 暂存旧数组</span>
+    curr <span class="token operator">=</span> table<span class="token operator">-></span>entries<span class="token punctuation">;</span>
+    <span class="token comment">// 指向新数组</span>
+    table<span class="token operator">-></span>entries <span class="token operator">=</span> temp<span class="token punctuation">;</span>
+
+    <span class="token comment">// 记录空间扩容</span>
+    old_size <span class="token operator">=</span> table<span class="token operator">-></span>table_size<span class="token punctuation">;</span>
+    table<span class="token operator">-></span>table_size <span class="token operator">=</span> <span class="token number">2</span> <span class="token operator">*</span> table<span class="token operator">-></span>table_size<span class="token punctuation">;</span>
+    table<span class="token operator">-></span>size <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">int</span> status<span class="token punctuation">;</span>
+
+    <span class="token comment">// 重新排布所有条目</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">size_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> old_size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>curr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>taken <span class="token operator">==</span> false<span class="token punctuation">)</span>
+            <span class="token keyword">continue</span><span class="token punctuation">;</span>
+        <span class="token comment">// 也很简单, 就是直接用 put 重新放一遍</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>status <span class="token operator">=</span> <span class="token function">hashtable_put</span><span class="token punctuation">(</span>table<span class="token punctuation">,</span> curr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>key<span class="token punctuation">,</span> curr<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>val<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">!=</span> HASHTABLE_OK<span class="token punctuation">)</span>
+            <span class="token keyword">return</span> status<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token comment">// 释放旧数组</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>curr<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> HASHTABLE_OK<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 默认的释放条目函数</span>
+<span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">destroy_entry</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token operator">*</span>entry<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>entry<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span>HASHTABLE_ERR<span class="token punctuation">;</span>
+
+    <span class="token comment">// 释放 key</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>entry<span class="token operator">-></span>key<span class="token punctuation">)</span>
+        <span class="token function">free</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span> entry<span class="token operator">-></span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 释放 val</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>entry<span class="token operator">-></span>val<span class="token punctuation">)</span>
+        <span class="token function">free</span><span class="token punctuation">(</span>entry<span class="token operator">-></span>val<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> HASHTABLE_OK<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 创建一个空的哈希表</span>
+<span class="token comment">// 新创建的哈希表被分配到堆中, 用完后必须手动释放</span>
+HashTable <span class="token operator">*</span><span class="token function">hashtable_create</span><span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>destructor<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 创建哈希表</span>
+    HashTable <span class="token operator">*</span>table <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span>HashTable<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>table<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token comment">// 初始化条目数组</span>
+    table<span class="token operator">-></span>entries <span class="token operator">=</span> <span class="token function">calloc</span><span class="token punctuation">(</span>INITIAL_SIZE<span class="token punctuation">,</span> <span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>table<span class="token operator">-></span>entries<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token function">hashtable_release</span><span class="token punctuation">(</span>table<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token comment">// 选择析构函数</span>
+    table<span class="token operator">-></span>destructor <span class="token operator">=</span> destructor <span class="token operator">?</span> destructor <span class="token operator">:</span> destroy_entry<span class="token punctuation">;</span>
+    <span class="token comment">// 初始化数据</span>
+    table<span class="token operator">-></span>table_size <span class="token operator">=</span> INITIAL_SIZE<span class="token punctuation">;</span>
+    table<span class="token operator">-></span>size <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> table<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 当前数据量</span>
+<span class="token class-name">size_t</span> <span class="token function">hashtable_size</span><span class="token punctuation">(</span><span class="token keyword">const</span> HashTable <span class="token operator">*</span>table<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> table<span class="token operator">-></span>size<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 是否存在 key</span>
+<span class="token keyword">int</span> <span class="token function">hashtable_exists</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span>table<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>key<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">void</span> <span class="token operator">*</span>ret <span class="token operator">=</span> <span class="token function">hashtable_get</span><span class="token punctuation">(</span>table<span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token operator">!</span>ret <span class="token operator">?</span> <span class="token number">0</span> <span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 添加数据, 如果 key 的哈希值重复则序号 +1</span>
+<span class="token keyword">int</span> <span class="token function">hashtable_put</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span>table<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>key<span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span>val<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>table <span class="token operator">&amp;&amp;</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 获得可以存储的序号</span>
+    <span class="token keyword">int</span> index <span class="token operator">=</span> <span class="token function">hashtable_hash</span><span class="token punctuation">(</span>table<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span><span class="token punctuation">)</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 如果满了</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span>index <span class="token operator">==</span> <span class="token operator">-</span>HASHTABLE_FULL<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token comment">// 尝试扩容</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">hashtable_rehash</span><span class="token punctuation">(</span>table<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token operator">-</span>HASHTABLE_ERR<span class="token punctuation">)</span>
+            <span class="token keyword">return</span> <span class="token operator">-</span>HASHTABLE_ERR<span class="token punctuation">;</span>
+        index <span class="token operator">=</span> <span class="token function">hashtable_hash</span><span class="token punctuation">(</span>table<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span><span class="token punctuation">)</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token comment">// 放置内容</span>
+    table<span class="token operator">-></span>entries<span class="token punctuation">[</span>index<span class="token punctuation">]</span><span class="token punctuation">.</span>val <span class="token operator">=</span> val<span class="token punctuation">;</span>
+    table<span class="token operator">-></span>entries<span class="token punctuation">[</span>index<span class="token punctuation">]</span><span class="token punctuation">.</span>key <span class="token operator">=</span> key<span class="token punctuation">;</span>
+
+    <span class="token comment">// 标记使用, 如果是新增, 还需要添加计数</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>table<span class="token operator">-></span>entries<span class="token punctuation">[</span>index<span class="token punctuation">]</span><span class="token punctuation">.</span>taken <span class="token operator">==</span> false<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        table<span class="token operator">-></span>entries<span class="token punctuation">[</span>index<span class="token punctuation">]</span><span class="token punctuation">.</span>taken <span class="token operator">=</span> true<span class="token punctuation">;</span>
+        table<span class="token operator">-></span>size<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token comment">// 译者觉得这里有一个问题, 当 put 使用了重复的 key 时, index会是这个 key 实际存放的索引</span>
+    <span class="token comment">// 之后对 key 和 val 进行了赋值, 但是如果 key 是存在的, 那么原来 entry 中的 key 和 val 没有被释放</span>
+
+    <span class="token keyword">return</span> HASHTABLE_OK<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 通过key获得val</span>
+<span class="token keyword">void</span> <span class="token operator">*</span><span class="token function">hashtable_get</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span>table<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>key<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>table <span class="token operator">&amp;&amp;</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 查 key 哈希值对应的索引</span>
+    <span class="token class-name">uint64_t</span> curr <span class="token operator">=</span> <span class="token function">hashtable_hash_int</span><span class="token punctuation">(</span>table<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span><span class="token punctuation">)</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 查 key 实际对应的索引</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> MAX_CHAIN_LENGTH<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>table<span class="token operator">-></span>entries<span class="token punctuation">[</span>curr<span class="token punctuation">]</span><span class="token punctuation">.</span>taken <span class="token operator">==</span> true<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">STREQ</span><span class="token punctuation">(</span>table<span class="token operator">-></span>entries<span class="token punctuation">[</span>curr<span class="token punctuation">]</span><span class="token punctuation">.</span>key<span class="token punctuation">,</span> key<span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">==</span> true<span class="token punctuation">)</span>
+                <span class="token keyword">return</span> table<span class="token operator">-></span>entries<span class="token punctuation">[</span>curr<span class="token punctuation">]</span><span class="token punctuation">.</span>val<span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        curr <span class="token operator">=</span> <span class="token punctuation">(</span>curr <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">%</span> table<span class="token operator">-></span>table_size<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 删除一个条目</span>
+<span class="token keyword">int</span> <span class="token function">hashtable_del</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span>table<span class="token punctuation">,</span> <span class="token keyword">const</span> <span class="token keyword">char</span> <span class="token operator">*</span>key<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>table <span class="token operator">&amp;&amp;</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 哈希值对应的索引</span>
+    <span class="token class-name">uint64_t</span> curr <span class="token operator">=</span> <span class="token function">hashtable_hash_int</span><span class="token punctuation">(</span>table<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span><span class="token punctuation">)</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment">// 找到实际 key 的索引</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> MAX_CHAIN_LENGTH<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">// 有数据</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>table<span class="token operator">-></span>entries<span class="token punctuation">[</span>curr<span class="token punctuation">]</span><span class="token punctuation">.</span>taken <span class="token operator">==</span> true<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token comment">// 且 key 一致</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">STREQ</span><span class="token punctuation">(</span>table<span class="token operator">-></span>entries<span class="token punctuation">[</span>curr<span class="token punctuation">]</span><span class="token punctuation">.</span>key<span class="token punctuation">,</span> key<span class="token punctuation">,</span> <span class="token function">strlen</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">==</span> true<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+                <span class="token comment">// 标记无数据</span>
+                table<span class="token operator">-></span>entries<span class="token punctuation">[</span>curr<span class="token punctuation">]</span><span class="token punctuation">.</span>taken <span class="token operator">=</span> false<span class="token punctuation">;</span>
+                <span class="token comment">// 记录尺寸</span>
+                table<span class="token operator">-></span>size<span class="token operator">--</span><span class="token punctuation">;</span>
+                <span class="token comment">// 使用析构释放</span>
+                table<span class="token operator">-></span><span class="token function">destructor</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>table<span class="token operator">-></span>entries<span class="token punctuation">[</span>curr<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">return</span> HASHTABLE_OK<span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span>
+        curr <span class="token operator">=</span> <span class="token punctuation">(</span>curr <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">%</span> table<span class="token operator">-></span>table_size<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token comment">// 未找到数据</span>
+    <span class="token keyword">return</span> <span class="token operator">-</span>HASHTABLE_ERR<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 通过传入的func迭代哈希表中的所有内容</span>
+<span class="token keyword">int</span> <span class="token function">hashtable_map</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span>table<span class="token punctuation">,</span> <span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>func<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>func<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 空表不处理</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>table <span class="token operator">||</span> table<span class="token operator">-></span>size <span class="token operator">&lt;=</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span>HASHTABLE_ERR<span class="token punctuation">;</span>
+
+    <span class="token comment">// 就遍历</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">size_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> table<span class="token operator">-></span>table_size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>table<span class="token operator">-></span>entries<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>taken <span class="token operator">==</span> true<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token comment">// 处理data</span>
+            <span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> data <span class="token operator">=</span> table<span class="token operator">-></span>entries<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+            <span class="token keyword">int</span> status <span class="token operator">=</span> <span class="token function">func</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment">// 要求传入函数正确时返回 HASHTABLE_OK</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>status <span class="token operator">!=</span> HASHTABLE_OK<span class="token punctuation">)</span>
+                <span class="token keyword">return</span> status<span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">return</span> HASHTABLE_OK<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 另一个迭代器, 支持一个参数</span>
+<span class="token keyword">int</span> <span class="token function">hashtable_map2</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span>table<span class="token punctuation">,</span>
+                   <span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>func<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                   <span class="token keyword">void</span> <span class="token operator">*</span>param<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token function">assert</span><span class="token punctuation">(</span>func<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>table <span class="token operator">||</span> table<span class="token operator">-></span>size <span class="token operator">&lt;=</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token operator">-</span>HASHTABLE_ERR<span class="token punctuation">;</span>
+
+    <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">size_t</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> table<span class="token operator">-></span>table_size<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>table<span class="token operator">-></span>entries<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>taken <span class="token operator">==</span> true<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token comment">// 区别就是带了参数</span>
+            <span class="token keyword">struct</span> <span class="token class-name">hashtable_entry</span> data <span class="token operator">=</span> table<span class="token operator">-></span>entries<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
+            <span class="token keyword">int</span> status <span class="token operator">=</span> <span class="token function">func</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>data<span class="token punctuation">,</span> param<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>status <span class="token operator">!=</span> HASHTABLE_OK<span class="token punctuation">)</span>
+                <span class="token keyword">return</span> status<span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">return</span> HASHTABLE_OK<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 使用预定义的析构函数释放哈希表</span>
+<span class="token comment">// 如果没有定义析构函数, 则使用默认函数 destroy_entry</span>
+<span class="token keyword">void</span> <span class="token function">hashtable_release</span><span class="token punctuation">(</span>HashTable <span class="token operator">*</span>table<span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>table<span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token function">hashtable_map</span><span class="token punctuation">(</span>table<span class="token punctuation">,</span> table<span class="token operator">-></span>destructor<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>table <span class="token operator">||</span> <span class="token operator">!</span>table<span class="token operator">-></span>entries<span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>table<span class="token operator">-></span>entries<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>table<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">/* The implementation here was originally done by Gary S. Brown. Slighltly
+ * modified by Pete Warden, without any imposition on the reuse of the code.
+ */</span>
+
+<span class="token comment">/* ============================================================= */</span>
+<span class="token comment">/*  COPYRIGHT (C) 1986 Gary S. Brown.  You may use this program, or       */</span>
+<span class="token comment">/*  code or tables extracted from it, as desired without restriction.     */</span>
+<span class="token comment">/*                                                                        */</span>
+<span class="token comment">/*  First, the polynomial itself and its table of feedback terms.  The    */</span>
+<span class="token comment">/*  polynomial is                                                         */</span>
+<span class="token comment">/*  X^32+X^26+X^23+X^22+X^16+X^12+X^11+X^10+X^8+X^7+X^5+X^4+X^2+X^1+X^0   */</span>
+<span class="token comment">/*                                                                        */</span>
+<span class="token comment">/*  Note that we take it "backwards" and put the highest-order term in    */</span>
+<span class="token comment">/*  the lowest-order bit.  The X^32 term is "implied"; the LSB is the     */</span>
+<span class="token comment">/*  X^31 term, etc.  The X^0 term (usually shown as "+1") results in      */</span>
+<span class="token comment">/*  the MSB being 1.                                                      */</span>
+<span class="token comment">/*                                                                        */</span>
+<span class="token comment">/*  Note that the usual hardware shift register implementation, which     */</span>
+<span class="token comment">/*  is what we're using (we're merely optimizing it by doing eight-bit    */</span>
+<span class="token comment">/*  chunks at a time) shifts bits into the lowest-order term.  In our     */</span>
+<span class="token comment">/*  implementation, that means shifting towards the right.  Why do we     */</span>
+<span class="token comment">/*  do it this way?  Because the calculated CRC must be transmitted in    */</span>
+<span class="token comment">/*  order from highest-order term to lowest-order term.  UARTs transmit   */</span>
+<span class="token comment">/*  characters in order from LSB to MSB.  By storing the CRC this way,    */</span>
+<span class="token comment">/*  we hand it to the UART in the order low-byte to high-byte; the UART   */</span>
+<span class="token comment">/*  sends each low-bit to hight-bit; and the result is transmission bit   */</span>
+<span class="token comment">/*  by bit from highest- to lowest-order term without requiring any bit   */</span>
+<span class="token comment">/*  shuffling on our part.  Reception works similarly.                    */</span>
+<span class="token comment">/*                                                                        */</span>
+<span class="token comment">/*  The feedback terms table consists of 256, 32-bit entries.  Notes:     */</span>
+<span class="token comment">/*                                                                        */</span>
+<span class="token comment">/*      The table can be generated at runtime if desired; code to do so   */</span>
+<span class="token comment">/*      is shown later.  It might not be obvious, but the feedback        */</span>
+<span class="token comment">/*      terms simply represent the results of eight shift/xor opera-      */</span>
+<span class="token comment">/*      tions for all combinations of data and CRC register values.       */</span>
+<span class="token comment">/*                                                                        */</span>
+<span class="token comment">/*      The values must be right-shifted by eight bits by the "updcrc"    */</span>
+<span class="token comment">/*      logic; the shift must be unsigned (bring in zeroes).  On some     */</span>
+<span class="token comment">/*      hardware you could probably optimize the shift in assembler by    */</span>
+<span class="token comment">/*      using byte-swap instructions.                                     */</span>
+<span class="token comment">/*      polynomial $edb88320                                              */</span>
+<span class="token comment">/*                                                                        */</span>
+<span class="token comment">/*  --------------------------------------------------------------------  */</span>
+
+<span class="token keyword">static</span> <span class="token keyword">unsigned</span> <span class="token keyword">long</span> crc32_tab<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    <span class="token number">0x00000000L</span><span class="token punctuation">,</span> <span class="token number">0x77073096L</span><span class="token punctuation">,</span> <span class="token number">0xee0e612cL</span><span class="token punctuation">,</span> <span class="token number">0x990951baL</span><span class="token punctuation">,</span> <span class="token number">0x076dc419L</span><span class="token punctuation">,</span>
+    <span class="token number">0x706af48fL</span><span class="token punctuation">,</span> <span class="token number">0xe963a535L</span><span class="token punctuation">,</span> <span class="token number">0x9e6495a3L</span><span class="token punctuation">,</span> <span class="token number">0x0edb8832L</span><span class="token punctuation">,</span> <span class="token number">0x79dcb8a4L</span><span class="token punctuation">,</span>
+    <span class="token number">0xe0d5e91eL</span><span class="token punctuation">,</span> <span class="token number">0x97d2d988L</span><span class="token punctuation">,</span> <span class="token number">0x09b64c2bL</span><span class="token punctuation">,</span> <span class="token number">0x7eb17cbdL</span><span class="token punctuation">,</span> <span class="token number">0xe7b82d07L</span><span class="token punctuation">,</span>
+    <span class="token number">0x90bf1d91L</span><span class="token punctuation">,</span> <span class="token number">0x1db71064L</span><span class="token punctuation">,</span> <span class="token number">0x6ab020f2L</span><span class="token punctuation">,</span> <span class="token number">0xf3b97148L</span><span class="token punctuation">,</span> <span class="token number">0x84be41deL</span><span class="token punctuation">,</span>
+    <span class="token number">0x1adad47dL</span><span class="token punctuation">,</span> <span class="token number">0x6ddde4ebL</span><span class="token punctuation">,</span> <span class="token number">0xf4d4b551L</span><span class="token punctuation">,</span> <span class="token number">0x83d385c7L</span><span class="token punctuation">,</span> <span class="token number">0x136c9856L</span><span class="token punctuation">,</span>
+    <span class="token number">0x646ba8c0L</span><span class="token punctuation">,</span> <span class="token number">0xfd62f97aL</span><span class="token punctuation">,</span> <span class="token number">0x8a65c9ecL</span><span class="token punctuation">,</span> <span class="token number">0x14015c4fL</span><span class="token punctuation">,</span> <span class="token number">0x63066cd9L</span><span class="token punctuation">,</span>
+    <span class="token number">0xfa0f3d63L</span><span class="token punctuation">,</span> <span class="token number">0x8d080df5L</span><span class="token punctuation">,</span> <span class="token number">0x3b6e20c8L</span><span class="token punctuation">,</span> <span class="token number">0x4c69105eL</span><span class="token punctuation">,</span> <span class="token number">0xd56041e4L</span><span class="token punctuation">,</span>
+    <span class="token number">0xa2677172L</span><span class="token punctuation">,</span> <span class="token number">0x3c03e4d1L</span><span class="token punctuation">,</span> <span class="token number">0x4b04d447L</span><span class="token punctuation">,</span> <span class="token number">0xd20d85fdL</span><span class="token punctuation">,</span> <span class="token number">0xa50ab56bL</span><span class="token punctuation">,</span>
+    <span class="token number">0x35b5a8faL</span><span class="token punctuation">,</span> <span class="token number">0x42b2986cL</span><span class="token punctuation">,</span> <span class="token number">0xdbbbc9d6L</span><span class="token punctuation">,</span> <span class="token number">0xacbcf940L</span><span class="token punctuation">,</span> <span class="token number">0x32d86ce3L</span><span class="token punctuation">,</span>
+    <span class="token number">0x45df5c75L</span><span class="token punctuation">,</span> <span class="token number">0xdcd60dcfL</span><span class="token punctuation">,</span> <span class="token number">0xabd13d59L</span><span class="token punctuation">,</span> <span class="token number">0x26d930acL</span><span class="token punctuation">,</span> <span class="token number">0x51de003aL</span><span class="token punctuation">,</span>
+    <span class="token number">0xc8d75180L</span><span class="token punctuation">,</span> <span class="token number">0xbfd06116L</span><span class="token punctuation">,</span> <span class="token number">0x21b4f4b5L</span><span class="token punctuation">,</span> <span class="token number">0x56b3c423L</span><span class="token punctuation">,</span> <span class="token number">0xcfba9599L</span><span class="token punctuation">,</span>
+    <span class="token number">0xb8bda50fL</span><span class="token punctuation">,</span> <span class="token number">0x2802b89eL</span><span class="token punctuation">,</span> <span class="token number">0x5f058808L</span><span class="token punctuation">,</span> <span class="token number">0xc60cd9b2L</span><span class="token punctuation">,</span> <span class="token number">0xb10be924L</span><span class="token punctuation">,</span>
+    <span class="token number">0x2f6f7c87L</span><span class="token punctuation">,</span> <span class="token number">0x58684c11L</span><span class="token punctuation">,</span> <span class="token number">0xc1611dabL</span><span class="token punctuation">,</span> <span class="token number">0xb6662d3dL</span><span class="token punctuation">,</span> <span class="token number">0x76dc4190L</span><span class="token punctuation">,</span>
+    <span class="token number">0x01db7106L</span><span class="token punctuation">,</span> <span class="token number">0x98d220bcL</span><span class="token punctuation">,</span> <span class="token number">0xefd5102aL</span><span class="token punctuation">,</span> <span class="token number">0x71b18589L</span><span class="token punctuation">,</span> <span class="token number">0x06b6b51fL</span><span class="token punctuation">,</span>
+    <span class="token number">0x9fbfe4a5L</span><span class="token punctuation">,</span> <span class="token number">0xe8b8d433L</span><span class="token punctuation">,</span> <span class="token number">0x7807c9a2L</span><span class="token punctuation">,</span> <span class="token number">0x0f00f934L</span><span class="token punctuation">,</span> <span class="token number">0x9609a88eL</span><span class="token punctuation">,</span>
+    <span class="token number">0xe10e9818L</span><span class="token punctuation">,</span> <span class="token number">0x7f6a0dbbL</span><span class="token punctuation">,</span> <span class="token number">0x086d3d2dL</span><span class="token punctuation">,</span> <span class="token number">0x91646c97L</span><span class="token punctuation">,</span> <span class="token number">0xe6635c01L</span><span class="token punctuation">,</span>
+    <span class="token number">0x6b6b51f4L</span><span class="token punctuation">,</span> <span class="token number">0x1c6c6162L</span><span class="token punctuation">,</span> <span class="token number">0x856530d8L</span><span class="token punctuation">,</span> <span class="token number">0xf262004eL</span><span class="token punctuation">,</span> <span class="token number">0x6c0695edL</span><span class="token punctuation">,</span>
+    <span class="token number">0x1b01a57bL</span><span class="token punctuation">,</span> <span class="token number">0x8208f4c1L</span><span class="token punctuation">,</span> <span class="token number">0xf50fc457L</span><span class="token punctuation">,</span> <span class="token number">0x65b0d9c6L</span><span class="token punctuation">,</span> <span class="token number">0x12b7e950L</span><span class="token punctuation">,</span>
+    <span class="token number">0x8bbeb8eaL</span><span class="token punctuation">,</span> <span class="token number">0xfcb9887cL</span><span class="token punctuation">,</span> <span class="token number">0x62dd1ddfL</span><span class="token punctuation">,</span> <span class="token number">0x15da2d49L</span><span class="token punctuation">,</span> <span class="token number">0x8cd37cf3L</span><span class="token punctuation">,</span>
+    <span class="token number">0xfbd44c65L</span><span class="token punctuation">,</span> <span class="token number">0x4db26158L</span><span class="token punctuation">,</span> <span class="token number">0x3ab551ceL</span><span class="token punctuation">,</span> <span class="token number">0xa3bc0074L</span><span class="token punctuation">,</span> <span class="token number">0xd4bb30e2L</span><span class="token punctuation">,</span>
+    <span class="token number">0x4adfa541L</span><span class="token punctuation">,</span> <span class="token number">0x3dd895d7L</span><span class="token punctuation">,</span> <span class="token number">0xa4d1c46dL</span><span class="token punctuation">,</span> <span class="token number">0xd3d6f4fbL</span><span class="token punctuation">,</span> <span class="token number">0x4369e96aL</span><span class="token punctuation">,</span>
+    <span class="token number">0x346ed9fcL</span><span class="token punctuation">,</span> <span class="token number">0xad678846L</span><span class="token punctuation">,</span> <span class="token number">0xda60b8d0L</span><span class="token punctuation">,</span> <span class="token number">0x44042d73L</span><span class="token punctuation">,</span> <span class="token number">0x33031de5L</span><span class="token punctuation">,</span>
+    <span class="token number">0xaa0a4c5fL</span><span class="token punctuation">,</span> <span class="token number">0xdd0d7cc9L</span><span class="token punctuation">,</span> <span class="token number">0x5005713cL</span><span class="token punctuation">,</span> <span class="token number">0x270241aaL</span><span class="token punctuation">,</span> <span class="token number">0xbe0b1010L</span><span class="token punctuation">,</span>
+    <span class="token number">0xc90c2086L</span><span class="token punctuation">,</span> <span class="token number">0x5768b525L</span><span class="token punctuation">,</span> <span class="token number">0x206f85b3L</span><span class="token punctuation">,</span> <span class="token number">0xb966d409L</span><span class="token punctuation">,</span> <span class="token number">0xce61e49fL</span><span class="token punctuation">,</span>
+    <span class="token number">0x5edef90eL</span><span class="token punctuation">,</span> <span class="token number">0x29d9c998L</span><span class="token punctuation">,</span> <span class="token number">0xb0d09822L</span><span class="token punctuation">,</span> <span class="token number">0xc7d7a8b4L</span><span class="token punctuation">,</span> <span class="token number">0x59b33d17L</span><span class="token punctuation">,</span>
+    <span class="token number">0x2eb40d81L</span><span class="token punctuation">,</span> <span class="token number">0xb7bd5c3bL</span><span class="token punctuation">,</span> <span class="token number">0xc0ba6cadL</span><span class="token punctuation">,</span> <span class="token number">0xedb88320L</span><span class="token punctuation">,</span> <span class="token number">0x9abfb3b6L</span><span class="token punctuation">,</span>
+    <span class="token number">0x03b6e20cL</span><span class="token punctuation">,</span> <span class="token number">0x74b1d29aL</span><span class="token punctuation">,</span> <span class="token number">0xead54739L</span><span class="token punctuation">,</span> <span class="token number">0x9dd277afL</span><span class="token punctuation">,</span> <span class="token number">0x04db2615L</span><span class="token punctuation">,</span>
+    <span class="token number">0x73dc1683L</span><span class="token punctuation">,</span> <span class="token number">0xe3630b12L</span><span class="token punctuation">,</span> <span class="token number">0x94643b84L</span><span class="token punctuation">,</span> <span class="token number">0x0d6d6a3eL</span><span class="token punctuation">,</span> <span class="token number">0x7a6a5aa8L</span><span class="token punctuation">,</span>
+    <span class="token number">0xe40ecf0bL</span><span class="token punctuation">,</span> <span class="token number">0x9309ff9dL</span><span class="token punctuation">,</span> <span class="token number">0x0a00ae27L</span><span class="token punctuation">,</span> <span class="token number">0x7d079eb1L</span><span class="token punctuation">,</span> <span class="token number">0xf00f9344L</span><span class="token punctuation">,</span>
+    <span class="token number">0x8708a3d2L</span><span class="token punctuation">,</span> <span class="token number">0x1e01f268L</span><span class="token punctuation">,</span> <span class="token number">0x6906c2feL</span><span class="token punctuation">,</span> <span class="token number">0xf762575dL</span><span class="token punctuation">,</span> <span class="token number">0x806567cbL</span><span class="token punctuation">,</span>
+    <span class="token number">0x196c3671L</span><span class="token punctuation">,</span> <span class="token number">0x6e6b06e7L</span><span class="token punctuation">,</span> <span class="token number">0xfed41b76L</span><span class="token punctuation">,</span> <span class="token number">0x89d32be0L</span><span class="token punctuation">,</span> <span class="token number">0x10da7a5aL</span><span class="token punctuation">,</span>
+    <span class="token number">0x67dd4accL</span><span class="token punctuation">,</span> <span class="token number">0xf9b9df6fL</span><span class="token punctuation">,</span> <span class="token number">0x8ebeeff9L</span><span class="token punctuation">,</span> <span class="token number">0x17b7be43L</span><span class="token punctuation">,</span> <span class="token number">0x60b08ed5L</span><span class="token punctuation">,</span>
+    <span class="token number">0xd6d6a3e8L</span><span class="token punctuation">,</span> <span class="token number">0xa1d1937eL</span><span class="token punctuation">,</span> <span class="token number">0x38d8c2c4L</span><span class="token punctuation">,</span> <span class="token number">0x4fdff252L</span><span class="token punctuation">,</span> <span class="token number">0xd1bb67f1L</span><span class="token punctuation">,</span>
+    <span class="token number">0xa6bc5767L</span><span class="token punctuation">,</span> <span class="token number">0x3fb506ddL</span><span class="token punctuation">,</span> <span class="token number">0x48b2364bL</span><span class="token punctuation">,</span> <span class="token number">0xd80d2bdaL</span><span class="token punctuation">,</span> <span class="token number">0xaf0a1b4cL</span><span class="token punctuation">,</span>
+    <span class="token number">0x36034af6L</span><span class="token punctuation">,</span> <span class="token number">0x41047a60L</span><span class="token punctuation">,</span> <span class="token number">0xdf60efc3L</span><span class="token punctuation">,</span> <span class="token number">0xa867df55L</span><span class="token punctuation">,</span> <span class="token number">0x316e8eefL</span><span class="token punctuation">,</span>
+    <span class="token number">0x4669be79L</span><span class="token punctuation">,</span> <span class="token number">0xcb61b38cL</span><span class="token punctuation">,</span> <span class="token number">0xbc66831aL</span><span class="token punctuation">,</span> <span class="token number">0x256fd2a0L</span><span class="token punctuation">,</span> <span class="token number">0x5268e236L</span><span class="token punctuation">,</span>
+    <span class="token number">0xcc0c7795L</span><span class="token punctuation">,</span> <span class="token number">0xbb0b4703L</span><span class="token punctuation">,</span> <span class="token number">0x220216b9L</span><span class="token punctuation">,</span> <span class="token number">0x5505262fL</span><span class="token punctuation">,</span> <span class="token number">0xc5ba3bbeL</span><span class="token punctuation">,</span>
+    <span class="token number">0xb2bd0b28L</span><span class="token punctuation">,</span> <span class="token number">0x2bb45a92L</span><span class="token punctuation">,</span> <span class="token number">0x5cb36a04L</span><span class="token punctuation">,</span> <span class="token number">0xc2d7ffa7L</span><span class="token punctuation">,</span> <span class="token number">0xb5d0cf31L</span><span class="token punctuation">,</span>
+    <span class="token number">0x2cd99e8bL</span><span class="token punctuation">,</span> <span class="token number">0x5bdeae1dL</span><span class="token punctuation">,</span> <span class="token number">0x9b64c2b0L</span><span class="token punctuation">,</span> <span class="token number">0xec63f226L</span><span class="token punctuation">,</span> <span class="token number">0x756aa39cL</span><span class="token punctuation">,</span>
+    <span class="token number">0x026d930aL</span><span class="token punctuation">,</span> <span class="token number">0x9c0906a9L</span><span class="token punctuation">,</span> <span class="token number">0xeb0e363fL</span><span class="token punctuation">,</span> <span class="token number">0x72076785L</span><span class="token punctuation">,</span> <span class="token number">0x05005713L</span><span class="token punctuation">,</span>
+    <span class="token number">0x95bf4a82L</span><span class="token punctuation">,</span> <span class="token number">0xe2b87a14L</span><span class="token punctuation">,</span> <span class="token number">0x7bb12baeL</span><span class="token punctuation">,</span> <span class="token number">0x0cb61b38L</span><span class="token punctuation">,</span> <span class="token number">0x92d28e9bL</span><span class="token punctuation">,</span>
+    <span class="token number">0xe5d5be0dL</span><span class="token punctuation">,</span> <span class="token number">0x7cdcefb7L</span><span class="token punctuation">,</span> <span class="token number">0x0bdbdf21L</span><span class="token punctuation">,</span> <span class="token number">0x86d3d2d4L</span><span class="token punctuation">,</span> <span class="token number">0xf1d4e242L</span><span class="token punctuation">,</span>
+    <span class="token number">0x68ddb3f8L</span><span class="token punctuation">,</span> <span class="token number">0x1fda836eL</span><span class="token punctuation">,</span> <span class="token number">0x81be16cdL</span><span class="token punctuation">,</span> <span class="token number">0xf6b9265bL</span><span class="token punctuation">,</span> <span class="token number">0x6fb077e1L</span><span class="token punctuation">,</span>
+    <span class="token number">0x18b74777L</span><span class="token punctuation">,</span> <span class="token number">0x88085ae6L</span><span class="token punctuation">,</span> <span class="token number">0xff0f6a70L</span><span class="token punctuation">,</span> <span class="token number">0x66063bcaL</span><span class="token punctuation">,</span> <span class="token number">0x11010b5cL</span><span class="token punctuation">,</span>
+    <span class="token number">0x8f659effL</span><span class="token punctuation">,</span> <span class="token number">0xf862ae69L</span><span class="token punctuation">,</span> <span class="token number">0x616bffd3L</span><span class="token punctuation">,</span> <span class="token number">0x166ccf45L</span><span class="token punctuation">,</span> <span class="token number">0xa00ae278L</span><span class="token punctuation">,</span>
+    <span class="token number">0xd70dd2eeL</span><span class="token punctuation">,</span> <span class="token number">0x4e048354L</span><span class="token punctuation">,</span> <span class="token number">0x3903b3c2L</span><span class="token punctuation">,</span> <span class="token number">0xa7672661L</span><span class="token punctuation">,</span> <span class="token number">0xd06016f7L</span><span class="token punctuation">,</span>
+    <span class="token number">0x4969474dL</span><span class="token punctuation">,</span> <span class="token number">0x3e6e77dbL</span><span class="token punctuation">,</span> <span class="token number">0xaed16a4aL</span><span class="token punctuation">,</span> <span class="token number">0xd9d65adcL</span><span class="token punctuation">,</span> <span class="token number">0x40df0b66L</span><span class="token punctuation">,</span>
+    <span class="token number">0x37d83bf0L</span><span class="token punctuation">,</span> <span class="token number">0xa9bcae53L</span><span class="token punctuation">,</span> <span class="token number">0xdebb9ec5L</span><span class="token punctuation">,</span> <span class="token number">0x47b2cf7fL</span><span class="token punctuation">,</span> <span class="token number">0x30b5ffe9L</span><span class="token punctuation">,</span>
+    <span class="token number">0xbdbdf21cL</span><span class="token punctuation">,</span> <span class="token number">0xcabac28aL</span><span class="token punctuation">,</span> <span class="token number">0x53b39330L</span><span class="token punctuation">,</span> <span class="token number">0x24b4a3a6L</span><span class="token punctuation">,</span> <span class="token number">0xbad03605L</span><span class="token punctuation">,</span>
+    <span class="token number">0xcdd70693L</span><span class="token punctuation">,</span> <span class="token number">0x54de5729L</span><span class="token punctuation">,</span> <span class="token number">0x23d967bfL</span><span class="token punctuation">,</span> <span class="token number">0xb3667a2eL</span><span class="token punctuation">,</span> <span class="token number">0xc4614ab8L</span><span class="token punctuation">,</span>
+    <span class="token number">0x5d681b02L</span><span class="token punctuation">,</span> <span class="token number">0x2a6f2b94L</span><span class="token punctuation">,</span> <span class="token number">0xb40bbe37L</span><span class="token punctuation">,</span> <span class="token number">0xc30c8ea1L</span><span class="token punctuation">,</span> <span class="token number">0x5a05df1bL</span><span class="token punctuation">,</span>
+    <span class="token number">0x2d02ef8dL</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 根据输入的字符串计算一个 64 位的 CRC</span>
+<span class="token keyword">static</span> <span class="token keyword">unsigned</span> <span class="token keyword">long</span> <span class="token function">crc32</span><span class="token punctuation">(</span><span class="token keyword">const</span> <span class="token class-name">uint8_t</span> <span class="token operator">*</span>s<span class="token punctuation">,</span> <span class="token keyword">unsigned</span> <span class="token keyword">int</span> len<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">int</span> i<span class="token punctuation">;</span>
+    <span class="token class-name">uint64_t</span> crc32val<span class="token punctuation">;</span>
+    crc32val <span class="token operator">=</span> <span class="token number">0LL</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>  i <span class="token operator">&lt;</span> len<span class="token punctuation">;</span>  i <span class="token operator">++</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        crc32val <span class="token operator">=</span> crc32_tab<span class="token punctuation">[</span><span class="token punctuation">(</span>crc32val <span class="token operator">^</span> s<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">&amp;</span> <span class="token number">0xff</span><span class="token punctuation">]</span> <span class="token operator">^</span> <span class="token punctuation">(</span>crc32val <span class="token operator">>></span> <span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">return</span> crc32val<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>我们的哈希表使用 <code>knuth multiplicative</code> 方法将字符串转为CRC，另一个可用的方法是 <code>Murmur3</code>，但是我也不清楚什么才是最佳的哈希算法。</p>
+<h1 id="列表"><a href="#列表" class="headerlink" title="列表"></a>列表</h1><p>接下来我们会用到列表 <code>list</code>，虽然 <code>vector</code> 可以通过他的缓存友好性来提升一些性能，但是对于我们的需求来说也没有太大的收益。O(1)的数据插入复杂度对于我们来说完全足够使用了。我们的列表会基于一个单向链表，带有头部和尾部的指针，这样可以保证我们从两侧插入时的复杂度都为O(1)。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/list.h</span></div><code class="language-c"><span class="token comment">// 节点</span>
+<span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">void</span> <span class="token operator">*</span>data<span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>next<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 列表</span>
+<span class="token keyword">typedef</span> <span class="token keyword">struct</span> <span class="token class-name">list</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>head<span class="token punctuation">;</span> <span class="token comment">// 头指针</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>tail<span class="token punctuation">;</span> <span class="token comment">// 尾指针</span>
+    <span class="token keyword">unsigned</span> <span class="token keyword">long</span> len<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>destructor<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span> List<span class="token punctuation">;</span>
+
+<span class="token comment">// 比较函数接口, 用来比较两个节点</span>
+<span class="token keyword">typedef</span> <span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>compare_func<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 创建列表</span>
+List <span class="token operator">*</span><span class="token function">list_create</span><span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>destructor<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span><span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 释放链表, 通过一个 int 的标志来决定释放深度</span>
+<span class="token comment">// 例如：判断是否需要释放所有的节点中的数据</span>
+<span class="token keyword">void</span> <span class="token function">list_release</span><span class="token punctuation">(</span>List <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 当前大小</span>
+<span class="token keyword">unsigned</span> <span class="token keyword">long</span> <span class="token function">list_size</span><span class="token punctuation">(</span><span class="token keyword">const</span> List <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 清空链表, 但保留链表本身, 根据 int 判断是否释放节点中的数据</span>
+<span class="token keyword">void</span> <span class="token function">list_clear</span><span class="token punctuation">(</span>List <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">int</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 在头部插入数据</span>
+List <span class="token operator">*</span><span class="token function">list_push</span><span class="token punctuation">(</span>List <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 在尾部插入数据</span>
+List <span class="token operator">*</span><span class="token function">list_push_back</span><span class="token punctuation">(</span>List <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 通过传入的比较函数, 删除和第二参数相同的节点</span>
+<span class="token keyword">void</span> <span class="token function">list_remove</span><span class="token punctuation">(</span>List <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token punctuation">,</span> compare_func<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 删除一个节点并返回被删除的节点</span>
+<span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token function">list_remove_node</span><span class="token punctuation">(</span>List <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">,</span> compare_func<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 另一个比较函数接口, 用来进行合并或排序</span>
+<span class="token keyword">typedef</span> <span class="token keyword">int</span> <span class="token function">cmp</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 再 cmp_func 计算的位置插入一个节点</span>
+<span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token function">list_sort_insert</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token punctuation">,</span> compare_func<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 将 list 从中间分为两份</span>
+<span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token function">bisect_list</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<figure><div class="code-wrapper"><pre class="line-numbers language-c" data-language="c"><div class="caption"><span>src/list.c</span></div><code class="language-c"><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">"list.h"</span></span>
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">include</span> <span class="token string">&lt;stdlib.h></span></span>
+
+<span class="token comment">// 私有的删除节点函数</span>
+<span class="token keyword">static</span> <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token function">list_node_remove</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token punctuation">,</span> compare_func<span class="token punctuation">,</span> <span class="token keyword">int</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 创建列表</span>
+List <span class="token operator">*</span><span class="token function">list_create</span><span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token punctuation">(</span><span class="token operator">*</span>destructor<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    List <span class="token operator">*</span>l <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span>List<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>l<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// 默认值</span>
+    l<span class="token operator">-></span>head <span class="token operator">=</span> l<span class="token operator">-></span>tail <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    l<span class="token operator">-></span>len <span class="token operator">=</span> <span class="token number">0L</span><span class="token punctuation">;</span>
+    <span class="token comment">// TODO 默认析构</span>
+    l<span class="token operator">-></span>destructor <span class="token operator">=</span> destructor<span class="token punctuation">;</span>
+
+    <span class="token keyword">return</span> l<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 释放列表</span>
+<span class="token keyword">void</span> <span class="token function">list_release</span><span class="token punctuation">(</span>List <span class="token operator">*</span>l<span class="token punctuation">,</span> <span class="token keyword">int</span> deep<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>l<span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>h <span class="token operator">=</span> l<span class="token operator">-></span>head<span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>tmp<span class="token punctuation">;</span>
+
+    <span class="token comment">// 释放所有节点</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span>l<span class="token operator">-></span>len<span class="token operator">--</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        tmp <span class="token operator">=</span> h<span class="token operator">-></span>next<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>l<span class="token operator">-></span>destructor<span class="token punctuation">)</span>
+            l<span class="token operator">-></span><span class="token function">destructor</span><span class="token punctuation">(</span>h<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>h<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+                <span class="token comment">// 如果需要释放数据</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>h<span class="token operator">-></span>data <span class="token operator">&amp;&amp;</span> deep <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span>
+                    <span class="token function">free</span><span class="token punctuation">(</span>h<span class="token operator">-></span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token function">free</span><span class="token punctuation">(</span>h<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">&#125;</span>
+        <span class="token punctuation">&#125;</span>
+        h <span class="token operator">=</span> tmp<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+
+    <span class="token comment">// 释放列表本身</span>
+    <span class="token function">free</span><span class="token punctuation">(</span>l<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">unsigned</span> <span class="token keyword">long</span> <span class="token function">list_size</span><span class="token punctuation">(</span><span class="token keyword">const</span> List <span class="token operator">*</span>list<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">return</span> list<span class="token operator">-></span>len<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 清空链表, 但保留链表本身, 根据 int 判断是否释放节点中的数据</span>
+<span class="token keyword">void</span> <span class="token function">list_clear</span><span class="token punctuation">(</span>List <span class="token operator">*</span>l<span class="token punctuation">,</span> <span class="token keyword">int</span> deep<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>l <span class="token operator">||</span> <span class="token operator">!</span>l<span class="token operator">-></span>head<span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>h <span class="token operator">=</span> l<span class="token operator">-></span>head<span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>tmp<span class="token punctuation">;</span>
+
+    <span class="token comment">// 释放所有节点</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span>l<span class="token operator">-></span>len<span class="token operator">--</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        tmp <span class="token operator">=</span> h<span class="token operator">-></span>next<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>h<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>h<span class="token operator">-></span>data <span class="token operator">&amp;&amp;</span> deep <span class="token operator">==</span> <span class="token number">1</span><span class="token punctuation">)</span>
+                <span class="token function">free</span><span class="token punctuation">(</span>h<span class="token operator">-></span>data<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">free</span><span class="token punctuation">(</span>h<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+        h <span class="token operator">=</span> tmp<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    l<span class="token operator">-></span>head <span class="token operator">=</span> l<span class="token operator">-></span>tail <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    l<span class="token operator">-></span>len <span class="token operator">=</span> <span class="token number">0L</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 插入一个数据到头部</span>
+List <span class="token operator">*</span><span class="token function">list_push</span><span class="token punctuation">(</span>List <span class="token operator">*</span>l<span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span>val<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>new_node <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>new_node<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    new_node<span class="token operator">-></span>data <span class="token operator">=</span> val<span class="token punctuation">;</span>
+    <span class="token comment">// 第一个数据即使头也是尾</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>l<span class="token operator">-></span>len <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        l<span class="token operator">-></span>head <span class="token operator">=</span> l<span class="token operator">-></span>tail <span class="token operator">=</span> new_node<span class="token punctuation">;</span>
+        new_node<span class="token operator">-></span>next <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token comment">// 插入为头部</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+        new_node<span class="token operator">-></span>next <span class="token operator">=</span> l<span class="token operator">-></span>head<span class="token punctuation">;</span>
+        l<span class="token operator">-></span>head <span class="token operator">=</span> new_node<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    l<span class="token operator">-></span>len<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> l<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 插入一个数据到尾部</span>
+List <span class="token operator">*</span><span class="token function">list_push_back</span><span class="token punctuation">(</span>List <span class="token operator">*</span>l<span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span>val<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>new_node <span class="token operator">=</span> <span class="token function">malloc</span><span class="token punctuation">(</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>new_node<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    new_node<span class="token operator">-></span>data <span class="token operator">=</span> val<span class="token punctuation">;</span>
+    new_node<span class="token operator">-></span>next <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>l<span class="token operator">-></span>len <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        l<span class="token operator">-></span>head <span class="token operator">=</span> l<span class="token operator">-></span>tail <span class="token operator">=</span> new_node<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+        l<span class="token operator">-></span>tail<span class="token operator">-></span>next <span class="token operator">=</span> new_node<span class="token punctuation">;</span>
+        l<span class="token operator">-></span>tail <span class="token operator">=</span> new_node<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    l<span class="token operator">-></span>len<span class="token operator">++</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> l<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 通过传入的比较函数, 删除一个节点</span>
+<span class="token keyword">void</span> <span class="token function">list_remove</span><span class="token punctuation">(</span>List <span class="token operator">*</span>l<span class="token punctuation">,</span> <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>node<span class="token punctuation">,</span> compare_func cmp<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>l <span class="token operator">||</span> <span class="token operator">!</span>node<span class="token punctuation">)</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> counter <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token comment">// list_node_remove 会递归的一层一层返回下一个节点指针, 并在其中去除被删除的节点</span>
+    l<span class="token operator">-></span>head <span class="token operator">=</span> <span class="token function">list_node_remove</span><span class="token punctuation">(</span>l<span class="token operator">-></span>head<span class="token punctuation">,</span> node<span class="token punctuation">,</span> cmp<span class="token punctuation">,</span> <span class="token operator">&amp;</span>counter<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    l<span class="token operator">-></span>len <span class="token operator">-=</span> counter<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 删除节点的工具方法</span>
+<span class="token comment">// return 递归用的返回, 删除成功后的那次调用会返回被删除节点的 next</span>
+<span class="token comment">// head 传入遍历起点</span>
+<span class="token comment">// node 需要删除的节点的样子</span>
+<span class="token comment">// cmp 比较函数, 用来比较遍历的节点和传入的node</span>
+<span class="token comment">// counter 被删除节点的数量, 0 或者 1</span>
+<span class="token keyword">static</span> <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token function">list_node_remove</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>head<span class="token punctuation">,</span>
+                                          <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>node<span class="token punctuation">,</span>
+                                          compare_func cmp<span class="token punctuation">,</span> <span class="token keyword">int</span> <span class="token operator">*</span>counter<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>head<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">cmp</span><span class="token punctuation">(</span>head<span class="token punctuation">,</span> node<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>tmp_next <span class="token operator">=</span> head<span class="token operator">-></span>next<span class="token punctuation">;</span>
+        <span class="token comment">// 译者认为这里没有考虑节点的data也可能需要释放, 或者是作者觉得可以在cmp中释放？</span>
+        <span class="token function">free</span><span class="token punctuation">(</span>head<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        head <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+
+        <span class="token comment">// 匹配成功就 return 的话，这里实际只能删除第一个匹配的节点</span>
+        <span class="token punctuation">(</span><span class="token operator">*</span>counter<span class="token punctuation">)</span><span class="token operator">++</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> tmp_next<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    head<span class="token operator">-></span>next <span class="token operator">=</span> <span class="token function">list_node_remove</span><span class="token punctuation">(</span>head<span class="token operator">-></span>next<span class="token punctuation">,</span> node<span class="token punctuation">,</span> cmp<span class="token punctuation">,</span> counter<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> head<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 删除一个节点的工具方法</span>
+<span class="token comment">// return 递归的返回</span>
+<span class="token comment">// head 查询起点</span>
+<span class="token comment">// data 被删除的 node 的形状</span>
+<span class="token comment">// ret 返回被删除的 node</span>
+<span class="token comment">// cmp 比较函数</span>
+<span class="token keyword">static</span> <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token function">list_remove_single_node</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>head<span class="token punctuation">,</span>
+                                                 <span class="token keyword">void</span> <span class="token operator">*</span>data<span class="token punctuation">,</span>
+                                                 <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token operator">*</span>ret<span class="token punctuation">,</span>
+                                                 compare_func cmp<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>head<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">cmp</span><span class="token punctuation">(</span>head<span class="token punctuation">,</span> data<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token operator">*</span>ret<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>tmp_next <span class="token operator">=</span> head<span class="token operator">-></span>next<span class="token punctuation">;</span>
+        <span class="token operator">*</span>ret <span class="token operator">=</span> head<span class="token punctuation">;</span>
+        <span class="token keyword">return</span> tmp_next<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    head<span class="token operator">-></span>next <span class="token operator">=</span> <span class="token function">list_remove_single_node</span><span class="token punctuation">(</span>head<span class="token operator">-></span>next<span class="token punctuation">,</span> data<span class="token punctuation">,</span> ret<span class="token punctuation">,</span> cmp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> head<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 删除一个节点并返回被删除的节点</span>
+<span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token function">list_remove_node</span><span class="token punctuation">(</span>List <span class="token operator">*</span>list<span class="token punctuation">,</span> <span class="token keyword">void</span> <span class="token operator">*</span>data<span class="token punctuation">,</span> compare_func cmp<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>list<span class="token operator">-></span>len <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">||</span> <span class="token operator">!</span>list<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>node <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token function">list_remove_single_node</span><span class="token punctuation">(</span>list<span class="token operator">-></span>head<span class="token punctuation">,</span> data<span class="token punctuation">,</span> <span class="token operator">&amp;</span>node<span class="token punctuation">,</span> cmp<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>node<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        list<span class="token operator">-></span>len<span class="token operator">--</span><span class="token punctuation">;</span>
+        node<span class="token operator">-></span>next <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">return</span> node<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 在 cmp_func 计算的位置插入一个节点</span>
+<span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token function">list_sort_insert</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token operator">*</span>head<span class="token punctuation">,</span>
+                                   <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>new<span class="token punctuation">,</span> cmp cmp_func<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token operator">*</span>head <span class="token operator">||</span> <span class="token function">cmp_func</span><span class="token punctuation">(</span><span class="token operator">*</span>head<span class="token punctuation">,</span> new<span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        new<span class="token operator">-></span>next <span class="token operator">=</span> <span class="token operator">*</span>head<span class="token punctuation">;</span>
+        <span class="token operator">*</span>head <span class="token operator">=</span> new<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>cur<span class="token punctuation">;</span>
+        cur <span class="token operator">=</span> <span class="token operator">*</span>head<span class="token punctuation">;</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span>cur<span class="token operator">-></span>next <span class="token operator">&amp;&amp;</span> <span class="token function">cmp_func</span><span class="token punctuation">(</span>cur<span class="token operator">-></span>next<span class="token punctuation">,</span> new<span class="token punctuation">)</span> <span class="token operator">&lt;</span> <span class="token number">0</span><span class="token punctuation">)</span>
+            cur <span class="token operator">=</span> cur<span class="token operator">-></span>next<span class="token punctuation">;</span>
+        new<span class="token operator">-></span>next <span class="token operator">=</span> cur<span class="token operator">-></span>next<span class="token punctuation">;</span>
+        cur<span class="token operator">-></span>next <span class="token operator">=</span> new<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">return</span> <span class="token operator">*</span>head<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// 返回一个靠近中间的 node, 并且已经将原 list 从此处截断</span>
+<span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span><span class="token function">bisect_list</span><span class="token punctuation">(</span><span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>head<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// fast 的移动速度是 slow 的两倍</span>
+    <span class="token comment">// prev 表示 slow的前一个节点, 也就是截取后的第一个 list 的最后一个节点</span>
+    <span class="token keyword">struct</span> <span class="token class-name">list_node</span> <span class="token operator">*</span>fast <span class="token operator">=</span> head<span class="token punctuation">,</span> <span class="token operator">*</span>slow <span class="token operator">=</span> head<span class="token punctuation">,</span> <span class="token operator">*</span>prev <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token keyword">while</span> <span class="token punctuation">(</span>fast <span class="token operator">!=</span> <span class="token constant">NULL</span> <span class="token operator">&amp;&amp;</span> fast<span class="token operator">-></span>next <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        fast <span class="token operator">=</span> fast<span class="token operator">-></span>next<span class="token operator">-></span>next<span class="token punctuation">;</span>
+        prev <span class="token operator">=</span> slow<span class="token punctuation">;</span>
+        slow <span class="token operator">=</span> slow<span class="token operator">-></span>next<span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>prev <span class="token operator">!=</span> <span class="token constant">NULL</span><span class="token punctuation">)</span>
+        prev<span class="token operator">-></span>next <span class="token operator">=</span> <span class="token constant">NULL</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> slow<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h1 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h1><p>我们成功的实现了两个经典的数据结构，这样我们可以在项目中使用他们：</p>
+<ul>
+<li>哈希表</li>
+<li>列表</li>
+</ul>
+<p>下一个要实现的数据结构是 <strong>特里树</strong>，他可以让我们轻松的维护我们的主题和主题的分层结构。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/MQTT/" class="category-chain-item">MQTT</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="print-no-link">#网络编程</a>
+      
+        <a href="/tags/%E7%BF%BB%E8%AF%91/" class="print-no-link">#翻译</a>
+      
+        <a href="/tags/C/" class="print-no-link">#C</a>
+      
+        <a href="/tags/MQTT/" class="print-no-link">#MQTT</a>
+      
+        <a href="/tags/%E7%89%A9%E8%81%94%E7%BD%91/" class="print-no-link">#物联网</a>
+      
+        <a href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" class="print-no-link">#数据结构</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>[翻译]Sol - 从零开始的MQTT broker - 第四部分：数据结构</div>
+      <div>https://vitsumoc.github.io/translate-sol-4.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>vc</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年12月27日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/translate-sol-5.html" title="[翻译]Sol - 从零开始的MQTT broker - 第五部分：主题树">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">[翻译]Sol - 从零开始的MQTT broker - 第五部分：主题树</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/translate-sol-3.html" title="[翻译]Sol - 从零开始的MQTT broker - 第三部分：服务">
+                        <span class="hidden-mobile">[翻译]Sol - 从零开始的MQTT broker - 第三部分：服务</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>vitusmoc Blog, Powered by </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script  src="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
