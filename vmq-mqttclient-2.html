@@ -16,27 +16,25 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="按照既定思路搭建基本的软件框架：两个仓库，一个是 MQTT 客户端，另一个是图形化测试工具，图形化测试工具需要依赖我们的客户端。">
+    <meta name="description" content="MQTT 5.0 规范中定义了 7 种数据表示，分别是：  比特位 2字节整数 4字节整数 UTF-8字符串 变长整数 二进制数据 UTF-8字符串对">
 <meta property="og:type" content="article">
-<meta property="og:title" content="vmq-从零开始的MQTT客户端-2-框架">
+<meta property="og:title" content="vmq-从零开始的MQTT客户端-2-数据表示">
 <meta property="og:url" content="https://vitsumoc.github.io/vmq-mqttclient-2.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="按照既定思路搭建基本的软件框架：两个仓库，一个是 MQTT 客户端，另一个是图形化测试工具，图形化测试工具需要依赖我们的客户端。">
+<meta property="og:description" content="MQTT 5.0 规范中定义了 7 种数据表示，分别是：  比特位 2字节整数 4字节整数 UTF-8字符串 变长整数 二进制数据 UTF-8字符串对">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://vitsumoc.github.io/vmq-mqttclient-2/test.png">
-<meta property="article:published_time" content="2024-02-05T07:21:20.000Z">
-<meta property="article:modified_time" content="2024-03-01T09:16:07.236Z">
+<meta property="article:published_time" content="2024-03-10T07:21:20.000Z">
+<meta property="article:modified_time" content="2024-03-10T09:12:17.649Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="网络编程">
 <meta property="article:tag" content="golang">
 <meta property="article:tag" content="MQTT">
 <meta property="article:tag" content="vmq">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://vitsumoc.github.io/vmq-mqttclient-2/test.png">
   
   
   
-  <title>vmq-从零开始的MQTT客户端-2-框架 - Thinking...</title>
+  <title>vmq-从零开始的MQTT客户端-2-数据表示 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -204,7 +202,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">vmq-从零开始的MQTT客户端-2-框架</span>
+            <span id="subtitle">vmq-从零开始的MQTT客户端-2-数据表示</span>
           
         </div>
 
@@ -215,8 +213,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-02-05 15:21" pubdate>
-          2024年2月5日 下午
+        <time datetime="2024-03-10 15:21" pubdate>
+          2024年3月10日 下午
         </time>
       </span>
     
@@ -227,7 +225,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          399 字
+          562 字
         
       </span>
     
@@ -238,7 +236,7 @@
         
         
         
-          4 分钟
+          5 分钟
         
       </span>
     
@@ -275,45 +273,225 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">vmq-从零开始的MQTT客户端-2-框架</h1>
+            <h1 id="seo-header">vmq-从零开始的MQTT客户端-2-数据表示</h1>
             
             
               <div class="markdown-body">
                 
-                <p>按照既定思路搭建基本的软件框架：两个仓库，一个是 MQTT 客户端，另一个是图形化测试工具，图形化测试工具需要依赖我们的客户端。</p>
+                <p>MQTT 5.0 规范中定义了 7 种<a href="/mqtt-v5-0-chinese.html#1-5-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%A4%BA">数据表示</a>，分别是：</p>
+<ul>
+<li><code>比特位</code></li>
+<li><code>2字节整数</code></li>
+<li><code>4字节整数</code></li>
+<li><code>UTF-8字符串</code></li>
+<li><code>变长整数</code></li>
+<li><code>二进制数据</code></li>
+<li><code>UTF-8字符串对</code></li>
+</ul>
 <span id="more"></span>
 
-<p>两个仓库分别是 <a target="_blank" rel="noopener" href="https://github.com/vitsumoc/vmq">vmq</a> 和 <a target="_blank" rel="noopener" href="https://github.com/vitsumoc/vmq-tool">vmq-tool</a></p>
-<h1 id="最初的vmq"><a href="#最初的vmq" class="headerlink" title="最初的vmq"></a>最初的vmq</h1><p>让 vmq 提供一个可以被外部访问的函数：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>test.go</span></div><code class="language-go"><span class="token keyword">func</span> <span class="token function">HelloVmq</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">&#123;</span>
-	fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"I'm vmq"</span><span class="token punctuation">)</span>
-	<span class="token keyword">return</span> <span class="token string">"I'm vmq"</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<p>这 7 种数据有些比较简单，有些比较复杂，但是为了方便统一处理，我还是为每一种数据设置了数据类型：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>types.go</span></div><code class="language-go"><span class="token keyword">type</span> MQTT_BYTE <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	data <span class="token builtin">byte</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">type</span> MQTT_U16 <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	data <span class="token builtin">uint16</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">type</span> MQTT_U32 <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	data <span class="token builtin">uint32</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">type</span> MQTT_UTF8 <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	<span class="token builtin">len</span>  MQTT_U16
+	data <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">type</span> MQTT_VAR_INT <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	data <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">type</span> MQTT_BIN <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	<span class="token builtin">len</span>  MQTT_U16
+	data <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">type</span> MQTT_UTF8_PAIR <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	key   MQTT_UTF8
+	value MQTT_UTF8
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
-<p>现在只是一个 Hello World，但是以后他可以是一个创建连接的函数、创建客户端的函数、执行订阅的函数等等。总之原理是一样的，这是一个可以被 vmq-tool 调用的函数。</p>
-<h1 id="最初的vmq-tool"><a href="#最初的vmq-tool" class="headerlink" title="最初的vmq-tool"></a>最初的vmq-tool</h1><p>接下来是 vmq-tool 项目，既然是 gui，意味着需要一个图形化库来显示窗口，我没有这方面的经验，凭感觉选择了 <a target="_blank" rel="noopener" href="https://fyne.io/">fyne</a>。</p>
-<p>参考 fyne 中的 Hello World 示例，只不过是把 vmq 塞进去：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>test.go</span></div><code class="language-go"><span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-	a <span class="token operator">:=</span> app<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-	w <span class="token operator">:=</span> a<span class="token punctuation">.</span><span class="token function">NewWindow</span><span class="token punctuation">(</span><span class="token string">"Hello"</span><span class="token punctuation">)</span>
+<ul>
+<li><code>比特位</code>：只是描述字节内部高低位顺序，可以用一个普通的字节来表示</li>
+<li><code>2字节整数</code>：等同于 golang 中的 <code>uint16</code></li>
+<li><code>4字节整数</code>：等同于 golang 中的 <code>uint32</code></li>
+<li><code>UTF-8字符串</code>：使用 <code>2字节整数</code> 表示内容长度，使用 <code>[]byte</code> 存储字符串内容</li>
+<li><code>变长整数</code>：1-4位的 <code>[]byte</code>，用来表示一个正整数值</li>
+<li><code>二进制数据</code>：使用 <code>2字节整数</code> 表示内容长度，使用 <code>[]byte</code> 存储二进制数据的内容</li>
+<li><code>UTF-8字符串对</code>：两个 <code>UTF-8字符串</code>，表示一个键值对</li>
+</ul>
+<h1 id="接口"><a href="#接口" class="headerlink" title="接口"></a>接口</h1><p>上述的 7 种数据表示都有一个共同点，就是使用这些数据时都需要在 3 种不同的状态之间来回转换，这三种状态分别是：</p>
+<ul>
+<li>值：例如 “i’m MQTT”，在业务代码中使用，类型为 <code>string</code></li>
+<li>变量：在 MQTT 包中使用，类型为 <code>MQTT_UTF8</code></li>
+<li>数据流：在网络传输中使用，类型为 <code>[]byte</code></li>
+</ul>
+<p>因此，可以为这些数据表示定义统一的使用接口：</p>
+<ul>
+<li>NewXXX：创建XXX类型的变量</li>
+<li>FromStream：从数据流向变量赋值</li>
+<li>ToStream：从变量向数据流赋值</li>
+<li>FromValue：将值赋值给变量</li>
+<li>ToValue：将变量转换为可以用的值</li>
+</ul>
+<h1 id="比特位"><a href="#比特位" class="headerlink" title="比特位"></a>比特位</h1><p>比特位是一个最简单的例子，实现如下：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>mqttbyte.go</span></div><code class="language-go"><span class="token keyword">func</span> <span class="token function">NewByte</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span>MQTT_BYTE <span class="token punctuation">&#123;</span>
+	<span class="token keyword">return</span> <span class="token operator">&amp;</span>MQTT_BYTE<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
 
-	hello <span class="token operator">:=</span> widget<span class="token punctuation">.</span><span class="token function">NewLabel</span><span class="token punctuation">(</span><span class="token string">"Hello Fyne!"</span><span class="token punctuation">)</span>
-	w<span class="token punctuation">.</span><span class="token function">SetContent</span><span class="token punctuation">(</span>container<span class="token punctuation">.</span><span class="token function">NewVBox</span><span class="token punctuation">(</span>
-		hello<span class="token punctuation">,</span>
-		widget<span class="token punctuation">.</span><span class="token function">NewButton</span><span class="token punctuation">(</span><span class="token string">"Hi!"</span><span class="token punctuation">,</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-			hello<span class="token punctuation">.</span><span class="token function">SetText</span><span class="token punctuation">(</span>vmq<span class="token punctuation">.</span><span class="token function">HelloVmq</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-		<span class="token punctuation">&#125;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-	<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>mb <span class="token operator">*</span>MQTT_BYTE<span class="token punctuation">)</span> <span class="token function">FromStream</span><span class="token punctuation">(</span>input io<span class="token punctuation">.</span>Reader<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">*</span>MQTT_BYTE<span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	err <span class="token operator">:=</span> binary<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>input<span class="token punctuation">,</span> binary<span class="token punctuation">.</span>BigEndian<span class="token punctuation">,</span> <span class="token operator">&amp;</span>mb<span class="token punctuation">.</span>data<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> err
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> mb<span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span>
 
-	w<span class="token punctuation">.</span><span class="token function">ShowAndRun</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>mb <span class="token operator">*</span>MQTT_BYTE<span class="token punctuation">)</span> <span class="token function">ToStream</span><span class="token punctuation">(</span>output io<span class="token punctuation">.</span>Writer<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	err <span class="token operator">:=</span> binary<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>output<span class="token punctuation">,</span> binary<span class="token punctuation">.</span>BigEndian<span class="token punctuation">,</span> mb<span class="token punctuation">.</span>data<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">,</span> err
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span>
 
-<p>到这一步的结果符合我们的预期：</p>
-<p><img src="/vmq-mqttclient-2/test.png" srcset="/img/loading.gif" lazyload></p>
-<h1 id="接下来"><a href="#接下来" class="headerlink" title="接下来"></a>接下来</h1><p>至此为止的事情都非常简单，而接下来的事情会开始有一些挑战性。</p>
-<p>我比较喜欢用需求来推动软件的功能，因为我觉得合理的软件设计是很难凭空产生的，但是合理的需求是易于理解和提出的，一旦有了合理的需求，那么能够实现需求的设计就可以视为合理的软件设计。</p>
-<p>对于 vmq 也是一样，vmq-tool 就是 vmq 的需求方，我们的开发总是会从 gui 开始，先做出需要功能的界面，再在 vmq 中实现功能。</p>
-<p>图形化界面开发会有一些难度，fyne 的学习应该也会有一些成本，但这些都会是值得的。</p>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>mb <span class="token operator">*</span>MQTT_BYTE<span class="token punctuation">)</span> <span class="token function">FromValue</span><span class="token punctuation">(</span>b <span class="token builtin">byte</span><span class="token punctuation">)</span> <span class="token operator">*</span>MQTT_BYTE <span class="token punctuation">&#123;</span>
+	mb<span class="token punctuation">.</span>data <span class="token operator">=</span> b
+	<span class="token keyword">return</span> mb
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>mb <span class="token operator">*</span>MQTT_BYTE<span class="token punctuation">)</span> <span class="token function">ToValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">byte</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">return</span> mb<span class="token punctuation">.</span>data
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h1 id="UTF-8字符串"><a href="#UTF-8字符串" class="headerlink" title="UTF-8字符串"></a>UTF-8字符串</h1><p><code>2字节整数</code> 和 <code>4字节整数</code> 的实现和 <code>比特位</code> 几乎一致，不再赘述。而 <code>UTF-8字符串</code> 的实现略微有些不同，因为他需要使用一个 <code>2字节整数</code> 来表示字符串的长度，还需要考虑一些越界问题：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>mqttutf8.go</span></div><code class="language-go"><span class="token keyword">const</span> MQTT_UTF_8_MAX <span class="token operator">=</span> <span class="token number">65535</span> <span class="token comment">// 0xFFFF</span>
+
+<span class="token keyword">func</span> <span class="token function">NewUtf8</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span>MQTT_UTF8 <span class="token punctuation">&#123;</span>
+	<span class="token keyword">return</span> <span class="token operator">&amp;</span>MQTT_UTF8<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>mutf8 <span class="token operator">*</span>MQTT_UTF8<span class="token punctuation">)</span> <span class="token function">FromStream</span><span class="token punctuation">(</span>input io<span class="token punctuation">.</span>Reader<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">*</span>MQTT_UTF8<span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	err <span class="token operator">:=</span> binary<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>input<span class="token punctuation">,</span> binary<span class="token punctuation">.</span>BigEndian<span class="token punctuation">,</span> <span class="token operator">&amp;</span>mutf8<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">.</span>data<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> err
+	<span class="token punctuation">&#125;</span>
+	mutf8<span class="token punctuation">.</span>data <span class="token operator">=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> mutf8<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">.</span>data<span class="token punctuation">)</span>
+	err <span class="token operator">=</span> binary<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>input<span class="token punctuation">,</span> binary<span class="token punctuation">.</span>BigEndian<span class="token punctuation">,</span> mutf8<span class="token punctuation">.</span>data<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> err
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> mutf8<span class="token punctuation">,</span> <span class="token number">2</span> <span class="token operator">+</span> <span class="token function">int</span><span class="token punctuation">(</span>mutf8<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>mutf8 <span class="token operator">*</span>MQTT_UTF8<span class="token punctuation">)</span> <span class="token function">ToStream</span><span class="token punctuation">(</span>output io<span class="token punctuation">.</span>Writer<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	n<span class="token punctuation">,</span> err <span class="token operator">:=</span> mutf8<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">.</span><span class="token function">ToStream</span><span class="token punctuation">(</span>output<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> n<span class="token punctuation">,</span> err
+	<span class="token punctuation">&#125;</span>
+	err <span class="token operator">=</span> binary<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>output<span class="token punctuation">,</span> binary<span class="token punctuation">.</span>BigEndian<span class="token punctuation">,</span> mutf8<span class="token punctuation">.</span>data<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> n<span class="token punctuation">,</span> err
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> <span class="token number">2</span> <span class="token operator">+</span> <span class="token function">int</span><span class="token punctuation">(</span>mutf8<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>mutf8 <span class="token operator">*</span>MQTT_UTF8<span class="token punctuation">)</span> <span class="token function">FromValue</span><span class="token punctuation">(</span>s <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">*</span>MQTT_UTF8<span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">if</span> <span class="token function">len</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span> <span class="token operator">></span> MQTT_UTF_8_MAX <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> errors<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span><span class="token string">"MQTT_UTF8 length error"</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	mutf8<span class="token punctuation">.</span><span class="token builtin">len</span><span class="token punctuation">.</span>data <span class="token operator">=</span> <span class="token function">uint16</span><span class="token punctuation">(</span><span class="token function">len</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span class="token punctuation">)</span>
+	mutf8<span class="token punctuation">.</span>data <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token function">byte</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span>
+	<span class="token keyword">return</span> mutf8<span class="token punctuation">,</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>mutf8 <span class="token operator">*</span>MQTT_UTF8<span class="token punctuation">)</span> <span class="token function">ToValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">string</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">return</span> <span class="token function">string</span><span class="token punctuation">(</span>mutf8<span class="token punctuation">.</span>data<span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h1 id="变长整数"><a href="#变长整数" class="headerlink" title="变长整数"></a>变长整数</h1><p><code>变长整数</code> 是这些数据表示中最复杂的，好在文档中提供了能作为参考的伪代码，实现后如下：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">const</span> <span class="token punctuation">(</span>
+	MQTT_VAR_INT_MIN <span class="token operator">=</span> <span class="token number">0</span>         <span class="token comment">// 0x00</span>
+	MQTT_VAR_INT_MAX <span class="token operator">=</span> <span class="token number">268435455</span> <span class="token comment">// 0xFF 0xFF 0xFF 0x7F</span>
+<span class="token punctuation">)</span>
+
+<span class="token keyword">func</span> <span class="token function">NewVarInt</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span>MQTT_VAR_INT <span class="token punctuation">&#123;</span>
+	<span class="token keyword">return</span> <span class="token operator">&amp;</span>MQTT_VAR_INT<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>mvi <span class="token operator">*</span>MQTT_VAR_INT<span class="token punctuation">)</span> <span class="token function">FromStream</span><span class="token punctuation">(</span>input io<span class="token punctuation">.</span>Reader<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">*</span>MQTT_VAR_INT<span class="token punctuation">,</span> <span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	mvi<span class="token punctuation">.</span>data <span class="token operator">=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+	buf <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span>
+	x <span class="token operator">:=</span> <span class="token number">0</span>
+	<span class="token comment">// maximum 4bytes</span>
+	<span class="token keyword">for</span> <span class="token punctuation">;</span> x <span class="token operator">&lt;</span> <span class="token number">4</span><span class="token punctuation">;</span> x<span class="token operator">++</span> <span class="token punctuation">&#123;</span>
+		<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">:=</span> input<span class="token punctuation">.</span><span class="token function">Read</span><span class="token punctuation">(</span>buf<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">return</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> x<span class="token punctuation">,</span> err
+		<span class="token punctuation">&#125;</span>
+		b <span class="token operator">:=</span> buf<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+		<span class="token comment">// height byte can't be 0</span>
+		<span class="token keyword">if</span> x <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">&amp;&amp;</span> b <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">return</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> x<span class="token punctuation">,</span> errors<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span><span class="token string">"MQTT_VAR_INT read error"</span><span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+		mvi<span class="token punctuation">.</span>data <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>mvi<span class="token punctuation">.</span>data<span class="token punctuation">,</span> b<span class="token punctuation">)</span>
+		<span class="token comment">// is there after</span>
+		<span class="token keyword">if</span> b<span class="token operator">&amp;</span><span class="token number">0x80</span> <span class="token operator">></span> <span class="token number">0</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">if</span> x <span class="token operator">==</span> <span class="token number">3</span> <span class="token punctuation">&#123;</span>
+				<span class="token keyword">return</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> x<span class="token punctuation">,</span> errors<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span><span class="token string">"MQTT_VAR_INT read error, length > 4"</span><span class="token punctuation">)</span>
+			<span class="token punctuation">&#125;</span>
+			<span class="token keyword">continue</span>
+		<span class="token punctuation">&#125;</span>
+		<span class="token comment">// over</span>
+		<span class="token keyword">break</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> mvi<span class="token punctuation">,</span> x <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>mvi <span class="token operator">*</span>MQTT_VAR_INT<span class="token punctuation">)</span> <span class="token function">ToStream</span><span class="token punctuation">(</span>output io<span class="token punctuation">.</span>Writer<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">return</span> output<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>mvi<span class="token punctuation">.</span>data<span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>mvi <span class="token operator">*</span>MQTT_VAR_INT<span class="token punctuation">)</span> <span class="token function">FromValue</span><span class="token punctuation">(</span>v <span class="token builtin">int</span><span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">*</span>MQTT_VAR_INT<span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">if</span> v <span class="token operator">&lt;</span> MQTT_VAR_INT_MIN <span class="token operator">||</span> v <span class="token operator">></span> MQTT_VAR_INT_MAX <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> <span class="token boolean">nil</span><span class="token punctuation">,</span> errors<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span><span class="token string">"MQTT_VAR_INT parse error, value out of range"</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	mvi<span class="token punctuation">.</span>data <span class="token operator">=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+	<span class="token keyword">for</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">var</span> b <span class="token builtin">byte</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token builtin">byte</span><span class="token punctuation">)</span><span class="token punctuation">(</span>v <span class="token operator">%</span> <span class="token number">0x80</span><span class="token punctuation">)</span>
+		v <span class="token operator">=</span> v <span class="token operator">/</span> <span class="token number">0x80</span>
+		<span class="token comment">// set top bit</span>
+		<span class="token keyword">if</span> v <span class="token operator">></span> <span class="token number">0</span> <span class="token punctuation">&#123;</span>
+			b <span class="token operator">=</span> b <span class="token operator">|</span> <span class="token number">0x80</span>
+		<span class="token punctuation">&#125;</span>
+		<span class="token comment">// put</span>
+		mvi<span class="token punctuation">.</span>data <span class="token operator">=</span> <span class="token function">append</span><span class="token punctuation">(</span>mvi<span class="token punctuation">.</span>data<span class="token punctuation">,</span> b<span class="token punctuation">)</span>
+		<span class="token comment">// over</span>
+		<span class="token keyword">if</span> v <span class="token operator">==</span> <span class="token number">0</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">break</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> mvi<span class="token punctuation">,</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>mvi <span class="token operator">*</span>MQTT_VAR_INT<span class="token punctuation">)</span> <span class="token function">ToValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span> <span class="token punctuation">&#123;</span>
+	multiplier <span class="token operator">:=</span> <span class="token number">1</span>
+	value <span class="token operator">:=</span> <span class="token number">0</span>
+	<span class="token keyword">for</span> x <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> x <span class="token operator">&lt;</span> <span class="token function">len</span><span class="token punctuation">(</span>mvi<span class="token punctuation">.</span>data<span class="token punctuation">)</span><span class="token punctuation">;</span> x<span class="token operator">++</span> <span class="token punctuation">&#123;</span>
+		b <span class="token operator">:=</span> mvi<span class="token punctuation">.</span>data<span class="token punctuation">[</span>x<span class="token punctuation">]</span>
+		value <span class="token operator">+=</span> <span class="token function">int</span><span class="token punctuation">(</span>b<span class="token operator">&amp;</span><span class="token number">0x7F</span><span class="token punctuation">)</span> <span class="token operator">*</span> multiplier
+		multiplier <span class="token operator">*=</span> <span class="token number">0x80</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> value
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h1 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h1><p>这里我没有列出所有数据表示实现的源码，因为这些代码大体相似，只是细节不同，您可以在仓库中自行查看。</p>
+<p>有了基础数据，接下来就可以组织 MQTT 包，</p>
 
                 
               </div>
@@ -365,7 +543,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>vmq-从零开始的MQTT客户端-2-框架</div>
+      <div>vmq-从零开始的MQTT客户端-2-数据表示</div>
       <div>https://vitsumoc.github.io/vmq-mqttclient-2.html</div>
     </div>
     <div class="license-meta">
@@ -378,7 +556,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年2月5日</div>
+          <div>2024年3月10日</div>
         </div>
       
       
@@ -410,18 +588,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/vmq-mqttclient-3.html" title="vmq-从零开始的MQTT客户端-3-fyne">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">vmq-从零开始的MQTT客户端-3-fyne</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/vmq-mqttclient-1.html" title="vmq-从零开始的MQTT客户端-1-简介">
-                        <span class="hidden-mobile">vmq-从零开始的MQTT客户端-1-简介</span>
+                      <a href="/golang-log.html" title="go标准库：log">
+                        <span class="hidden-mobile">go标准库：log</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
