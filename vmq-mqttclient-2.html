@@ -24,7 +24,7 @@
 <meta property="og:description" content="MQTT 5.0 规范中定义了 7 种数据表示，分别是：  比特位 2字节整数 4字节整数 UTF-8字符串 变长整数 二进制数据 UTF-8字符串对">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-03-10T07:21:20.000Z">
-<meta property="article:modified_time" content="2024-03-10T09:12:17.649Z">
+<meta property="article:modified_time" content="2024-03-18T11:16:42.790Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="网络编程">
 <meta property="article:tag" content="golang">
@@ -225,7 +225,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          562 字
+          575 字
         
       </span>
     
@@ -491,8 +491,20 @@
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <h1 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h1><p>这里我没有列出所有数据表示实现的源码，因为这些代码大体相似，只是细节不同，您可以在仓库中自行查看。</p>
-<p>有了基础数据，接下来就可以组织 MQTT 包，</p>
-
+<p>有了基础数据，接下来就可以组织 MQTT 包，此时我们的项目结构是这样的：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><code class="language-text">vmq/
+ ├── types/
+ │    ├── mqttbin.go
+ │    ├── mqttbyte.go
+ │    ├── mqttu16.go
+ │    ├── mqttu32.go
+ │    ├── mqttutf8.go
+ │    ├── mqttutf8pair.go
+ │    ├── mqttvarint.go
+ │    ├── types_test.go
+ │    └── types.go
+ ├── go.mod
+ └── vmq.go<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
                 
               </div>
             
@@ -587,6 +599,12 @@
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/vmq-mqttclient-3.html" title="vmq-从零开始的MQTT客户端-3-CONNECT">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">vmq-从零开始的MQTT客户端-3-CONNECT</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">
