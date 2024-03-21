@@ -1,0 +1,963 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="vc">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="实现了 CONNECT 包后，可以按照相似的方法实现其他几个重要的数据包，例如： CONNACK DISCONNECT SUBSCRIBE SUBACK PUBLISH，有了这些包就可以进行基础的 MQTT 通信了。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vmq-从零开始的MQTT客户端-4-MQTT包">
+<meta property="og:url" content="https://vitsumoc.github.io/vmq-mqttclient-4.html">
+<meta property="og:site_name" content="Thinking...">
+<meta property="og:description" content="实现了 CONNECT 包后，可以按照相似的方法实现其他几个重要的数据包，例如： CONNACK DISCONNECT SUBSCRIBE SUBACK PUBLISH，有了这些包就可以进行基础的 MQTT 通信了。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-03-21T10:56:06.000Z">
+<meta property="article:modified_time" content="2024-03-21T11:46:50.251Z">
+<meta property="article:author" content="vc">
+<meta property="article:tag" content="网络编程">
+<meta property="article:tag" content="golang">
+<meta property="article:tag" content="MQTT">
+<meta property="article:tag" content="vmq">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>vmq-从零开始的MQTT客户端-4-MQTT包 - Thinking...</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"vitsumoc.github.io","root":"/","version":"1.9.6","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Thinking...</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">vmq-从零开始的MQTT客户端-4-MQTT包</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-03-21 18:56" pubdate>
+          2024年3月21日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          651 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          6 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">vmq-从零开始的MQTT客户端-4-MQTT包</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>实现了 <code>CONNECT</code> 包后，可以按照相似的方法实现其他几个重要的数据包，例如： <code>CONNACK</code> <code>DISCONNECT</code> <code>SUBSCRIBE</code> <code>SUBACK</code> <code>PUBLISH</code>，有了这些包就可以进行基础的 MQTT 通信了。</p>
+<span id="more"></span>
+
+<h1 id="分类与接口"><a href="#分类与接口" class="headerlink" title="分类与接口"></a>分类与接口</h1><p>在实现这些包之前，我们可以将这些包进行分类，站在 MQTT 客户端的角度，这些包可以分为三类：</p>
+<ul>
+<li>只需发送的：<code>CONNECT</code> <code>SUBSCRIBE</code></li>
+<li>只需接收的：<code>CONNACK</code> <code>SUBACK</code></li>
+<li>需要发送和接收的：<code>DISCONNECT</code> <code>PUBLISH</code></li>
+</ul>
+<p>然后可以为发送和接收分别制定一套简易流程，对于要发送的包：</p>
+<ol>
+<li>提供配置类，用户使用配置类设定自定义参数，例如：<code>ConnectConf</code></li>
+<li>vmq提供操作函数，用户将配置类作为参数，通过操作函数实现发包动作，例如：<code>vmq.Connect(*ConnectConf)</code></li>
+<li>在操作函数中，使用一个转换函数将配置类转为包，例如：<code>NewConnectPacketFromConf(*ConnectConf)</code></li>
+<li>操作函数完成发包，提供返回</li>
+</ol>
+<p>对于要接收的包，则是这样的流程：</p>
+<ol>
+<li>vmq提供设置回调函数的入口，例如：<code>v.OnMessage(func(v *vmq, topic string, message []byte))</code></li>
+<li>vmq接收到数据流后，解析第一个字节 <code>packetType</code> 和随后的 <code>remaningLength</code>，之后根据包类型使用该包的组包函数，例如：<code>NewPublishPacket(packetType *t.MQTT_BYTE, remainingLength *t.MQTT_VAR_INT) *PUBLISH_PACKET</code></li>
+<li>组包后，根据包类型触发 vmq 内的 handle 函数，例如：<code>handlePublish(v *vmq, pub *p.PUBLISH_PACKET) error</code>，并在 handle 中触发被设置的回调函数</li>
+</ol>
+<p>通过上述流程，可以看到要发送和要接收的包只需要实现几个特定的函数就可以实现收发功能，例如对于既需要发送又需要接收的 <code>PUBLISH</code> 包，发送流程是这样的：</p>
+<ul>
+<li>提供 <code>PublishConf</code> 作为配置类，提供构造函数和各种Set函数</li>
+<li>提供 <code>NewPublishPacketFromConf(pc *PublishConf) *PUBLISH_PACKET</code>，用于通过配置制作包</li>
+<li>提供 <code>(p *PUBLISH_PACKET) ToStream(output io.Writer) (int, error)</code>，用于实际发送</li>
+<li>vmq侧提供 <code>(v *vmq) Publish(pc *p.PublishConf) error</code>，作为用户操作的入口</li>
+</ul>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>vmq.go</span></div><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>v <span class="token operator">*</span>vmq<span class="token punctuation">)</span> <span class="token function">Publish</span><span class="token punctuation">(</span>pc <span class="token operator">*</span>p<span class="token punctuation">.</span>PublishConf<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">if</span> v<span class="token punctuation">.</span>status <span class="token operator">!=</span> STATUS_CONNECTED <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> errors<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span><span class="token string">"vmq status error: not connected"</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	publish <span class="token operator">:=</span> p<span class="token punctuation">.</span><span class="token function">NewPublishPacketFromConf</span><span class="token punctuation">(</span>pc<span class="token punctuation">)</span>
+	<span class="token comment">// packetId if qos > 0</span>
+	<span class="token keyword">if</span> publish<span class="token punctuation">.</span><span class="token function">Qos</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> p<span class="token punctuation">.</span>PUBLISH_FLAG_QOS_0 <span class="token punctuation">&#123;</span>
+		publish<span class="token punctuation">.</span>VariableHeader<span class="token punctuation">.</span>PacketId<span class="token punctuation">.</span><span class="token function">FromValue</span><span class="token punctuation">(</span>v<span class="token punctuation">.</span><span class="token function">getPID</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">:=</span> publish<span class="token punctuation">.</span><span class="token function">ToStream</span><span class="token punctuation">(</span>v<span class="token punctuation">.</span>conn<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> err
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>publishconf.go</span></div><code class="language-go"><span class="token keyword">type</span> PublishConf <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	dup                <span class="token builtin">bool</span>
+	qos                PUBLISH_FLAG_QOS
+	retain             <span class="token builtin">bool</span>
+	topic              <span class="token builtin">string</span>
+	publishProperties  PROPERTIES
+	applicationMessage <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token function">NewPublishConf</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">*</span>PublishConf <span class="token punctuation">&#123;</span>
+	<span class="token keyword">return</span> <span class="token operator">&amp;</span>PublishConf<span class="token punctuation">&#123;</span>
+		qos<span class="token punctuation">:</span>                PUBLISH_FLAG_QOS_0<span class="token punctuation">,</span>
+		publishProperties<span class="token punctuation">:</span>  <span class="token operator">*</span><span class="token function">NewProperties</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+		applicationMessage<span class="token punctuation">:</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>publish.go</span></div><code class="language-go"><span class="token keyword">type</span> PUBLISH_FLAG_QOS <span class="token builtin">byte</span>
+
+<span class="token keyword">const</span> PUBLISH_FLAG_RETAIN <span class="token builtin">byte</span> <span class="token operator">=</span> <span class="token number">0x01</span>
+<span class="token keyword">const</span> PUBLISH_FLAG_QOS_0 PUBLISH_FLAG_QOS <span class="token operator">=</span> <span class="token number">0x00</span>
+<span class="token keyword">const</span> PUBLISH_FLAG_QOS_1 PUBLISH_FLAG_QOS <span class="token operator">=</span> <span class="token number">0x02</span>
+<span class="token keyword">const</span> PUBLISH_FLAG_QOS_2 PUBLISH_FLAG_QOS <span class="token operator">=</span> <span class="token number">0x04</span>
+<span class="token keyword">const</span> PUBLISH_FLAG_DUP <span class="token builtin">byte</span> <span class="token operator">=</span> <span class="token number">0x09</span>
+
+<span class="token keyword">type</span> PUBLISH_PACKET <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	FixHeader      PUBLISH_FIX_HEADER
+	VariableHeader PUBLISH_VARIABLE_HEADER
+	Payload        PUBLISH_PAYLOAD
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">type</span> PUBLISH_FIX_HEADER <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	PacketType      t<span class="token punctuation">.</span>MQTT_BYTE <span class="token comment">// pak type dup qos retain</span>
+	RemainingLength t<span class="token punctuation">.</span>MQTT_VAR_INT
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">type</span> PUBLISH_VARIABLE_HEADER <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	TopicName         t<span class="token punctuation">.</span>MQTT_UTF8
+	PacketId          t<span class="token punctuation">.</span>MQTT_U16
+	PublishProperties PROPERTIES
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">type</span> PUBLISH_PAYLOAD <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	ApplicationMessage <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token function">NewPublishPacketFromConf</span><span class="token punctuation">(</span>pc <span class="token operator">*</span>PublishConf<span class="token punctuation">)</span> <span class="token operator">*</span>PUBLISH_PACKET <span class="token punctuation">&#123;</span>
+	packet <span class="token operator">:=</span> PUBLISH_PACKET<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+	<span class="token comment">// fix header</span>
+	packetType <span class="token operator">:=</span> <span class="token function">byte</span><span class="token punctuation">(</span>PACKET_TYPE_PUBLISH<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> pc<span class="token punctuation">.</span>retain <span class="token punctuation">&#123;</span>
+		packetType <span class="token operator">|=</span> PUBLISH_FLAG_RETAIN
+	<span class="token punctuation">&#125;</span>
+	packetType <span class="token operator">|=</span> <span class="token function">byte</span><span class="token punctuation">(</span>pc<span class="token punctuation">.</span>qos<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> pc<span class="token punctuation">.</span>dup <span class="token punctuation">&#123;</span>
+		packetType <span class="token operator">|=</span> PUBLISH_FLAG_DUP
+	<span class="token punctuation">&#125;</span>
+	packet<span class="token punctuation">.</span>FixHeader<span class="token punctuation">.</span>PacketType<span class="token punctuation">.</span><span class="token function">FromValue</span><span class="token punctuation">(</span>packetType<span class="token punctuation">)</span>
+	remainingLen <span class="token operator">:=</span> <span class="token number">0</span>
+
+	<span class="token comment">// variable header</span>
+	packet<span class="token punctuation">.</span>VariableHeader<span class="token punctuation">.</span>TopicName<span class="token punctuation">.</span><span class="token function">FromValue</span><span class="token punctuation">(</span>pc<span class="token punctuation">.</span>topic<span class="token punctuation">)</span>
+	remainingLen <span class="token operator">+=</span> packet<span class="token punctuation">.</span>VariableHeader<span class="token punctuation">.</span>TopicName<span class="token punctuation">.</span><span class="token function">Length</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token comment">// only qos1 or qos2, there is packetId</span>
+	<span class="token keyword">if</span> packet<span class="token punctuation">.</span><span class="token function">Qos</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> PUBLISH_FLAG_QOS_0 <span class="token punctuation">&#123;</span>
+		<span class="token comment">// PID is 0, then vmq will set it</span>
+		packet<span class="token punctuation">.</span>VariableHeader<span class="token punctuation">.</span>PacketId<span class="token punctuation">.</span><span class="token function">FromValue</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>
+		remainingLen <span class="token operator">+=</span> packet<span class="token punctuation">.</span>VariableHeader<span class="token punctuation">.</span>PacketId<span class="token punctuation">.</span><span class="token function">Length</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	packet<span class="token punctuation">.</span>VariableHeader<span class="token punctuation">.</span>PublishProperties <span class="token operator">=</span> pc<span class="token punctuation">.</span>publishProperties
+	remainingLen <span class="token operator">+=</span> packet<span class="token punctuation">.</span>VariableHeader<span class="token punctuation">.</span>PublishProperties<span class="token punctuation">.</span><span class="token function">Length</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// payload</span>
+	packet<span class="token punctuation">.</span>Payload<span class="token punctuation">.</span>ApplicationMessage <span class="token operator">=</span> pc<span class="token punctuation">.</span>applicationMessage
+	remainingLen <span class="token operator">+=</span> <span class="token function">len</span><span class="token punctuation">(</span>packet<span class="token punctuation">.</span>Payload<span class="token punctuation">.</span>ApplicationMessage<span class="token punctuation">)</span>
+
+	<span class="token comment">// set remainingLen</span>
+	packet<span class="token punctuation">.</span>FixHeader<span class="token punctuation">.</span>RemainingLength<span class="token punctuation">.</span><span class="token function">FromValue</span><span class="token punctuation">(</span>remainingLen<span class="token punctuation">)</span>
+
+	<span class="token keyword">return</span> <span class="token operator">&amp;</span>packet
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>p <span class="token operator">*</span>PUBLISH_PACKET<span class="token punctuation">)</span> <span class="token function">ToStream</span><span class="token punctuation">(</span>output io<span class="token punctuation">.</span>Writer<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token builtin">int</span><span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">var</span> err <span class="token builtin">error</span>
+	<span class="token keyword">var</span> buffer <span class="token operator">=</span> bytes<span class="token punctuation">.</span><span class="token function">NewBuffer</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">)</span>
+	<span class="token comment">// fix header</span>
+	<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">=</span> p<span class="token punctuation">.</span>FixHeader<span class="token punctuation">.</span>PacketType<span class="token punctuation">.</span><span class="token function">ToStream</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">,</span> err
+	<span class="token punctuation">&#125;</span>
+	<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">=</span> p<span class="token punctuation">.</span>FixHeader<span class="token punctuation">.</span>RemainingLength<span class="token punctuation">.</span><span class="token function">ToStream</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">,</span> err
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token comment">// variable header</span>
+	<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">=</span> p<span class="token punctuation">.</span>VariableHeader<span class="token punctuation">.</span>TopicName<span class="token punctuation">.</span><span class="token function">ToStream</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">,</span> err
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">if</span> p<span class="token punctuation">.</span><span class="token function">Qos</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> PUBLISH_FLAG_QOS_0 <span class="token punctuation">&#123;</span>
+		<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">=</span> p<span class="token punctuation">.</span>VariableHeader<span class="token punctuation">.</span>PacketId<span class="token punctuation">.</span><span class="token function">ToStream</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">,</span> err
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">=</span> p<span class="token punctuation">.</span>VariableHeader<span class="token punctuation">.</span>PublishProperties<span class="token punctuation">.</span><span class="token function">ToStream</span><span class="token punctuation">(</span>buffer<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">,</span> err
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token comment">// payload</span>
+	<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">=</span> buffer<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>Payload<span class="token punctuation">.</span>ApplicationMessage<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">,</span> err
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token comment">// to stream</span>
+	<span class="token keyword">return</span> output<span class="token punctuation">.</span><span class="token function">Write</span><span class="token punctuation">(</span>buffer<span class="token punctuation">.</span><span class="token function">Bytes</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>而他的接收流程是这样的：</p>
+<ul>
+<li>用户设置回调函数，自定义对应用消息的处理方式</li>
+<li>vmq收到数据，判断包类型</li>
+<li>vmq使用 <code>PUBLISH</code> 的组包函数，获得 <code>PUBLISH_PACKET</code></li>
+<li>vmq调用 <code>PUBLISH</code> 的 handle 函数，在其中使用用户注册的回调</li>
+</ul>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>vmq.go</span></div><code class="language-go"><span class="token comment">// set callback</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>v <span class="token operator">*</span>vmq<span class="token punctuation">)</span> <span class="token function">OnMessage</span><span class="token punctuation">(</span>f <span class="token keyword">func</span><span class="token punctuation">(</span>v <span class="token operator">*</span>vmq<span class="token punctuation">,</span> topic <span class="token builtin">string</span><span class="token punctuation">,</span> message <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	v<span class="token punctuation">.</span>onMessage <span class="token operator">=</span> f
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token function">handleData</span><span class="token punctuation">(</span>v <span class="token operator">*</span>vmq<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	packetType <span class="token operator">:=</span> t<span class="token punctuation">.</span><span class="token function">NewByte</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	remainingLength <span class="token operator">:=</span> t<span class="token punctuation">.</span><span class="token function">NewVarInt</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">for</span> <span class="token punctuation">&#123;</span>
+		<span class="token comment">// read fix header: PacketType + RemainingLength</span>
+		<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">:=</span> packetType<span class="token punctuation">.</span><span class="token function">FromStream</span><span class="token punctuation">(</span>v<span class="token punctuation">.</span>conn<span class="token punctuation">)</span>
+		<span class="token comment">// EOF means the server is disconnected</span>
+		<span class="token keyword">if</span> err <span class="token operator">==</span> io<span class="token punctuation">.</span>EOF <span class="token punctuation">&#123;</span>
+			v<span class="token punctuation">.</span>conn<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+			v<span class="token punctuation">.</span><span class="token function">setStatus</span><span class="token punctuation">(</span>STATUS_DISCONNECTED<span class="token punctuation">)</span>
+			<span class="token keyword">break</span>
+		<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			v<span class="token punctuation">.</span>conn<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+			v<span class="token punctuation">.</span><span class="token function">setStatus</span><span class="token punctuation">(</span>STATUS_IDLE<span class="token punctuation">)</span>
+			<span class="token keyword">break</span>
+		<span class="token punctuation">&#125;</span>
+		<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">=</span> remainingLength<span class="token punctuation">.</span><span class="token function">FromStream</span><span class="token punctuation">(</span>v<span class="token punctuation">.</span>conn<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			v<span class="token punctuation">.</span>conn<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+			v<span class="token punctuation">.</span><span class="token function">setStatus</span><span class="token punctuation">(</span>STATUS_IDLE<span class="token punctuation">)</span>
+			<span class="token keyword">break</span>
+		<span class="token punctuation">&#125;</span>
+		<span class="token comment">// handle packet</span>
+		err <span class="token operator">=</span> <span class="token function">handlePacket</span><span class="token punctuation">(</span>v<span class="token punctuation">,</span> packetType<span class="token punctuation">,</span> remainingLength<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			v<span class="token punctuation">.</span>conn<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+			v<span class="token punctuation">.</span><span class="token function">setStatus</span><span class="token punctuation">(</span>STATUS_IDLE<span class="token punctuation">)</span>
+			<span class="token keyword">break</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token function">handlePacket</span><span class="token punctuation">(</span>v <span class="token operator">*</span>vmq<span class="token punctuation">,</span> packetType <span class="token operator">*</span>t<span class="token punctuation">.</span>MQTT_BYTE<span class="token punctuation">,</span> remainingLength <span class="token operator">*</span>t<span class="token punctuation">.</span>MQTT_VAR_INT<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+	<span class="token comment">// slect packet by type</span>
+	<span class="token comment">// TODO need more packet type</span>
+	<span class="token keyword">if</span> packetType<span class="token punctuation">.</span><span class="token function">ToValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token function">byte</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>PACKET_TYPE_CONNACK<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token comment">// stream to packet</span>
+		ca <span class="token operator">:=</span> p<span class="token punctuation">.</span><span class="token function">NewConnackPacket</span><span class="token punctuation">(</span>packetType<span class="token punctuation">,</span> remainingLength<span class="token punctuation">)</span>
+		<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">:=</span> ca<span class="token punctuation">.</span><span class="token function">FromStream</span><span class="token punctuation">(</span>v<span class="token punctuation">.</span>conn<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">return</span> err
+		<span class="token punctuation">&#125;</span>
+		<span class="token comment">// handle connACK</span>
+		<span class="token keyword">return</span> <span class="token function">handleConnAck</span><span class="token punctuation">(</span>v<span class="token punctuation">,</span> ca<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">if</span> packetType<span class="token punctuation">.</span><span class="token function">ToValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token function">byte</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>PACKET_TYPE_DISCONNECT<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		dc <span class="token operator">:=</span> p<span class="token punctuation">.</span><span class="token function">NewDisconnectPacket</span><span class="token punctuation">(</span>packetType<span class="token punctuation">,</span> remainingLength<span class="token punctuation">)</span>
+		<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">:=</span> dc<span class="token punctuation">.</span><span class="token function">FromStream</span><span class="token punctuation">(</span>v<span class="token punctuation">.</span>conn<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">return</span> err
+		<span class="token punctuation">&#125;</span>
+		<span class="token comment">// handle connACK</span>
+		<span class="token keyword">return</span> <span class="token function">handleDisconn</span><span class="token punctuation">(</span>v<span class="token punctuation">,</span> dc<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">if</span> packetType<span class="token punctuation">.</span><span class="token function">ToValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token function">byte</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>PACKET_TYPE_SUBACK<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		sa <span class="token operator">:=</span> p<span class="token punctuation">.</span><span class="token function">NewSubackPacket</span><span class="token punctuation">(</span>packetType<span class="token punctuation">,</span> remainingLength<span class="token punctuation">)</span>
+		<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">:=</span> sa<span class="token punctuation">.</span><span class="token function">FromStream</span><span class="token punctuation">(</span>v<span class="token punctuation">.</span>conn<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">return</span> err
+		<span class="token punctuation">&#125;</span>
+		<span class="token keyword">return</span> <span class="token function">handleSuback</span><span class="token punctuation">(</span>v<span class="token punctuation">,</span> sa<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">if</span> packetType<span class="token punctuation">.</span><span class="token function">ToValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token function">byte</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>PACKET_TYPE_PUBLISH<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		pub <span class="token operator">:=</span> p<span class="token punctuation">.</span><span class="token function">NewPublishPacket</span><span class="token punctuation">(</span>packetType<span class="token punctuation">,</span> remainingLength<span class="token punctuation">)</span>
+		<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">:=</span> pub<span class="token punctuation">.</span><span class="token function">FromStream</span><span class="token punctuation">(</span>v<span class="token punctuation">.</span>conn<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">return</span> err
+		<span class="token punctuation">&#125;</span>
+		<span class="token keyword">return</span> <span class="token function">handlePublish</span><span class="token punctuation">(</span>v<span class="token punctuation">,</span> pub<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> errors<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span><span class="token string">"can't metch packet type"</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token function">handlePublish</span><span class="token punctuation">(</span>v <span class="token operator">*</span>vmq<span class="token punctuation">,</span> pub <span class="token operator">*</span>p<span class="token punctuation">.</span>PUBLISH_PACKET<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+	v<span class="token punctuation">.</span><span class="token function">onMessage</span><span class="token punctuation">(</span>v<span class="token punctuation">,</span> pub<span class="token punctuation">.</span>VariableHeader<span class="token punctuation">.</span>TopicName<span class="token punctuation">.</span><span class="token function">ToValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> pub<span class="token punctuation">.</span>Payload<span class="token punctuation">.</span>ApplicationMessage<span class="token punctuation">)</span>
+	<span class="token keyword">return</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>这样的流程看上去有些麻烦，但是暂时所有的包都能够通过这样一套流程实现，后续随着会话状态的引入，肯定会有所变化。</p>
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><p>到此为止，已经可以直接测试连接、订阅、发布、断开的过程：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>vmq_test.go</span></div><code class="language-go"><span class="token keyword">func</span> <span class="token function">TestPublish</span><span class="token punctuation">(</span>test <span class="token operator">*</span>testing<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token comment">// vmq</span>
+	v <span class="token operator">:=</span> <span class="token function">New</span><span class="token punctuation">(</span><span class="token string">"test"</span><span class="token punctuation">,</span> <span class="token string">"tcp"</span><span class="token punctuation">,</span> <span class="token string">"36.33.24.191"</span><span class="token punctuation">,</span> <span class="token number">1883</span><span class="token punctuation">)</span>
+	v<span class="token punctuation">.</span><span class="token function">OnMessage</span><span class="token punctuation">(</span><span class="token keyword">func</span><span class="token punctuation">(</span>v <span class="token operator">*</span>vmq<span class="token punctuation">,</span> topic <span class="token builtin">string</span><span class="token punctuation">,</span> message <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">byte</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span>topic<span class="token punctuation">)</span>
+		fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token function">string</span><span class="token punctuation">(</span>message<span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+	<span class="token comment">// conn conf</span>
+	cc <span class="token operator">:=</span> p<span class="token punctuation">.</span><span class="token function">NewConnectConf</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	cc<span class="token punctuation">.</span><span class="token function">SetClientID</span><span class="token punctuation">(</span><span class="token string">"impub"</span><span class="token punctuation">)</span>
+	<span class="token comment">// conn to server</span>
+	err <span class="token operator">:=</span> v<span class="token punctuation">.</span><span class="token function">Connect</span><span class="token punctuation">(</span>cc<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		test<span class="token punctuation">.</span><span class="token function">Error</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token comment">// do sub after 3 second</span>
+	<span class="token keyword">for</span> x <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> x <span class="token operator">&lt;</span> <span class="token number">10</span><span class="token punctuation">;</span> x<span class="token operator">++</span> <span class="token punctuation">&#123;</span>
+		time<span class="token punctuation">.</span><span class="token function">Sleep</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">*</span> time<span class="token punctuation">.</span>Second<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> x <span class="token operator">==</span> <span class="token number">3</span> <span class="token punctuation">&#123;</span>
+			subconf <span class="token operator">:=</span> p<span class="token punctuation">.</span><span class="token function">NewSubscribeConf</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+			subconf<span class="token punctuation">.</span><span class="token function">SetTopic</span><span class="token punctuation">(</span><span class="token string">"vctest/vc"</span><span class="token punctuation">)</span>
+			subconf<span class="token punctuation">.</span><span class="token function">SetTopicAndOption</span><span class="token punctuation">(</span><span class="token string">"vctest/vc2"</span><span class="token punctuation">,</span> p<span class="token punctuation">.</span>SUBSCRIBE_OPTION_QOS_2<span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">,</span> p<span class="token punctuation">.</span>SUBSCRIBE_OPTION_RETAIN_HANDLING_1<span class="token punctuation">)</span>
+			subconf<span class="token punctuation">.</span><span class="token function">SetTopic</span><span class="token punctuation">(</span><span class="token string">"vctest/vc3"</span><span class="token punctuation">)</span>
+			v<span class="token punctuation">.</span><span class="token function">Subscribe</span><span class="token punctuation">(</span>subconf<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+		<span class="token keyword">if</span> x <span class="token operator">==</span> <span class="token number">5</span> <span class="token punctuation">&#123;</span>
+			pc <span class="token operator">:=</span> p<span class="token punctuation">.</span><span class="token function">NewPublishConf</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+			pc<span class="token punctuation">.</span><span class="token function">SetTopic</span><span class="token punctuation">(</span><span class="token string">"vctest/vc"</span><span class="token punctuation">)</span>
+			pc<span class="token punctuation">.</span><span class="token function">SetApplicationMessage</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token function">byte</span><span class="token punctuation">(</span><span class="token string">"hello !!!! i ! am ! vmq !!!"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+			v<span class="token punctuation">.</span><span class="token function">Publish</span><span class="token punctuation">(</span>pc<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+	v<span class="token punctuation">.</span><span class="token function">Disconnect</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span><span class="token function">NewDisconnectConf</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	time<span class="token punctuation">.</span><span class="token function">Sleep</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token operator">*</span> time<span class="token punctuation">.</span>Second<span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h1 id="结尾"><a href="#结尾" class="headerlink" title="结尾"></a>结尾</h1><p>此时的 vmq 已经具备了连接、订阅、发布、断开的基本能力，但是离我们的目标还很远。例如，vmq 目前没有提供会话状态的能力，没有实现 PUBLISH 包的 QOS1 和 QOS2 的流程，对外发布的使用接口也混乱不堪。</p>
+<p>此时我们的项目结构是这样的：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><code class="language-text">vmq/
+ ├── packets/
+ │    ├── connack.go
+ │    ├── connect.go
+ │    ├── connectconf.go
+ │    ├── disconnect.go
+ │    ├── disconnectconf.go
+ │    ├── packets.go
+ │    ├── pingreq.go
+ │    ├── properties_test.go
+ │    ├── properties.go
+ │    ├── publish.go
+ │    ├── publishconf.go
+ │    ├── suback.go
+ │    ├── subscribe.go
+ │    ├── packets.go
+ │    ├── subscribeconf.go
+ │    └── unsubscribe.go
+ ├── types/
+ │    ├── mqttbin.go
+ │    ├── mqttbyte.go
+ │    ├── mqttu16.go
+ │    ├── mqttu32.go
+ │    ├── mqttutf8.go
+ │    ├── mqttutf8pair.go
+ │    ├── mqttvarint.go
+ │    ├── types_test.go
+ │    └── types.go
+ ├── go.mod
+ └── vmq.go<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/vmq/" class="category-chain-item">vmq</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="print-no-link">#网络编程</a>
+      
+        <a href="/tags/golang/" class="print-no-link">#golang</a>
+      
+        <a href="/tags/MQTT/" class="print-no-link">#MQTT</a>
+      
+        <a href="/tags/vmq/" class="print-no-link">#vmq</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>vmq-从零开始的MQTT客户端-4-MQTT包</div>
+      <div>https://vitsumoc.github.io/vmq-mqttclient-4.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>vc</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年3月21日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/vmq-mqttclient-3.html" title="vmq-从零开始的MQTT客户端-3-CONNECT">
+                        <span class="hidden-mobile">vmq-从零开始的MQTT客户端-3-CONNECT</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>vitusmoc Blog, Powered by </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script  src="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
