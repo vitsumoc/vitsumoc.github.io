@@ -24,12 +24,12 @@
 <meta property="og:description" content="MQTT 5.0 规范中定义了 7 种数据表示，分别是：  比特位 2字节整数 4字节整数 UTF-8字符串 变长整数 二进制数据 UTF-8字符串对">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-03-10T07:21:20.000Z">
-<meta property="article:modified_time" content="2024-03-18T11:16:42.790Z">
+<meta property="article:modified_time" content="2024-03-25T07:26:08.337Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="网络编程">
-<meta property="article:tag" content="golang">
 <meta property="article:tag" content="MQTT">
 <meta property="article:tag" content="vmq">
+<meta property="article:tag" content="Go">
 <meta name="twitter:card" content="summary_large_image">
   
   
@@ -318,8 +318,8 @@
 
 <ul>
 <li><code>比特位</code>：只是描述字节内部高低位顺序，可以用一个普通的字节来表示</li>
-<li><code>2字节整数</code>：等同于 golang 中的 <code>uint16</code></li>
-<li><code>4字节整数</code>：等同于 golang 中的 <code>uint32</code></li>
+<li><code>2字节整数</code>：等同于 Go 中的 <code>uint16</code></li>
+<li><code>4字节整数</code>：等同于 Go 中的 <code>uint32</code></li>
 <li><code>UTF-8字符串</code>：使用 <code>2字节整数</code> 表示内容长度，使用 <code>[]byte</code> 存储字符串内容</li>
 <li><code>变长整数</code>：1-4位的 <code>[]byte</code>，用来表示一个正整数值</li>
 <li><code>二进制数据</code>：使用 <code>2字节整数</code> 表示内容长度，使用 <code>[]byte</code> 存储二进制数据的内容</li>
@@ -539,11 +539,11 @@
       
         <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="print-no-link">#网络编程</a>
       
-        <a href="/tags/golang/" class="print-no-link">#golang</a>
-      
         <a href="/tags/MQTT/" class="print-no-link">#MQTT</a>
       
         <a href="/tags/vmq/" class="print-no-link">#vmq</a>
+      
+        <a href="/tags/Go/" class="print-no-link">#Go</a>
       
     </div>
   
@@ -610,8 +610,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/golang-log.html" title="go标准库：log">
-                        <span class="hidden-mobile">go标准库：log</span>
+                      <a href="/Go-log.html" title="Go标准库：log">
+                        <span class="hidden-mobile">Go标准库：log</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

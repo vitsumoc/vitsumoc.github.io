@@ -24,12 +24,12 @@
 <meta property="og:description" content="MQTT 5 定义了 15 种控制包，CONNECT 是其中的第一种，他也很适合作为我们实现的起点。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-03-18T05:42:26.000Z">
-<meta property="article:modified_time" content="2024-03-18T11:16:38.134Z">
+<meta property="article:modified_time" content="2024-03-25T07:26:18.639Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="网络编程">
-<meta property="article:tag" content="golang">
 <meta property="article:tag" content="MQTT">
 <meta property="article:tag" content="vmq">
+<meta property="article:tag" content="Go">
 <meta name="twitter:card" content="summary_large_image">
   
   
@@ -318,7 +318,7 @@
 	UserProperties <span class="token punctuation">[</span><span class="token punctuation">]</span>t<span class="token punctuation">.</span>MQTT_UTF8_PAIR          <span class="token comment">// The User Property is allowed to appear multiple times</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
-<p>MQTT 中的属性集类似于 golang 中的 map，使用键值对的方式存放一组属性。和 golang 中的 map 的主要区别是属性集中有一种被称为 <code>用户属性</code> 的特殊属性，他的键可以重复出现多次，因此我使用一个列表来存储用户属性。</p>
+<p>MQTT 中的属性集类似于 Go 中的 map，使用键值对的方式存放一组属性。和 Go 中的 map 的主要区别是属性集中有一种被称为 <code>用户属性</code> 的特殊属性，他的键可以重复出现多次，因此我使用一个列表来存储用户属性。</p>
 <p>这里还可以发现，在 <code>Properties map[*t.MQTT_BYTE]t.MQTT_TYPE</code> 中，我将所有的 <code>MQTT基本类型</code> 作为了一个接口 <code>t.MQTT_TYPE</code>，这个接口的定义是这样的：</p>
 <figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>types.go</span></div><code class="language-go"><span class="token keyword">type</span> MQTT_TYPE <span class="token keyword">interface</span> <span class="token punctuation">&#123;</span>
 	<span class="token function">Length</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">int</span>
@@ -376,7 +376,7 @@
 <td>内部使用，计算 <code>PropertyLength</code> 的值</td>
 </tr>
 </tbody></table>
-<p>在 <code>SetProperty</code> 函数中，<code>MQTT_PROPERTY_KEY</code> 是参考<a href="/mqtt-v5-0-chinese.html#2-2-2-2-%E5%B1%9E%E6%80%A7">文档</a>定义的属性键枚举，v1 和 v2 是属性的值，这里接收的值是 golang 中的基本类型，例如当键对应的值类型为 <code>4字节整数</code> 时，这里接收的值类型就是 <code>uint32</code>。v2 只在键是 <code>PROPERTY_USER_PROPERTY</code> 时有意义，因为此时的值应该是两个 <code>string</code>。</p>
+<p>在 <code>SetProperty</code> 函数中，<code>MQTT_PROPERTY_KEY</code> 是参考<a href="/mqtt-v5-0-chinese.html#2-2-2-2-%E5%B1%9E%E6%80%A7">文档</a>定义的属性键枚举，v1 和 v2 是属性的值，这里接收的值是 Go 中的基本类型，例如当键对应的值类型为 <code>4字节整数</code> 时，这里接收的值类型就是 <code>uint32</code>。v2 只在键是 <code>PROPERTY_USER_PROPERTY</code> 时有意义，因为此时的值应该是两个 <code>string</code>。</p>
 <p>而 CONNECT 只有两个方法、构造和序列化：</p>
 <table>
 <thead>
@@ -535,11 +535,11 @@
       
         <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="print-no-link">#网络编程</a>
       
-        <a href="/tags/golang/" class="print-no-link">#golang</a>
-      
         <a href="/tags/MQTT/" class="print-no-link">#MQTT</a>
       
         <a href="/tags/vmq/" class="print-no-link">#vmq</a>
+      
+        <a href="/tags/Go/" class="print-no-link">#Go</a>
       
     </div>
   

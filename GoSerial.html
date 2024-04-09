@@ -16,25 +16,25 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="需求简述硬件设备使用485Modbus通讯，需使用golang编写采集程序，将数据采集至平台。">
+    <meta name="description" content="需求简述硬件设备使用485Modbus通讯，需使用 Go 编写采集程序，将数据采集至平台。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="golang与串口设备在项目中的运用">
-<meta property="og:url" content="https://vitsumoc.github.io/golangSerial.html">
+<meta property="og:title" content="Go与串口设备在项目中的运用">
+<meta property="og:url" content="https://vitsumoc.github.io/GoSerial.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="需求简述硬件设备使用485Modbus通讯，需使用golang编写采集程序，将数据采集至平台。">
+<meta property="og:description" content="需求简述硬件设备使用485Modbus通讯，需使用 Go 编写采集程序，将数据采集至平台。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-11-22T03:06:28.000Z">
-<meta property="article:modified_time" content="2024-03-02T00:55:07.962Z">
+<meta property="article:modified_time" content="2024-03-25T07:25:05.708Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="网络编程">
-<meta property="article:tag" content="golang">
 <meta property="article:tag" content="项目实践">
 <meta property="article:tag" content="串口通讯">
+<meta property="article:tag" content="Go">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>golang与串口设备在项目中的运用 - Thinking...</title>
+  <title>Go与串口设备在项目中的运用 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -202,7 +202,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">golang与串口设备在项目中的运用</span>
+            <span id="subtitle">Go与串口设备在项目中的运用</span>
           
         </div>
 
@@ -273,16 +273,16 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">golang与串口设备在项目中的运用</h1>
+            <h1 id="seo-header">Go与串口设备在项目中的运用</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="需求简述"><a href="#需求简述" class="headerlink" title="需求简述"></a>需求简述</h1><p>硬件设备使用485Modbus通讯，需使用golang编写采集程序，将数据采集至平台。</p>
+                <h1 id="需求简述"><a href="#需求简述" class="headerlink" title="需求简述"></a>需求简述</h1><p>硬件设备使用485Modbus通讯，需使用 Go 编写采集程序，将数据采集至平台。</p>
 <span id="more"></span>
 
 <h1 id="方案简述"><a href="#方案简述" class="headerlink" title="方案简述"></a>方案简述</h1><p>使用串口服务器将485Modbus通讯转为TCPModbus，并将串口服务器设置为TCPserver。</p>
-<p>使用golang编写采集器，定期向串口服务器建立TCP链接，采集数据。</p>
+<p>使用 Go 编写采集器，定期向串口服务器建立TCP链接，采集数据。</p>
 <h1 id="技术点与实现"><a href="#技术点与实现" class="headerlink" title="技术点与实现"></a>技术点与实现</h1><h2 id="点表"><a href="#点表" class="headerlink" title="点表"></a>点表</h2><p>通过<code>struct</code>实现点位表</p>
 <p>这里使用Raw表示原始点表数据，和通讯协议一一对应</p>
 <p>后续可将Raw结构封装至更高层的业务结构，用来实现业务数据的表示、嵌套能其他功能</p>
@@ -414,8 +414,8 @@
 	<span class="token punctuation">&#125;</span>
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>使用golang+串口服务器进行串口通讯，非常的简单、直观，易于开发维护。</p>
-<p>在本次项目实践中，由于golang提供了方便的并发编程与控制机制，高负载环境下的性能也得到了充分保障。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>使用 Go + 串口服务器 进行串口通讯，非常的简单、直观，易于开发维护。</p>
+<p>在本次项目实践中，由于 Go 提供了方便的并发编程与控制机制，高负载环境下的性能也得到了充分保障。</p>
 
                 
               </div>
@@ -451,11 +451,11 @@
       
         <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="print-no-link">#网络编程</a>
       
-        <a href="/tags/golang/" class="print-no-link">#golang</a>
-      
         <a href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" class="print-no-link">#项目实践</a>
       
         <a href="/tags/%E4%B8%B2%E5%8F%A3%E9%80%9A%E8%AE%AF/" class="print-no-link">#串口通讯</a>
+      
+        <a href="/tags/Go/" class="print-no-link">#Go</a>
       
     </div>
   
@@ -467,8 +467,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>golang与串口设备在项目中的运用</div>
-      <div>https://vitsumoc.github.io/golangSerial.html</div>
+      <div>Go与串口设备在项目中的运用</div>
+      <div>https://vitsumoc.github.io/GoSerial.html</div>
     </div>
     <div class="license-meta">
       
