@@ -16,25 +16,22 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="什么是BBR 以下内容摘自Wiki">
+    <meta name="description" content="wiresock&#x2F;proxifyre 项目链接">
 <meta property="og:type" content="article">
-<meta property="og:title" content="在 Ubuntu 22.04 LTS 上使用 BBR">
-<meta property="og:url" content="https://vitsumoc.github.io/usingBBRonUbuntu2204.html">
+<meta property="og:title" content="在 Windows 环境使用 proxifyre 代理应用程序">
+<meta property="og:url" content="https://vitsumoc.github.io/usingProxifyreInWindows.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="什么是BBR 以下内容摘自Wiki">
+<meta property="og:description" content="wiresock&#x2F;proxifyre 项目链接">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-04-11T04:27:40.000Z">
-<meta property="article:modified_time" content="2024-04-15T02:22:50.234Z">
+<meta property="article:published_time" content="2024-04-15T01:03:38.000Z">
+<meta property="article:modified_time" content="2024-04-15T01:43:06.433Z">
 <meta property="article:author" content="vc">
-<meta property="article:tag" content="豆知识">
-<meta property="article:tag" content="Linux">
 <meta property="article:tag" content="网络工具">
-<meta property="article:tag" content="VPS">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>在 Ubuntu 22.04 LTS 上使用 BBR - Thinking...</title>
+  <title>在 Windows 环境使用 proxifyre 代理应用程序 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -202,7 +199,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">在 Ubuntu 22.04 LTS 上使用 BBR</span>
+            <span id="subtitle">在 Windows 环境使用 proxifyre 代理应用程序</span>
           
         </div>
 
@@ -213,8 +210,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-04-11 12:27" pubdate>
-          2024年4月11日 中午
+        <time datetime="2024-04-15 09:03" pubdate>
+          2024年4月15日 上午
         </time>
       </span>
     
@@ -225,7 +222,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          727 字
+          307 字
         
       </span>
     
@@ -236,7 +233,7 @@
         
         
         
-          7 分钟
+          3 分钟
         
       </span>
     
@@ -273,39 +270,57 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">在 Ubuntu 22.04 LTS 上使用 BBR</h1>
+            <h1 id="seo-header">在 Windows 环境使用 proxifyre 代理应用程序</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="什么是BBR"><a href="#什么是BBR" class="headerlink" title="什么是BBR"></a>什么是BBR</h1><blockquote>
-<p>以下内容摘自<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/TCP_congestion_control#TCP_BBR">Wiki</a></p>
+                <blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/wiresock/proxifyre">wiresock&#x2F;proxifyre 项目链接</a></p>
 </blockquote>
 <span id="more"></span>
 
-<p>Bottleneck Bandwidth and Round-trip propagation time (BBR) 是由 Google 在 2016年开发的一种拥塞控制算法 (CCA)。虽然其他的拥塞控制算法大多基于丢包机制，通过丢包来检测到拥塞并降低传输速率，但 BBR，和 TCP Vegas 相似，是基于模型的。算法利用网络传送最近一次发出的数据包达到的最大带宽和往返时间来构建网络模型。每次累积确认或选择性确认数据包的传送都会产生一个速率样本，该样本记录了数据包的发送时间和确认时间之间间隔内传送的数据量。</p>
-<p>在 YouTube 的实际部署中，BBRv1 版本平均带来了 4% 的网络吞吐量提升，在某些国家甚至能达到 14%。BBR 算法从 Linux 4.9 版本开始就被集成到 Linux 内核的 TCP 协议栈中。它同样也适用于 QUIC 协议。</p>
-<p>BBR 版本 1 (BBRv1) 对非 BBR 流的公平性存在争议。尽管谷歌的演示文稿显示 BBRv1 可以很好地与 CUBIC 协同工作，但一些研究人员 (例如 Geoff Huston 和 Hock、Bless 及 Zitterbart) 认为它对其他数据流并不公平，并且难以扩展。Hock等人还发现 Linux 4.9 版本的 BBR 实现存在一些严重的固有缺陷，例如增加的队列延迟、不公平性和大量丢包。Soheil Abbasloo 等人 (C2TCP 算法的作者) 指出，BBRv1 版本在动态环境（例如蜂窝网络）中表现不佳。他们还指出 BBR 存在公平性问题。例如，当网络中存在一个 CUBIC 流 (它是 Linux、Android 和 MacOS 操作系统默认的 TCP 实现) 和一个 BBR 流时，BBR 流可能会主导 CUBIC 流，并占用整个链路带宽。</p>
-<p>第 2 版 (Version 2) 尝试解决与基于丢包的拥塞控制 (例如 CUBIC) 共同运行时出现的不公平问题。BBRv2 改进了 BBRv1 的模型，加入了丢包信息和来自显式拥塞通知 (ECN) 的信息。虽然 BBRv2 有时可能比 BBRv1 吞吐量更低，但它通常被认为具有更好的有效吞吐量 (goodput)。[需要来源]</p>
-<p>第 3 版 (BBRv3) 修复了 BBRv2 中的两个漏洞（带宽探测过早结束、带宽收敛问题）并进行了一些性能调整。它还提供了一个变体版本，称为 BBR.Swift，专为数据中心内部链路进行优化：它使用 network_RTT（不包含接收方延迟）作为主要的拥塞控制信号。</p>
-<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>既然 BBR 已经被集成到 Linux 内核中，那么我们稍作配置就可以使用，首先：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token assign-left variable">net.core.default_qdisc</span><span class="token operator">=</span>fq <span class="token operator">>></span> /etc/sysctl.conf
-<span class="token builtin class-name">echo</span> <span class="token assign-left variable">net.ipv4.tcp_congestion_control</span><span class="token operator">=</span>bbr <span class="token operator">>></span> /etc/sysctl.conf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+<h1 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h1><p>proxifyre 适用于，当您已经拥有一个可用的 socks5 代理，但却不了解如何让某个应用程序通过此代理收发包的情况。</p>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>proxifyre 用于指定一些应用程序的网络流量通过 socks5 代理。</p>
+<p>proxifyre 是基于 Windows 包过滤器 <a target="_blank" rel="noopener" href="https://github.com/wiresock/ndisapi/tree/master/examples/cpp/socksify">socksify</a> demo 做的增强，加入了 UDP 能力，简化了配置。</p>
+<p>proxifyre 支持被注册为 Windows 服务。</p>
+<h1 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h1><p>使用 proxifyre 前需要安装两个依赖：</p>
+<ol>
+<li>Windows Packet Filter (<a target="_blank" rel="noopener" href="https://github.com/wiresock/ndisapi/releases">WinpkFilter</a>)</li>
+<li>Visual Studio Runtime Libraries(<a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170">Visual Studio 2022 redistributable download page</a>)</li>
+</ol>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>proxifyre 默认配置文件名为 app-config.json，将配置文件放到 proxifyre 执行目录下会被直接使用，配置文件示例如下：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">&#123;</span>
+ <span class="token property">"logLevel"</span><span class="token operator">:</span> <span class="token string">"None"</span><span class="token punctuation">,</span>
+ <span class="token property">"proxies"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+         <span class="token punctuation">&#123;</span>
+         <span class="token property">"appNames"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"chrome"</span><span class="token punctuation">,</span> <span class="token string">"C:\\Program Files\\WindowsApps\\ROBLOXCORPORATION.ROBLOX"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+         <span class="token property">"socks5ProxyEndpoint"</span><span class="token operator">:</span> <span class="token string">"158.101.205.51:1080"</span><span class="token punctuation">,</span>
+         <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"username1"</span><span class="token punctuation">,</span>
+         <span class="token property">"password"</span><span class="token operator">:</span> <span class="token string">"password1"</span><span class="token punctuation">,</span>
+         <span class="token property">"supportedProtocols"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"TCP"</span><span class="token punctuation">,</span> <span class="token string">"UDP"</span><span class="token punctuation">]</span>
+         <span class="token punctuation">&#125;</span>
+     <span class="token punctuation">]</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
-<p>向 <code>sysctl.conf</code> 写入两条配置：</p>
 <ul>
-<li><code>net.core.default_qdisc=fq</code> 修改 Linux 系统中的的 qdisc 为 fq(fair queue)，避免 BBR 占用太多流量</li>
-<li><code>net.ipv4.tcp_congestion_control=bbr</code> &gt;&gt; 将 ipv4 的 TCP 拥塞控制算法设置为 BBR</li>
+<li>logLevel: 日志等级，可选项为：<code>None</code> <code>Info</code> <code>Deb</code> <code>All</code></li>
+<li>proxies：代理配置列表</li>
+<li>appNames：被代理程序名，采用模糊匹配，例如 <code>chrome</code> 会匹配到包含 <code>chrome</code> 字符串的所有程序。如果使用路径则可以精确匹配。</li>
+<li>socks5ProxyEndpoint：socks5 服务位置，地址+端口。</li>
+<li>username：如果 socks5 服务用户名，可不填。</li>
+<li>password：socks5 服务密码，可不填。</li>
+<li>supportedProtocols：被代理的网络协议，支持 TCP UDP。</li>
 </ul>
-<p>接下来，保存生效：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sysctl</span> <span class="token parameter variable">-p</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-
-<p>查看是否已经应用：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sysctl</span> net.ipv4.tcp_congestion_control
-net.ipv4.tcp_congestion_control <span class="token operator">=</span> bbr<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
-
-<p>这样就完成了所有配置。</p>
-<p>（经过实际测试，不开启公平队列时 BBR 能提供更大的速率，也许对于一些纯粹跑流量的服务器（例如网络代理），不开启公平队列是更好的用法。）</p>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>完成配置后，直接运行 ProxiFyre.exe 即可使用，日志文件会生成在 <code>/logs</code> 路径。</p>
+<p>也可以通过下列命令进行服务的注册、启动、停止和卸载，通过 Windows 服务管理：</p>
+<ul>
+<li>ProxiFyre.exe install</li>
+<li>ProxiFyre.exe start</li>
+<li>ProxiFyre.exe stop</li>
+<li>ProxiFyre.exe uninstall</li>
+</ul>
+<p>当然也可以通过 nssm 工具将 ProxiFyre.exe 注册为 Windows 服务。</p>
 
                 
               </div>
@@ -339,13 +354,7 @@ net.ipv4.tcp_congestion_control <span class="token operator">=</span> bbr<span a
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E8%B1%86%E7%9F%A5%E8%AF%86/" class="print-no-link">#豆知识</a>
-      
-        <a href="/tags/Linux/" class="print-no-link">#Linux</a>
-      
         <a href="/tags/%E7%BD%91%E7%BB%9C%E5%B7%A5%E5%85%B7/" class="print-no-link">#网络工具</a>
-      
-        <a href="/tags/VPS/" class="print-no-link">#VPS</a>
       
     </div>
   
@@ -357,8 +366,8 @@ net.ipv4.tcp_congestion_control <span class="token operator">=</span> bbr<span a
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>在 Ubuntu 22.04 LTS 上使用 BBR</div>
-      <div>https://vitsumoc.github.io/usingBBRonUbuntu2204.html</div>
+      <div>在 Windows 环境使用 proxifyre 代理应用程序</div>
+      <div>https://vitsumoc.github.io/usingProxifyreInWindows.html</div>
     </div>
     <div class="license-meta">
       
@@ -370,7 +379,7 @@ net.ipv4.tcp_congestion_control <span class="token operator">=</span> bbr<span a
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年4月11日</div>
+          <div>2024年4月15日</div>
         </div>
       
       
@@ -402,9 +411,9 @@ net.ipv4.tcp_congestion_control <span class="token operator">=</span> bbr<span a
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/Go%E6%95%99%E7%A8%8B%EF%BC%9A%E6%B3%9B%E5%9E%8B%E5%85%A5%E9%97%A8.html" title="[翻译]Go教程：泛型入门">
+                      <a href="/Joel%E6%B5%8B%E8%AF%95%EF%BC%9A12%E6%AD%A5%E8%8E%B7%E5%BE%97%E6%9B%B4%E5%A5%BD%E7%9A%84%E4%BB%A3%E7%A0%81.html" title="[翻译]Joel测试：12步获得更好的代码">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">[翻译]Go教程：泛型入门</span>
+                        <span class="hidden-mobile">[翻译]Joel测试：12步获得更好的代码</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -412,8 +421,8 @@ net.ipv4.tcp_congestion_control <span class="token operator">=</span> bbr<span a
                   <article class="post-next col-6">
                     
                     
-                      <a href="/%E4%BA%BA%E6%9C%88%E7%A5%9E%E8%AF%9D%E7%9A%84%E5%9B%B0%E5%A2%83.html" title="[转载]人月神话的困境：项目经理的挑战与转变">
-                        <span class="hidden-mobile">[转载]人月神话的困境：项目经理的挑战与转变</span>
+                      <a href="/Go%E6%95%99%E7%A8%8B%EF%BC%9A%E6%B3%9B%E5%9E%8B%E5%85%A5%E9%97%A8.html" title="[翻译]Go教程：泛型入门">
+                        <span class="hidden-mobile">[翻译]Go教程：泛型入门</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

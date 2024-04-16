@@ -1,0 +1,720 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="vc">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="原文 The Joel Test: 12 Steps to Better Code   本文写于 2000 年，文中的很多理念值得我们学习，但文中的一些软件和硬件早已不是现在的主流">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[翻译]Joel测试：12步获得更好的代码">
+<meta property="og:url" content="https://vitsumoc.github.io/Joel%E6%B5%8B%E8%AF%95%EF%BC%9A12%E6%AD%A5%E8%8E%B7%E5%BE%97%E6%9B%B4%E5%A5%BD%E7%9A%84%E4%BB%A3%E7%A0%81.html">
+<meta property="og:site_name" content="Thinking...">
+<meta property="og:description" content="原文 The Joel Test: 12 Steps to Better Code   本文写于 2000 年，文中的很多理念值得我们学习，但文中的一些软件和硬件早已不是现在的主流">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-04-15T02:24:27.000Z">
+<meta property="article:modified_time" content="2024-04-16T02:40:19.088Z">
+<meta property="article:author" content="vc">
+<meta property="article:tag" content="软件项目">
+<meta property="article:tag" content="转载">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>[翻译]Joel测试：12步获得更好的代码 - Thinking...</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"vitsumoc.github.io","root":"/","version":"1.9.6","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Thinking...</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">[翻译]Joel测试：12步获得更好的代码</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-04-15 10:24" pubdate>
+          2024年4月15日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          49 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">[翻译]Joel测试：12步获得更好的代码</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p>原文 <a target="_blank" rel="noopener" href="https://www.joelonsoftware.com/2000/08/09/the-joel-test-12-steps-to-better-code/">The Joel Test: 12 Steps to Better Code</a></p>
+</blockquote>
+<blockquote>
+<p>本文写于 2000 年，文中的很多理念值得我们学习，但文中的一些软件和硬件早已不是现在的主流</p>
+</blockquote>
+<span id="more"></span>
+
+<p>您是否听说过 <a target="_blank" rel="noopener" href="http://www.sei.cmu.edu/sema/welcome.html">SEMA</a>？那是一个相当深奥的系统，用于衡量软件团队的优秀程度。但是， <em>等等！别去学那套东西！</em> 理解那套东西大概需要您 <em>六年</em> 的时间。因此，我想出了我自己的、非常不负责任的、草率的测试来评估软件团队的质量。最重要的是，整个过程只需要 3 分钟，省下来的时间足够您读一个医学学位。</p>
+<p><strong>Joel测试</strong></p>
+<ul>
+<li>您是否使用了源码控制？</li>
+<li>您能否一键构建？</li>
+<li>您是否进行每日例行构建？</li>
+<li>您是否拥有 bug 数据库？</li>
+<li>您是否在写新代码之前修复 bug？</li>
+<li>您是否拥有最新的的项目进度表？</li>
+<li>您是否拥有规格说明？</li>
+<li>程序员的工作环境是否安静？</li>
+<li>您是否在使用最先进的生产工具？</li>
+<li>团队中有测试人员吗？</li>
+<li>招募新人的时候会让他们在面试时写代码吗？</li>
+<li>您会进行走廊可用性测试吗？</li>
+</ul>
+<p>Joel 测试的妙处在于，每个问题都可以使用 <strong>是</strong> 或 <strong>否</strong> 来回答。您压根不用去计算每日平均代码数或者每版本平均BUG数什么的，只需每个 <strong>是</strong> 计一分。当然，Joel 测试的坏处在于，您 <em>不应该</em> 用他来确保您的核电站控制软件的安全性。</p>
+<p>12 分是完美结果，11 分也可以接受，但是 10 分或以下就意味着您已经遭遇了一些严肃的问题。实际上大部分软件组织的得分只有 2 或者 3，他们需要 <em>严肃的</em> 帮助，因为像微软这样的公司会在任何时候都以 12 分的状态运行。</p>
+<p>当然，这些不是决定成败的唯一因素：在现实中，如果您拥有一个伟大的团队但是在制造一个没人需求的产品，那么，确实也不会有市场。同时，也可以想象一群才华横溢的“枪手”，他们虽然不遵循这些流程，却能做出改变世界的惊人软件。但是，在其他条件相同的情况下，如果您把这 12 件事做好，您就会拥有一支纪律严明、能够持续交付的团队。</p>
+<h1 id="1-您是否使用了源码控制？"><a href="#1-您是否使用了源码控制？" class="headerlink" title="1. 您是否使用了源码控制？"></a>1. 您是否使用了源码控制？</h1><p>我曾经用过商用的代码控制软件，也用过免费的 CVS，我会告诉您，免费的 CVS 也很好用。但是如果您没有源码控制的话，您会在让程序员协同工作的过程中遇到各种阻碍。程序员们无法知道别人做了些什么，错误也没办法被回滚。源码控制系统带来的另一个优点是，源码会被检出到每一个程序员的硬盘上——我从未听说过使用了源码控制的项目遭遇大量源码丢失的事故。</p>
+<h1 id="2-您能否一键构建？"><a href="#2-您能否一键构建？" class="headerlink" title="2. 您能否一键构建？"></a>2. 您能否一键构建？</h1><p>这里我的意思是：从最新的代码到可交付产品需要多少个步骤？在一个好的团队中，会有一个单独的脚本，他可以从头开始检查代码、重新构建代码、为所有的分支版本和语言或者 #ifdef 约束条件构建可执行文件，创建安装包，然后将其发送到最终的媒介——光盘或者下载网站等等。</p>
+<p>如果这个过程无法一键执行，那就带来了犯错的机会。而且您的项目越接近交付，您往往需要更快速的迭代部署来处理“最后的” bug，创建最终的可执行文件，等等。如果这个过程需要耗费20步，相信我，您一定会感受到痛苦，而且会犯下很多愚蠢的操作错误。</p>
+<p>正是因为这个原因，我工作的上一家公司从 WISI 转向了 InstallShield：我们希望安装程序能在夜间使用 NT scheduler 通过一个脚本自动运行，而 WISE 无法在夜间自动运行，因此我们淘汰了他。（WISE 的开发人员向我保证他们的最新版本已经支持了夜间构建。）</p>
+<h1 id="3-您是否进行每日例行构建？"><a href="#3-您是否进行每日例行构建？" class="headerlink" title="3. 您是否进行每日例行构建？"></a>3. 您是否进行每日例行构建？</h1><p>当您在使用了源码控制后，有时某个程序员无意中提交了一些错误的代码导致项目无法构建。例如，他添加了一个新的源文件，在他自己的机器上编译都没有问题，但是他忘记把他的文件提交到代码库了。之后这哥们关机回家了，浑然不觉，心满意足。但是其他人就没法干活了，因此其他人也被迫回家了。</p>
+<p>导致项目无法构建的错误非常的糟糕（但是也非常常见），这导致了我们需要进行每日构建，用来检查有没有构建错误。在一个大团队中，一个用来定位构建问题的很好的方式是在每天的午餐时间进行每日例行构建。每个团队成员都在午餐前尽可能多的提交代码，而当他们吃完饭回来时，构建已经完成了。如果例行构建成功，那非常好，每个人都可以将代码更新到最新版本然后继续工作。如果构建失败，您需要修复问题，但是其他人仍然可以在上次成功构建的版本上继续工作。</p>
+<p>在开发 Excel 时我们定下了一个规则，谁的代码打破了构建，那么作为“惩罚”，就由他负责处理构建过程，直到另一个程序员又打破了构建。这是一个鼓励大家不要打破构建的好办法，也是一个让大家轮流参与构建过程，了解构建过程工作原理的好办法。</p>
+<p>可以在我的文章 <a target="_blank" rel="noopener" href="https://www.joelonsoftware.com/articles/fog0000000023.html">Daily Builds are Your Friend</a> 中了解更多和每日例行构建相关的内容。</p>
+<h1 id="4-您是否拥有-bug-数据库？"><a href="#4-您是否拥有-bug-数据库？" class="headerlink" title="4. 您是否拥有 bug 数据库？"></a>4. 您是否拥有 bug 数据库？</h1><p>无论您做何辩解，但是只要您是在写代码，无论是团队工作还是独立开发，如果没有一个数据库来组织所有的已知 bug 的话，您的代码交付质量一定不高。有很多程序员觉得他们可以吧 bug 列表记在脑子里，这完全不靠谱。我的脑子现在连三个 bug 都记不住，而且每次睡一觉过后，或者是随着交付的压力，程序员早就把 bug 列表忘的一干二净了。你绝对需要使用工具正式的进行 bug 追踪。</p>
+<p>Bug 数据库可以设计的复杂一点或者简单一点，但是最简单的可以用 bug 数据库也应该为每个 bug 包含下列字段：</p>
+<ul>
+<li>完整的复现步骤</li>
+<li>预期行为</li>
+<li>观察到的（出bug的）行为</li>
+<li>分配给谁处理</li>
+<li>是否已经修复</li>
+</ul>
+<p>如果说 bug 追踪软件的复杂度导致了您不想使用他们，那您可以使用上述五列的简单表格来开始您的 bug 追踪工作。</p>
+<p>更多关于 bug 追踪的知识，可以阅读 <a target="_blank" rel="noopener" href="https://www.joelonsoftware.com/articles/fog0000000029.html">Painless Bug Tracking</a>。</p>
+<h1 id="5-您是否在写新代码之前修复-bug？"><a href="#5-您是否在写新代码之前修复-bug？" class="headerlink" title="5. 您是否在写新代码之前修复 bug？"></a>5. 您是否在写新代码之前修复 bug？</h1><p>第一个版本的微软 Windows 版 Word 被称为“死亡竞速”项目。整个过程漫长而坎坷，一再延期。整个团队都加班加点到离谱的地步，项目一次又一次地推迟，压力也大得让人难以置信。这该死的项目最终在发布时已经比原计划晚了数年。微软公司把整个团队送到坎昆去度假放松一下，随后坐下来进行深刻的反省。</p>
+<p>他们认识到，项目经理们一直如此执着于遵守“进度表”，以至于程序员们为了赶进度，只匆匆完成了编码过程，写出了非常糟糕的代码，因为修复漏洞并不是正式进度表的一部分，恰恰相反，当时并没有指标尝试控制漏洞数量。据传闻，一位程序员需要编写计算文本行高的代码，他干脆直接写了“return 12;” 这段代码，然后等着关于这个函数并不总是正确的漏洞报告出现。进度表变成了一份等待变成漏洞的功能清单。在事后分析中，这种做法被戏称为“无限缺陷方法论”。</p>
+<p>为了纠正这个问题，微软在整个公司范围内实施了一种名为“零缺陷方法论”的东西。公司里的许多程序员都对此嗤之以鼻，因为这听起来像是管理层认为他们可以通过行政命令来减少漏洞数量。实际上，“零缺陷”意味着在任何给定时间，最高优先级都是在编写任何新代码之前消除漏洞。原因如下：</p>
+<p>普遍上，修复 bug 前等待的时间越长，修复的成本（时间和金钱）就越高。</p>
+<p>例如，当您犯了编译器捕获的拼写错误或语法 bug 时，修复它基本上是微不足道的。</p>
+<p>当您第一次尝试运行代码时发现代码中有 bug 时，您将能够立即修复它，因为所有代码在您的脑海中仍然记忆犹新。</p>
+<p>如果您在几天前编写的某些代码中发现 bug，您将需要一段时间才能找到它，但是当您重读您编写的代码时，您会记住所有内容，并且能够在合理的时间内修复该 bug。</p>
+<p>但是如果您发现的 bug 是在您 <em>几个月</em> 前编写的代码中出现的，您很可能基本上已经把代码中的事情忘光了，这样 bug 修复工作就会变的很难，这种感觉就像是在修复其他人的代码，而且那哥们现在正在阿鲁巴度假。在这种情况下，修复 bug 就像是一种考古工作：您必须缓慢的，有条理的，细致的处理，而且您还无法确定需要多长时间才能取得成果。</p>
+<p>如果您在已经交付的产品中发现了 bug，那么您可能需要花费相当高昂的代价来修复他。</p>
+<p>这就是为什么要立刻修复 bug 的原因：因为这样最省时间。这里还有另一个原因，关乎到一个事实情况，就是编写新代码所消耗的工时比修复 bug 消耗的工时更加容易预测。例如，如果我请您预测需要花费多少时间来编写一个对列表进行排序的代码，您可以反馈给我一个精准的评估。但是如果我请您预测需要花费多少时间来处理您的代码在用户安装了 Internet Explorer 5.5 后无法运行的 bug，您可能无法估算，因为您压根不知道 bug 发生的原因。寻找 bug 的成因也许需要三天，也有可能只需要两分钟。</p>
+<p>这意味着如果您拥有一个项目进度表，但是表上的完成项目都包含有大量需要被处理的 bug，那么这个项目进度表就完全不靠谱。但是如果您已经处理了所有已知的 bug，剩余的工作只有新需求的开发，那么您的项目进度表就会更加精准。</p>
+<p>将未处理 bug 数量保持为 0 的另一大好处是您可以更快速的响应竞争，有些程序员认为这种行为表示产品随时处于<em>可交付</em>状态。如果您的竞争对手发布了一个杀手级的功能来偷取您的客户，您可以立刻实现该功能并且随后马上跟进发布，无需等待处理堆积如山的遗留 bug。</p>
+<h1 id="6-您是否拥有最新的的项目进度表？"><a href="#6-您是否拥有最新的的项目进度表？" class="headerlink" title="6. 您是否拥有最新的的项目进度表？"></a>6. 您是否拥有最新的的项目进度表？</h1><p>既然我们已经聊到了项目进度表，如果您的代码交付和商务有关，那么商务同事会有无数个理由来询问您的项目进度。程序员在制定进度表时的暴躁众所周知 “等我做完了就能交付了！” 他们用这样的语言回怼他们的商务同事。</p>
+<p>不幸的是，这样没法解决问题。在代码交付前，商务同事需要做很多很多的事：demo 展示、举办展会、投放广告，等等。这些事情都需要项目进度表的支持，而且项目进度表要尽可能的更新而且准确。</p>
+<p>关于使用项目进度表的另一个至关重要的原因是，他可以帮助你决定接下来需要开发哪些软件功能，而且他还会强迫你筛选出最不重要的功能，移除他们，而不是陷入功能炎（<a target="_blank" rel="noopener" href="http://www.netmeg.net/jargon/terms/c/creeping_featuritis.html">featuritis</a>）（也被称为 scope creep）。</p>
+<p>保持您的项目进度表简单易读，参考我的文章 <a target="_blank" rel="noopener" href="https://www.joelonsoftware.com/articles/fog0000000245.html">Painless Software Schedules</a>，这里描述了如何通过简单的方式运用项目进度表。</p>
+<h1 id="7-您是否拥有规格说明？"><a href="#7-您是否拥有规格说明？" class="headerlink" title="7. 您是否拥有规格说明？"></a>7. 您是否拥有规格说明？</h1><p>编写规格说明书就像使用牙线：每个人都赞成这是件好事，但就是没人去做。</p>
+<p>我不确定这事的成因，但是最大的可能性就是大部分程序员仇恨写文档。因此，当仅由程序员组成的团队解决问题时，他们更喜欢用代码而不是文档来表达他们的解决方案。他们更愿意深入研究并编写代码，而不是先制定规范。</p>
+<p>在设计阶段，当您发现问题时，只需要寥寥几行文本就可以将问题解决。一旦代码已经完成，修复问题的开销就急剧增加，无论是情感上的（人们厌恶抛弃已经完成的代码），还是时间上的，因此程序员会产生对抗情绪。没有规格说明的项目往往以糟糕的设计和无法控制的进度收场。这似乎是 Netscape 犯过的错误，前四个版本变得如此混乱，以至于管理层 <a target="_blank" rel="noopener" href="https://www.joelonsoftware.com/articles/fog0000000069.html">愚蠢地决定</a> 扔掉代码并重新开始。然后他们在 Mozilla 上再次犯了这个错误，创造了一个失控的怪物，花了 <em>好几年</em> 才进入 alpha 阶段。</p>
+<p>我的理论是，这个问题可以通过把程序员送去参加 <a target="_blank" rel="noopener" href="http://www.yale.edu/engl450b/">写作集中培训</a> 来降低他们对写文档的抵触情绪，或者是聘用有能力的项目经理来编写规格说明。无论如何，您都需要遵循简单的规则“先写规范后写代码”。</p>
+<p>了解更多如何书写规格说说明的支持，参考我的另一篇 <a target="_blank" rel="noopener" href="https://www.joelonsoftware.com/articles/fog0000000036.html">文章</a>。</p>
+<h1 id="8-程序员的工作环境是否安静？"><a href="#8-程序员的工作环境是否安静？" class="headerlink" title="8. 程序员的工作环境是否安静？"></a>8. 程序员的工作环境是否安静？</h1><p>关于为知识工作者提供空间、安静和隐私能够提升生产效率的文章已经很广泛了，经典的软件管理书籍 <a target="_blank" rel="noopener" href="http://www.amazon.com/exec/obidos/ASIN/0932633439/ref=nosim/joelonsoftware/">Peopleware</a> 大量记载了这些关于生产力提升的理论。</p>
+<p>这里有个小问题。我们都知道知识工作者的最佳工作状态是“心流”，或者被称为“在领域中”，这种情况下他们完全专注于工作而且屏蔽外界的环境。他们忘记了时间，通过绝对的专注创造出伟大的作品。这是他们完成所有富有成效的工作的时候。作家、程序员、科学家甚至篮球运动员都会告诉你这种心流的感觉。</p>
+<p>问题在于，进入心流状态并不简单。当您尝试观测时，您会发现平均需要 15 分钟才能进入最高效率的工作状态。有时候，如果您累了或者那天已经做了很多创造性的工作，您就是无法进入状态，您就把工作日剩下的时间花在闲逛、阅读网页、玩俄罗斯方块上。</p>
+<p>另一个问题是，心流状态非常容易被打断。噪音、电话、出门吃午饭、需要出去买咖啡，或者被同事打扰——特别是被同事打扰——这些情况都会打断您的心流状态。如果同事问您一个问题，只造成了 1 分钟的中断，但这会让您脱离心流状态，需要半个小时才能再次恢复工作效率，那么你的整体工作效率就会遇到严重问题。如果您处于一个嘈杂的牛棚环境中，就像含有咖啡因的网络公司所喜欢创造的那样，营销人员在程序员旁边打电话尖叫，那么您的生产力将会下降，因为知识工作者一次又一次地被打扰，永远无法进入状态。</p>
+<p>对于程序员来说，这种情况尤为严重。生产力依赖于能够同时处理短期记忆中的许多小细节。任何微小的打扰都会造成这些细节的崩溃。当您恢复工作时，您无法无法完整的回忆起这些细节（例如本地的变量名称，或者您正在实现该搜索算法时要达到的目的）您必须不断地寻回这些细节，在此之前您的工作速度都会被严重降低。</p>
+<p>这是个简单的代数问题，我们认为（基于我们观测到的证据）只要我们打断了程序员的工作，哪怕只有一分钟，我们至少浪费了十五分钟的生产力。例如，有两个程序员，Jeff 和 Mutt， 待在标准 Dilbert 小牛育肥农场中彼此相邻的开放式小隔间中。Mutt 忘记了 strcpy 函数的 Unicode 版本的名称，他可以选择自己查询，这会消耗他 30 秒，他也可以选择询问 Jeff，这会消耗他 15 秒。由于他的座位就在 Jeff 旁边，他选择了询问 Jeff。Jeff 由于被打断工作而损失了 15 分钟的生产力（用来为 Mutt 节省 15 秒）。</p>
+<p>现在，让我们把他们搬到有墙壁和门的单独办公室去。此时当 Mutt 记不得函数的名称时，他可以选择自己查询，这依然会消耗他 30 秒，或者他也可以选择询问 Jeff，但这次需要消耗他 45 秒，而且他还必须站起来（考虑到程序员的平均身体素质，这不是一件容易的事！），因此他选择了自己查询。这次 Mutt 损失了 30 秒的生产力，但是 Jeff 节约了 15 分钟。</p>
+<h1 id="9-您是否在使用最先进的生产工具？"><a href="#9-您是否在使用最先进的生产工具？" class="headerlink" title="9. 您是否在使用最先进的生产工具？"></a>9. 您是否在使用最先进的生产工具？</h1><p>使用编译型语言写代码是最后仍然无法立刻在普通家用计算机上完成的事情之一。如果您的编译过程超过了几秒钟，改用最新款的电脑可以节省您的时间。如果编译过程达到了 15 秒，程序员就会等的无聊然后跑去刷 <a target="_blank" rel="noopener" href="https://www.theonion.com/">洋葱新闻</a>，一不留神就会刷好几个小时。</p>
+<p>使用单个显示器对 GUI 软件进行 Debug 也不是不可能，但是过程非常痛苦。如果您在编写 GUI 代码，两台显示器会让事情变的简单许多。</p>
+<p>大部分程序员最终都必须操作位图来制作图标和菜单，然而大部分程序员并没有一个好用的位图编辑器。“用 Windows 画图来处理位图”听起来像个笑话，但是实际上很多程序员都不得不这样做。</p>
+<p>在 <a target="_blank" rel="noopener" href="https://www.joelonsoftware.com/articles/TwoStories.html">我的最后一份工作</a> 中，运维老大持续的给我发垃圾邮件来抱怨我在服务器上使用了超过（大约）220M的硬盘空间。我则是这样告诉他，考虑到现在的硬盘价格，我使用这些硬盘来存储的成本明显要低于我使用<em>卫生纸</em>来存储。即便是花 10 分钟来让我清理一下我的文件夹，那也是对我生产力的一种浪费。</p>
+<p><strong>顶尖的开发团队不会折磨他们的程序员。</strong>即使是由于工具不好用带来的微小挫败感，积累起来也会让程序员变得暴躁和不开心。而一个带有负面情绪的程序员实际上就是一个毫无生产力的程序员。</p>
+<p>除此之外…其实程序员很容易被最新最酷的电子产品吸引。用这种方式引诱他们为你工作比起涨工资便宜的多。</p>
+<h1 id="10-团队中有测试人员吗？"><a href="#10-团队中有测试人员吗？" class="headerlink" title="10. 团队中有测试人员吗？"></a>10. 团队中有测试人员吗？</h1><p>如果您的团队没有专职的测试人员，或者没有至少为每两到三个项目配一个测试员，那么要么你就是在交付充满 BUG 的产品，要么你就是在让时薪 100 美金的程序员在干时薪 30 美金的测试员的活。在测试员身上降低支出是一种令人发指的“虚假节约”，很多人没有意识到这一点，这让我很震惊。</p>
+<p>阅读 <a target="_blank" rel="noopener" href="https://www.joelonsoftware.com/articles/fog0000000067.html">Top Five (Wrong) Reasons You Don’t Have Testers</a>，这篇文章里我详细介绍了这个主题。</p>
+<h1 id="11-招募新人的时候会让他们在面试时写代码吗？"><a href="#11-招募新人的时候会让他们在面试时写代码吗？" class="headerlink" title="11. 招募新人的时候会让他们在面试时写代码吗？"></a>11. 招募新人的时候会让他们在面试时写代码吗？</h1><p>您会在雇佣一名魔术师的时候不让他为您展示一些魔术技巧吗？当然不是。</p>
+<p>您会在雇佣婚礼厨师的时候不品尝他们的食物吗？我觉得也不是。（除非您雇佣的是 Marge 阿姨，而且如果您不让她制作她“出名的”碎肝饼的话，她会恨您一辈子的）。</p>
+<p>然而，每时每刻，都有程序员会因为他感人的简历或者在面试时表现出的言谈举止被雇佣。或者他们只是被问了一些无关紧要的编程细节（“CreateDialog() 和 DialogBox() 的区别是什么？”），这种东西只要查查文档就行了。您不应该在乎他能否记得住成百上千个细节，您应该在乎的是他有没有能力写代码。或者说，更糟糕的情况下，他们会被询问“AHA！”问题：就是那种您知道了答案就特别简单，但是不知道答案也完全无所谓的问题。</p>
+<p>请不要再做这种事情了。您可以在面试的时候安排任何环节，但千万记得要让受试者写一些代码。（参考我的文章 <a target="_blank" rel="noopener" href="https://www.joelonsoftware.com/articles/fog0000000073.html">Guerrilla Guide to Interviewing</a>，了解更多建议）。</p>
+<h1 id="12-您会进行走廊可用性测试吗？"><a href="#12-您会进行走廊可用性测试吗？" class="headerlink" title="12. 您会进行走廊可用性测试吗？"></a>12. 您会进行走廊可用性测试吗？</h1><p><em>走廊可用性测试</em>指的是您在走廊随便抓一个人，让后强迫他试用您刚写完的代码。如果您对五个人这样做，您就会学到关于代码可用性问题中 95% 的知识。</p>
+<p>好的 UI 设计没有您想的那么难，而这对于客户选择并钟情您的产品至关重要。您可阅读我的 <a target="_blank" rel="noopener" href="https://www.joelonsoftware.com/uibook/chapters/fog0000000057.html">free online book on UI design</a>，这是为程序员准备的一个简短的入门书籍。</p>
+<p>但是关于 UI 最重要的一点是，只需将您的程序展示给几个用户（实际上，五到六个人就完全足够了），您立刻就会发现用户关注的最大问题。这篇文章 <a target="_blank" rel="noopener" href="http://www.useit.com/alertbox/20000319.html">Jakob Nielsen’s article</a> 阐述了这个现象的成因。即便您缺乏关于 UI 设计的技巧，只要您坚持进行走廊测试（这也没啥成本），您的 UI 就会变得好很多，很多。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%BD%AF%E4%BB%B6%E9%A1%B9%E7%9B%AE/" class="category-chain-item">软件项目</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E8%BD%AF%E4%BB%B6%E9%A1%B9%E7%9B%AE/" class="print-no-link">#软件项目</a>
+      
+        <a href="/tags/%E8%BD%AC%E8%BD%BD/" class="print-no-link">#转载</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>[翻译]Joel测试：12步获得更好的代码</div>
+      <div>https://vitsumoc.github.io/Joel测试：12步获得更好的代码.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>vc</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年4月15日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/usingProxifyreInWindows.html" title="在 Windows 环境使用 proxifyre 代理应用程序">
+                        <span class="hidden-mobile">在 Windows 环境使用 proxifyre 代理应用程序</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>vitusmoc Blog, Powered by </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script  src="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
