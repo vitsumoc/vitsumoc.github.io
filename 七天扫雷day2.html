@@ -16,23 +16,25 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="在这里记录一些基础的 Linux 服务管理维护方式，作为程序员，总是会用到的。">
+    <meta name="description" content="与文档配套的源码和资源在这里">
 <meta property="og:type" content="article">
-<meta property="og:title" content="简单的Linux服务管理">
-<meta property="og:url" content="https://vitsumoc.github.io/%E7%AE%80%E5%8D%95%E7%9A%84Linux%E6%9C%8D%E5%8A%A1%E7%AE%A1%E7%90%86.html">
+<meta property="og:title" content="七天制作扫雷-day2（拆分成类）">
+<meta property="og:url" content="https://vitsumoc.github.io/%E4%B8%83%E5%A4%A9%E6%89%AB%E9%9B%B7day2.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="在这里记录一些基础的 Linux 服务管理维护方式，作为程序员，总是会用到的。">
+<meta property="og:description" content="与文档配套的源码和资源在这里">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-05-22T07:30:38.000Z">
-<meta property="article:modified_time" content="2024-05-22T08:10:27.402Z">
+<meta property="og:image" content="https://vitsumoc.github.io/%E4%B8%83%E5%A4%A9%E6%89%AB%E9%9B%B7day2/1.jpg">
+<meta property="article:published_time" content="2024-06-04T02:51:05.000Z">
+<meta property="article:modified_time" content="2024-06-04T06:05:29.328Z">
 <meta property="article:author" content="vc">
-<meta property="article:tag" content="Linux">
-<meta property="article:tag" content="运维">
+<meta property="article:tag" content="小玩具">
+<meta property="article:tag" content="前端">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://vitsumoc.github.io/%E4%B8%83%E5%A4%A9%E6%89%AB%E9%9B%B7day2/1.jpg">
   
   
   
-  <title>简单的Linux服务管理 - Thinking...</title>
+  <title>七天制作扫雷-day2（拆分成类） - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -200,7 +202,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">简单的Linux服务管理</span>
+            <span id="subtitle">七天制作扫雷-day2（拆分成类）</span>
           
         </div>
 
@@ -211,8 +213,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-05-22 15:30" pubdate>
-          2024年5月22日 下午
+        <time datetime="2024-06-04 10:51" pubdate>
+          2024年6月4日 上午
         </time>
       </span>
     
@@ -223,7 +225,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          272 字
+          1.1k 字
         
       </span>
     
@@ -234,7 +236,7 @@
         
         
         
-          3 分钟
+          10 分钟
         
       </span>
     
@@ -271,65 +273,115 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">简单的Linux服务管理</h1>
+            <h1 id="seo-header">七天制作扫雷-day2（拆分成类）</h1>
             
             
               <div class="markdown-body">
                 
-                <p>在这里记录一些基础的 <code>Linux</code> 服务管理维护方式，作为程序员，总是会用到的。</p>
+                <p>与文档配套的源码和资源在<a target="_blank" rel="noopener" href="https://github.com/vitsumoc/7daysMineSweeper">这里</a></p>
 <span id="more"></span>
 
-<h1 id="手动运行"><a href="#手动运行" class="headerlink" title="手动运行"></a>手动运行</h1><p>以一个 Java Web 项目为例，手动运行 Jar 包可能是这样的：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">nohup</span> <span class="token function">java</span> <span class="token parameter variable">-jar</span> YongWang-1.0-SNAPSHOT.jar <span class="token operator">></span> /dev/null <span class="token operator"><span class="token file-descriptor important">2</span>></span><span class="token file-descriptor important">&amp;1</span> <span class="token operator">&amp;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-
-<p>这样程序就可以在后台运行，但是有一些缺点：</p>
+<h1 id="面向对象"><a href="#面向对象" class="headerlink" title="面向对象"></a>面向对象</h1><p><img src="/%E4%B8%83%E5%A4%A9%E6%89%AB%E9%9B%B7day2/1.jpg" srcset="/img/loading.gif" lazyload></p>
+<p>面向对象的方法并不会像之前那样，直接关注过程和实现，而是先拆分问题，将一个综合性的问题拆分为很多相关的 <code>类(class)</code>，用来表示某种类型的汇总，这些类又可以有具体的存在被称为 <code>实例(instance)</code>，每一个类都会具有一些 <code>属性(member)</code> 和 <code>方法(method)</code>，属性表示类或者实例的特性，方法则表示类或者实例可以进行的行为。</p>
+<p>好的，相信你已经被绕晕了，以上四个概念就是面向对象中最基础的概念，接下来我们用一个例子来表示：</p>
 <ul>
-<li>系统重启后程序不会启动</li>
-<li>只能通过 <code>ps</code> 查询进程状态</li>
-<li>想要关闭程序的话，需要通过 <code>ps</code> 查找进程号，然后手动 <code>kill</code></li>
-<li>难以接入各种自动化工具</li>
+<li><p><em>我要办一所小学，目的是培养小学生</em>，这句话只关注了目标，没有拆分问题，这<strong>不叫面向对象</strong>。</p>
+</li>
+<li><p><em>小学需要校长、教师、保安、清洁工、厨师</em>，这句话将综合性的问题拆分成了支持这个问题的 <code>类</code>，对于办小学这个问题而言，需要五种不同的 <code>类</code>。</p>
+</li>
+<li><p><em>招聘到三名教师，王老师、许老师和邓老师</em>，教师是一种 <code>类</code>，而 王老师、许老师和邓老师都是 <code>教师类</code> 的 <code>实例</code>。</p>
+</li>
+<li><p><em>王老师和许老师是男性，邓老师是女性</em>，性别是 <code>教师类</code> 的一种 <code>属性</code>，王老师的 <code>性别属性值</code> 为男性，邓老师的 <code>性别属性值</code> 为女性。</p>
+</li>
+<li><p><em>王老师是语文老师，许老师和邓老师是数学老师</em>，学科是 <code>教师类</code> 的另一种 <code>属性</code>，王老师的 <code>学科属性值</code> 为语文，许老师的 <code>学科属性值</code> 为数学，<code>教师类</code> 可以拥有多种属性，只要和主要问题相关的属性都需要被纳入考虑。</p>
+</li>
+<li><p><em>三名老师都可以上课</em>，上课是 <code>教师类</code> 的一种 <code>方法</code>，表示某种类可以执行的行为和带来的后果。上课带来了占用课时、为教师计薪、提高学生成绩等等后果。</p>
+</li>
 </ul>
-<p>因此，将程序注册为服务是一个更好的选择。</p>
-<h1 id="注册服务"><a href="#注册服务" class="headerlink" title="注册服务"></a>注册服务</h1><p>如果想将我们的程序注册为服务，首先需要编写一个配置文件，这个文件可以放在 <code>/etc/systemd/system/</code> 路径下。</p>
-<p>文件的名称一般参考服务的名称，并以 <code>.server</code> 结尾，因此在这个例子中，我的文件名为 <code>yongwang.service</code>：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><div class="caption"><span>yongwang.service</span></div><code class="language-text">[Unit]
-Description=YongWang Server
-
-[Service]
-WorkingDirectory=/home/vc/ywyl/server/
-ExecStart=java -jar YongWang-1.0-SNAPSHOT.jar
-
-[Install]
-WantedBy=multi-user.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-
-<p>之后，需要通过命令注册服务</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">systemctl daemon-reload<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-
-<h1 id="服务管理命令"><a href="#服务管理命令" class="headerlink" title="服务管理命令"></a>服务管理命令</h1><p>后续我们对服务的管理，一般包括：</p>
+<p>好了，面向对象就是这样，这种方式让我们把话说的复杂又精确，最重要的是，相比于 <em>办小学</em> 这个模糊的目标，面向对象的思维方式为我们提供了一条清晰的解决路径。所谓编程，就是一个将含糊的目标逐渐明确，最终明确到计算机也能够执行的过程，面向对现的思维方式在这个过程中总是能帮助我们很多。</p>
+<h1 id="扫雷中的面向对象"><a href="#扫雷中的面向对象" class="headerlink" title="扫雷中的面向对象"></a>扫雷中的面向对象</h1><p>那么将扫雷游戏简单拆分一下，可以这样分：</p>
 <ul>
-<li>启动服务</li>
+<li>交互逻辑 （输入事件捕获及处理）</li>
+<li>游戏逻辑 （游戏计算）</li>
+<li>显示逻辑 （游戏界面输出）</li>
 </ul>
-<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">systemctl start yongwang<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+<p>我打算设计这些 <code>类</code> 来分工上述的三种逻辑：</p>
+<table>
+<thead>
+<tr>
+<th>类</th>
+<th>功能</th>
+<th>负责逻辑</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>游戏控制类</td>
+<td>游戏初始化入口<br />持有棋盘类和格子类实例<br />输入事件的捕捉、判断、转发<br />预留控制接口（外部菜单、网络接口等等）</td>
+<td>是交互的统一入口<br />不负责游戏逻辑<br />不负责显示逻辑</td>
+</tr>
+<tr>
+<td>棋盘类</td>
+<td>扫雷游戏的盘面信息<br />包括行数、列数、雷数、打开格子数</td>
+<td>不负责交互逻辑<br />负责游戏逻辑中的棋盘<br />不负责显示逻辑</td>
+</tr>
+<tr>
+<td>格子类</td>
+<td>扫雷游戏的格子<br />包括格子的位置、是否有雷、是否已经打开</td>
+<td>负责交互逻辑中的处理<br />负责游戏逻辑中的格子<br />不负责显示逻辑</td>
+</tr>
+<tr>
+<td>显示类</td>
+<td>通过盘面信息，绘制游戏界面<br />HTML页面可通过dom元素、SVG、Canvas等方式绘制<br />本教程中会提供dom和svg两种方式的代码实现</td>
+<td>只负责显示逻辑</td>
+</tr>
+</tbody></table>
+<p>拆分后的项目文件夹如下表：</p>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>asset文件夹</td>
+<td>存放游戏中可能使用的图形资源</td>
+</tr>
+<tr>
+<td>app.css</td>
+<td>全局样式表</td>
+</tr>
+<tr>
+<td>app.html</td>
+<td>游戏入口</td>
+</tr>
+<tr>
+<td>board.js</td>
+<td>棋盘类</td>
+</tr>
+<tr>
+<td>cell.js</td>
+<td>格子类</td>
+</tr>
+<tr>
+<td>game.js</td>
+<td>游戏控制类</td>
+</tr>
+<tr>
+<td>view_canvas.js</td>
+<td>canvas方式的显示类</td>
+</tr>
+<tr>
+<td>view_dom.js</td>
+<td>dom方式的显示类</td>
+</tr>
+<tr>
+<td>view_svg.js</td>
+<td>svg方式的显示类</td>
+</tr>
+</tbody></table>
+<p>到此处为止，我们没有进行任何代码编写，只是将游戏拆分成了各种类。相比于上一章的实现，似乎我们把一件简单的事情变复杂了，但实际上这种设计会在软件需求变复杂时大大降低我们的心智负担。</p>
 
-<ul>
-<li>停止服务</li>
-</ul>
-<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">systemctl stop yongwang<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-
-<ul>
-<li>查看服务状态</li>
-</ul>
-<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">systemctl status yongwang<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-
-<ul>
-<li>设置开机自启</li>
-</ul>
-<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">systemctl <span class="token builtin class-name">enable</span> yongwang<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-
-<ul>
-<li>取消开机自启</li>
-</ul>
-<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">systemctl disable yongwang<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
                 
               </div>
             
@@ -347,7 +399,7 @@ WantedBy=multi-user.target<span aria-hidden="true" class="line-numbers-rows"><sp
     
       <span class="category-chain">
         
-  <a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-chain-item">运维</a>
+  <a href="/categories/%E4%B8%83%E5%A4%A9%E6%89%AB%E9%9B%B7/" class="category-chain-item">七天扫雷</a>
   
   
 
@@ -362,9 +414,9 @@ WantedBy=multi-user.target<span aria-hidden="true" class="line-numbers-rows"><sp
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Linux/" class="print-no-link">#Linux</a>
+        <a href="/tags/%E5%B0%8F%E7%8E%A9%E5%85%B7/" class="print-no-link">#小玩具</a>
       
-        <a href="/tags/%E8%BF%90%E7%BB%B4/" class="print-no-link">#运维</a>
+        <a href="/tags/%E5%89%8D%E7%AB%AF/" class="print-no-link">#前端</a>
       
     </div>
   
@@ -376,8 +428,8 @@ WantedBy=multi-user.target<span aria-hidden="true" class="line-numbers-rows"><sp
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>简单的Linux服务管理</div>
-      <div>https://vitsumoc.github.io/简单的Linux服务管理.html</div>
+      <div>七天制作扫雷-day2（拆分成类）</div>
+      <div>https://vitsumoc.github.io/七天扫雷day2.html</div>
     </div>
     <div class="license-meta">
       
@@ -389,7 +441,7 @@ WantedBy=multi-user.target<span aria-hidden="true" class="line-numbers-rows"><sp
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年5月22日</div>
+          <div>2024年6月4日</div>
         </div>
       
       
@@ -421,9 +473,9 @@ WantedBy=multi-user.target<span aria-hidden="true" class="line-numbers-rows"><sp
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/%E4%B8%83%E5%A4%A9%E6%89%AB%E9%9B%B7day1.html" title="七天制作扫雷-day1（一把梭）">
+                      <a href="/%E4%B8%83%E5%A4%A9%E6%89%AB%E9%9B%B7day345.html" title="七天制作扫雷-day345（棋盘、格子、控制、视图）">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">七天制作扫雷-day1（一把梭）</span>
+                        <span class="hidden-mobile">七天制作扫雷-day345（棋盘、格子、控制、视图）</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -431,8 +483,8 @@ WantedBy=multi-user.target<span aria-hidden="true" class="line-numbers-rows"><sp
                   <article class="post-next col-6">
                     
                     
-                      <a href="/%E4%BD%BF%E7%94%A8Jenkins%E8%87%AA%E5%8A%A8%E9%83%A8%E7%BD%B2%E9%A1%B9%E7%9B%AE.html" title="使用Jenkins自动部署项目">
-                        <span class="hidden-mobile">使用Jenkins自动部署项目</span>
+                      <a href="/%E4%B8%83%E5%A4%A9%E6%89%AB%E9%9B%B7day1.html" title="七天制作扫雷-day1（一把梭）">
+                        <span class="hidden-mobile">七天制作扫雷-day1（一把梭）</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
