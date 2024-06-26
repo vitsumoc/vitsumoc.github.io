@@ -16,22 +16,23 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="本文记录了一个使用工具寻找弹窗、分析弹窗、修改程序的过程，对于理解 Windows 编程有一些作用本文中的内容全部来自于此 视频">
+    <meta name="description" content="项目制的开发就是这样，你能从中获得一些宝贵的一手经验，但代价是每一次经验背后都有一个“事故”。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="关闭Windows程序弹窗">
-<meta property="og:url" content="https://vitsumoc.github.io/%E5%85%B3%E9%97%ADWindows%E7%A8%8B%E5%BA%8F%E5%BC%B9%E7%AA%97.html">
+<meta property="og:title" content="mysql bin_log 塞满了磁盘">
+<meta property="og:url" content="https://vitsumoc.github.io/mysql%20bin_log%20%E5%A1%9E%E6%BB%A1%E4%BA%86%E7%A3%81%E7%9B%98.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="本文记录了一个使用工具寻找弹窗、分析弹窗、修改程序的过程，对于理解 Windows 编程有一些作用本文中的内容全部来自于此 视频">
+<meta property="og:description" content="项目制的开发就是这样，你能从中获得一些宝贵的一手经验，但代价是每一次经验背后都有一个“事故”。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-06-18T09:22:21.000Z">
-<meta property="article:modified_time" content="2024-06-18T10:11:56.406Z">
+<meta property="article:published_time" content="2024-06-26T02:39:35.000Z">
+<meta property="article:modified_time" content="2024-06-26T03:44:35.352Z">
 <meta property="article:author" content="vc">
-<meta property="article:tag" content="Windows">
+<meta property="article:tag" content="项目实践">
+<meta property="article:tag" content="运维">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>关闭Windows程序弹窗 - Thinking...</title>
+  <title>mysql bin_log 塞满了磁盘 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -199,7 +200,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">关闭Windows程序弹窗</span>
+            <span id="subtitle">mysql bin_log 塞满了磁盘</span>
           
         </div>
 
@@ -210,8 +211,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-06-18 17:22" pubdate>
-          2024年6月18日 下午
+        <time datetime="2024-06-26 10:39" pubdate>
+          2024年6月26日 上午
         </time>
       </span>
     
@@ -222,7 +223,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          299 字
+          332 字
         
       </span>
     
@@ -270,48 +271,35 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">关闭Windows程序弹窗</h1>
+            <h1 id="seo-header">mysql bin_log 塞满了磁盘</h1>
             
             
               <div class="markdown-body">
                 
-                <blockquote>
-<p>本文记录了一个使用工具寻找弹窗、分析弹窗、修改程序的过程，对于理解 Windows 编程有一些作用<br>本文中的内容全部来自于此 <a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1YM4m1m7qc">视频</a></p>
-</blockquote>
+                <p>项目制的开发就是这样，你能从中获得一些宝贵的一手经验，但代价是每一次经验背后都有一个“事故”。</p>
 <span id="more"></span>
 
-<h1 id="通过-spy-获得弹窗的窗口类"><a href="#通过-spy-获得弹窗的窗口类" class="headerlink" title="通过 spy++ 获得弹窗的窗口类"></a>通过 spy++ 获得弹窗的窗口类</h1><p>spy++ 随着 Visual Studio 一同安装，在工具菜单中。</p>
-<p>通过其中的窗口搜索功能，可以搜索到弹出窗口的窗口名称和窗口类，例如在我的 WinRAR 中：</p>
-<p>广告弹窗可以看到窗口类为 RarReminder</p>
-<ul>
-<li>句柄：001E0A8C</li>
-<li>窗口名称：WinRAR 6.24b1 Expired Notification | Your Free Trial Period has Ended!</li>
-<li>窗口类：RarReminder</li>
+<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>客户告诉我，服务器磁盘增长速度异常，项目上线二十天，mysql 文件夹的磁盘占用就超过 700G。</p>
+<p><em>非常非常感谢这位能够提前帮我们发现问题的客户，责任心和专业性都很强。</em></p>
+<p>经检查，是 mysql&#x2F;data 文件夹中出现了大量的 binlog.xxxxxx 文件，每个文件大小大约 1GB，每天产生若干个文件。</p>
+<p>查阅资料后，发现该文件是 mysql 的二进制日志，可以用来进行数据恢复、数据备份等操作。（在我这个项目中用不到，另有备份机制）。</p>
+<h1 id="处理"><a href="#处理" class="headerlink" title="处理"></a>处理</h1><p>解决方案是这样的：</p>
+<ol>
+<li>在 mysql 命令行中查找 log_bin 相关的配置 <code>show variables like &#39;%log_bin%&#39;;</code></li>
+</ol>
+<p>发现输出包括 <code>log_bin ON</code>，表示二进制日志功能已经被打开。</p>
+<ol start="2">
+<li>通过 <code>PURGE BINARY LOGS BEFORE &#39;2024-06-26 10:00:00&#39;;</code> 删除原有的日志文件</li>
+</ol>
+<p><strong>必须在日志功能开启的情况下执行上述命令删除文件，否则命令无效</strong></p>
+<ol start="3">
+<li>在 mysql 启动脚本中添加参数 <code>--disable-log-bin</code>，重启 mysql 服务，再次检查 log_bin 配置</li>
+</ol>
+<p>发现输出包括 <code>log_bin OFF</code>，表示二进制日志功能已经被关闭，后续不再产生日志。</p>
+<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><ul>
+<li><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.4/en/replication-options-binary-log.html">Binary Logging Options and Variables</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/luckly-hf/p/14324957.html">MySQL的binlog日志详解</a></li>
 </ul>
-<p>注册弹窗是 Dialog，</p>
-<ul>
-<li>句柄：007A0950</li>
-<li>窗口名称：Please purchase WinRAR license</li>
-<li>窗口类：#32770 (对话框)</li>
-</ul>
-<h1 id="通过-apimonitor-截取软件对系统-api-的调用"><a href="#通过-apimonitor-截取软件对系统-api-的调用" class="headerlink" title="通过 apimonitor 截取软件对系统 api 的调用"></a>通过 apimonitor 截取软件对系统 api 的调用</h1><p>从 <a target="_blank" rel="noopener" href="http://www.rohitab.com/">这里</a> 下载工具。</p>
-<p>查找并监控 CreateWindow 相关函数，Dialog 相关函数。</p>
-<p>选择被监控程序 WinRAR 并启动，可以看到程序调用 api 的所有记录。</p>
-<p>广告弹窗调用类为：</p>
-<ul>
-<li>RarReminder</li>
-</ul>
-<p>注册弹窗的调用为：</p>
-<ul>
-<li>DialogBoxParamW ( 0x00007ff643070000, “REMINDER”, 0x0000000000600b84, 0x00007ff64316d600, 0 )</li>
-</ul>
-<p>查看堆栈，记录顶部偏移地址，分别为：</p>
-<ul>
-<li>0xbf3cc</li>
-<li>0xbf46d</li>
-</ul>
-<h1 id="使用-IDA-Pro-修改对应位置的机器码"><a href="#使用-IDA-Pro-修改对应位置的机器码" class="headerlink" title="使用 IDA Pro 修改对应位置的机器码"></a>使用 IDA Pro 修改对应位置的机器码</h1><p>使用 IDA Pro 查找对应位置的机器码，应该是创建窗口或弹窗的内容。</p>
-<p>使用十六进制编辑器，编辑可执行文件，将此处的机器码全部修改为 0x90 （空转）</p>
 
                 
               </div>
@@ -330,7 +318,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/Windows/" class="category-chain-item">Windows</a>
+  <a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-chain-item">运维</a>
   
   
 
@@ -345,7 +333,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Windows/" class="print-no-link">#Windows</a>
+        <a href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" class="print-no-link">#项目实践</a>
+      
+        <a href="/tags/%E8%BF%90%E7%BB%B4/" class="print-no-link">#运维</a>
       
     </div>
   
@@ -357,8 +347,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>关闭Windows程序弹窗</div>
-      <div>https://vitsumoc.github.io/关闭Windows程序弹窗.html</div>
+      <div>mysql bin_log 塞满了磁盘</div>
+      <div>https://vitsumoc.github.io/mysql bin_log 塞满了磁盘.html</div>
     </div>
     <div class="license-meta">
       
@@ -370,7 +360,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年6月18日</div>
+          <div>2024年6月26日</div>
         </div>
       
       
@@ -402,18 +392,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/mysql%20bin_log%20%E5%A1%9E%E6%BB%A1%E4%BA%86%E7%A3%81%E7%9B%98.html" title="mysql bin_log 塞满了磁盘">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">mysql bin_log 塞满了磁盘</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/%E4%B8%83%E5%A4%A9%E6%89%AB%E9%9B%B7day6789.html" title="七天制作扫雷-day67+（运行、特性、canvas、svg）">
-                        <span class="hidden-mobile">七天制作扫雷-day67+（运行、特性、canvas、svg）</span>
+                      <a href="/%E5%85%B3%E9%97%ADWindows%E7%A8%8B%E5%BA%8F%E5%BC%B9%E7%AA%97.html" title="关闭Windows程序弹窗">
+                        <span class="hidden-mobile">关闭Windows程序弹窗</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

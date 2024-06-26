@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>mysql bin_log 塞满了磁盘</title>
+    <link href="/mysql%20bin_log%20%E5%A1%9E%E6%BB%A1%E4%BA%86%E7%A3%81%E7%9B%98.html"/>
+    <url>/mysql%20bin_log%20%E5%A1%9E%E6%BB%A1%E4%BA%86%E7%A3%81%E7%9B%98.html</url>
+    
+    <content type="html"><![CDATA[<p>项目制的开发就是这样，你能从中获得一些宝贵的一手经验，但代价是每一次经验背后都有一个“事故”。</p><span id="more"></span><h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>客户告诉我，服务器磁盘增长速度异常，项目上线二十天，mysql 文件夹的磁盘占用就超过 700G。</p><p><em>非常非常感谢这位能够提前帮我们发现问题的客户，责任心和专业性都很强。</em></p><p>经检查，是 mysql&#x2F;data 文件夹中出现了大量的 binlog.xxxxxx 文件，每个文件大小大约 1GB，每天产生若干个文件。</p><p>查阅资料后，发现该文件是 mysql 的二进制日志，可以用来进行数据恢复、数据备份等操作。（在我这个项目中用不到，另有备份机制）。</p><h1 id="处理"><a href="#处理" class="headerlink" title="处理"></a>处理</h1><p>解决方案是这样的：</p><ol><li>在 mysql 命令行中查找 log_bin 相关的配置 <code>show variables like &#39;%log_bin%&#39;;</code></li></ol><p>发现输出包括 <code>log_bin ON</code>，表示二进制日志功能已经被打开。</p><ol start="2"><li>通过 <code>PURGE BINARY LOGS BEFORE &#39;2024-06-26 10:00:00&#39;;</code> 删除原有的日志文件</li></ol><p><strong>必须在日志功能开启的情况下执行上述命令删除文件，否则命令无效</strong></p><ol start="3"><li>在 mysql 启动脚本中添加参数 <code>--disable-log-bin</code>，重启 mysql 服务，再次检查 log_bin 配置</li></ol><p>发现输出包括 <code>log_bin OFF</code>，表示二进制日志功能已经被关闭，后续不再产生日志。</p><h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><ul><li><a href="https://dev.mysql.com/doc/refman/8.4/en/replication-options-binary-log.html">Binary Logging Options and Variables</a></li><li><a href="https://www.cnblogs.com/luckly-hf/p/14324957.html">MySQL的binlog日志详解</a></li></ul>]]></content>
+    
+    
+    <categories>
+      
+      <category>运维</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>项目实践</tag>
+      
+      <tag>运维</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>关闭Windows程序弹窗</title>
     <link href="/%E5%85%B3%E9%97%ADWindows%E7%A8%8B%E5%BA%8F%E5%BC%B9%E7%AA%97.html"/>
     <url>/%E5%85%B3%E9%97%ADWindows%E7%A8%8B%E5%BA%8F%E5%BC%B9%E7%AA%97.html</url>
