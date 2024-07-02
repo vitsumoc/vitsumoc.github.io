@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>使用garble混淆Go程序</title>
+    <link href="/%E4%BD%BF%E7%94%A8garble%E6%B7%B7%E6%B7%86Go%E7%A8%8B%E5%BA%8F.html"/>
+    <url>/%E4%BD%BF%E7%94%A8garble%E6%B7%B7%E6%B7%86Go%E7%A8%8B%E5%BA%8F.html</url>
+    
+    <content type="html"><![CDATA[<p>最近在做的一个产品，走的是私有化部署的路线，需要给很多客户部署服务，然后卖 License 的模式。</p><p>很自然的，就遇到了如何防止客户破解的问题，毕竟一个 License 也不便宜，客户破解的动机和经费还是很充足的。</p><span id="more"></span><p>最后决定使用这个库：</p><blockquote><p><a href="https://github.com/burrowers/garble">https://github.com/burrowers/garble</a></p></blockquote><p>可以对 Go 项目编译出的可执行程序进行混淆，删除额外信息，混淆代码中的明文字符串等等。</p><p>当然，我也知道没有什么方案能够完全防止软件破解，只是这种方法可以增大破解难度，只要黑客的报价比我的 License 更贵就可以了。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>豆知识</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>豆知识</tag>
+      
+      <tag>Go</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>mysql bin_log 塞满了磁盘</title>
     <link href="/mysql%20bin_log%20%E5%A1%9E%E6%BB%A1%E4%BA%86%E7%A3%81%E7%9B%98.html"/>
     <url>/mysql%20bin_log%20%E5%A1%9E%E6%BB%A1%E4%BA%86%E7%A3%81%E7%9B%98.html</url>

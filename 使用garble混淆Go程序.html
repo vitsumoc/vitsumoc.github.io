@@ -16,23 +16,23 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="项目制的开发就是这样，你能从中获得一些宝贵的一手经验，但代价是每一次经验背后都有一个“事故”。">
+    <meta name="description" content="最近在做的一个产品，走的是私有化部署的路线，需要给很多客户部署服务，然后卖 License 的模式。 很自然的，就遇到了如何防止客户破解的问题，毕竟一个 License 也不便宜，客户破解的动机和经费还是很充足的。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="mysql bin_log 塞满了磁盘">
-<meta property="og:url" content="https://vitsumoc.github.io/mysql%20bin_log%20%E5%A1%9E%E6%BB%A1%E4%BA%86%E7%A3%81%E7%9B%98.html">
+<meta property="og:title" content="使用garble混淆Go程序">
+<meta property="og:url" content="https://vitsumoc.github.io/%E4%BD%BF%E7%94%A8garble%E6%B7%B7%E6%B7%86Go%E7%A8%8B%E5%BA%8F.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="项目制的开发就是这样，你能从中获得一些宝贵的一手经验，但代价是每一次经验背后都有一个“事故”。">
+<meta property="og:description" content="最近在做的一个产品，走的是私有化部署的路线，需要给很多客户部署服务，然后卖 License 的模式。 很自然的，就遇到了如何防止客户破解的问题，毕竟一个 License 也不便宜，客户破解的动机和经费还是很充足的。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-06-26T02:39:35.000Z">
-<meta property="article:modified_time" content="2024-06-26T03:44:35.352Z">
+<meta property="article:published_time" content="2024-07-02T08:59:54.000Z">
+<meta property="article:modified_time" content="2024-07-02T09:06:13.918Z">
 <meta property="article:author" content="vc">
-<meta property="article:tag" content="项目实践">
-<meta property="article:tag" content="运维">
+<meta property="article:tag" content="豆知识">
+<meta property="article:tag" content="Go">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>mysql bin_log 塞满了磁盘 - Thinking...</title>
+  <title>使用garble混淆Go程序 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -200,7 +200,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">mysql bin_log 塞满了磁盘</span>
+            <span id="subtitle">使用garble混淆Go程序</span>
           
         </div>
 
@@ -211,8 +211,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-06-26 10:39" pubdate>
-          2024年6月26日 上午
+        <time datetime="2024-07-02 16:59" pubdate>
+          2024年7月2日 下午
         </time>
       </span>
     
@@ -223,7 +223,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          332 字
+          178 字
         
       </span>
     
@@ -234,7 +234,7 @@
         
         
         
-          3 分钟
+          2 分钟
         
       </span>
     
@@ -271,35 +271,21 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">mysql bin_log 塞满了磁盘</h1>
+            <h1 id="seo-header">使用garble混淆Go程序</h1>
             
             
               <div class="markdown-body">
                 
-                <p>项目制的开发就是这样，你能从中获得一些宝贵的一手经验，但代价是每一次经验背后都有一个“事故”。</p>
+                <p>最近在做的一个产品，走的是私有化部署的路线，需要给很多客户部署服务，然后卖 License 的模式。</p>
+<p>很自然的，就遇到了如何防止客户破解的问题，毕竟一个 License 也不便宜，客户破解的动机和经费还是很充足的。</p>
 <span id="more"></span>
 
-<h1 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h1><p>客户告诉我，服务器磁盘增长速度异常，项目上线二十天，mysql 文件夹的磁盘占用就超过 700G。</p>
-<p><em>非常非常感谢这位能够提前帮我们发现问题的客户，责任心和专业性都很强。</em></p>
-<p>经检查，是 mysql&#x2F;data 文件夹中出现了大量的 binlog.xxxxxx 文件，每个文件大小大约 1GB，每天产生若干个文件。</p>
-<p>查阅资料后，发现该文件是 mysql 的二进制日志，可以用来进行数据恢复、数据备份等操作。（在我这个项目中用不到，另有备份机制）。</p>
-<h1 id="处理"><a href="#处理" class="headerlink" title="处理"></a>处理</h1><p>解决方案是这样的：</p>
-<ol>
-<li>在 mysql 命令行中查找 log_bin 相关的配置 <code>show variables like &#39;%log_bin%&#39;;</code></li>
-</ol>
-<p>发现输出包括 <code>log_bin ON</code>，表示二进制日志功能已经被打开。</p>
-<ol start="2">
-<li>通过 <code>PURGE BINARY LOGS BEFORE &#39;2024-06-26 10:00:00&#39;;</code> 删除原有的日志文件</li>
-</ol>
-<p><strong>必须在日志功能开启的情况下执行上述命令删除文件，否则命令无效</strong></p>
-<ol start="3">
-<li>在 mysql 启动脚本中添加参数 <code>--disable-log-bin</code>，重启 mysql 服务，再次检查 log_bin 配置</li>
-</ol>
-<p>发现输出包括 <code>log_bin OFF</code>，表示二进制日志功能已经被关闭，后续不再产生日志。</p>
-<h1 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a>参考文档</h1><ul>
-<li><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.4/en/replication-options-binary-log.html">Binary Logging Options and Variables</a></li>
-<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/luckly-hf/p/14324957.html">MySQL的binlog日志详解</a></li>
-</ul>
+<p>最后决定使用这个库：</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/burrowers/garble">https://github.com/burrowers/garble</a></p>
+</blockquote>
+<p>可以对 Go 项目编译出的可执行程序进行混淆，删除额外信息，混淆代码中的明文字符串等等。</p>
+<p>当然，我也知道没有什么方案能够完全防止软件破解，只是这种方法可以增大破解难度，只要黑客的报价比我的 License 更贵就可以了。</p>
 
                 
               </div>
@@ -318,7 +304,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-chain-item">运维</a>
+  <a href="/categories/%E8%B1%86%E7%9F%A5%E8%AF%86/" class="category-chain-item">豆知识</a>
   
   
 
@@ -333,9 +319,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" class="print-no-link">#项目实践</a>
+        <a href="/tags/%E8%B1%86%E7%9F%A5%E8%AF%86/" class="print-no-link">#豆知识</a>
       
-        <a href="/tags/%E8%BF%90%E7%BB%B4/" class="print-no-link">#运维</a>
+        <a href="/tags/Go/" class="print-no-link">#Go</a>
       
     </div>
   
@@ -347,8 +333,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>mysql bin_log 塞满了磁盘</div>
-      <div>https://vitsumoc.github.io/mysql bin_log 塞满了磁盘.html</div>
+      <div>使用garble混淆Go程序</div>
+      <div>https://vitsumoc.github.io/使用garble混淆Go程序.html</div>
     </div>
     <div class="license-meta">
       
@@ -360,7 +346,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年6月26日</div>
+          <div>2024年7月2日</div>
         </div>
       
       
@@ -392,18 +378,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/%E4%BD%BF%E7%94%A8garble%E6%B7%B7%E6%B7%86Go%E7%A8%8B%E5%BA%8F.html" title="使用garble混淆Go程序">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">使用garble混淆Go程序</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/%E5%85%B3%E9%97%ADWindows%E7%A8%8B%E5%BA%8F%E5%BC%B9%E7%AA%97.html" title="关闭Windows程序弹窗">
-                        <span class="hidden-mobile">关闭Windows程序弹窗</span>
+                      <a href="/mysql%20bin_log%20%E5%A1%9E%E6%BB%A1%E4%BA%86%E7%A3%81%E7%9B%98.html" title="mysql bin_log 塞满了磁盘">
+                        <span class="hidden-mobile">mysql bin_log 塞满了磁盘</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
