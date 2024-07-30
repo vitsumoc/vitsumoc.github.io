@@ -1,0 +1,680 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="vc">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="GP2040-CE 是一个基于树莓派（或其他） RP 2040 微处理器的开源游戏控制器固件项目，支持多种输入模式，适配多个平台。本文译自 GP2040-CE 项目官网，FAQ  页面。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[译]GP2040-CE FAQ">
+<meta property="og:url" content="https://vitsumoc.github.io/[%E8%AF%91]GP2040-CE%20FAQ.html">
+<meta property="og:site_name" content="Thinking...">
+<meta property="og:description" content="GP2040-CE 是一个基于树莓派（或其他） RP 2040 微处理器的开源游戏控制器固件项目，支持多种输入模式，适配多个平台。本文译自 GP2040-CE 项目官网，FAQ  页面。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-07-30T06:27:46.000Z">
+<meta property="article:modified_time" content="2024-07-30T07:57:46.905Z">
+<meta property="article:author" content="vc">
+<meta property="article:tag" content="手抄报">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>[译]GP2040-CE FAQ - Thinking...</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"vitsumoc.github.io","root":"/","version":"1.9.6","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Thinking...</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">[译]GP2040-CE FAQ</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-07-30 14:27" pubdate>
+          2024年7月30日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          913 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          8 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">[译]GP2040-CE FAQ</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <blockquote>
+<p><a target="_blank" rel="noopener" href="https://gp2040-ce.info/">GP2040-CE</a> 是一个基于树莓派（或其他） <a target="_blank" rel="noopener" href="https://www.raspberrypi.com/documentation/microcontrollers/rp2040.html">RP 2040</a> 微处理器的开源游戏控制器固件项目，支持多种输入模式，适配多个平台。<br>本文译自 GP2040-CE 项目官网，<a target="_blank" rel="noopener" href="https://gp2040-ce.info/faq/faq-general">FAQ</a>  页面。</p>
+</blockquote>
+<span id="more"></span>
+
+<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><h2 id="我应该使用哪种输入模式？"><a href="#我应该使用哪种输入模式？" class="headerlink" title="我应该使用哪种输入模式？"></a>我应该使用哪种输入模式？</h2><p>这取决于您使用的平台：</p>
+<ul>
+<li>使用 <code>XInput Mode</code> 作为 PC 游戏和第三方主机适配的首选模式</li>
+<li>在 PS4 或 PS5 中运行 PS4 游戏时，使用 <code>PS4 Mode</code></li>
+<li>在 PS3 或 PS4 中使用传统模式时，使用 <code>PS3 Mode</code></li>
+<li>在任天堂 Switch 上使用  <code>Switch Mode</code></li>
+<li>在 MAME cabinets 或是 PC 音游等场景使用 <code>Keyboard Mode</code></li>
+</ul>
+<p>如果您配置了 USB 主机端口、启用了直通功能以及适当的验证设备，则可以在以下情况下使用 GP2040-CE 控制器。</p>
+<ul>
+<li>在支持 categorized 控制器（例如街机摇杆、赛车方向盘、飞行模拟操纵杆等）的 PS5 系统上的 PS5 游戏上使用 <code><a target="_blank" rel="noopener" href="https://gp2040-ce.info/web-configurator/menu-pages/settings#additional-ps4-settings">PS4 Input Mode</a></code></li>
+<li>在 Xbox One、Xbox Series X 和 Xbox Series S 上使用 <code><a target="_blank" rel="noopener" href="https://gp2040-ce.info/web-configurator/menu-pages/settings#additional-xbox-one-settings">Xbox One Input Mode</a></code></li>
+</ul>
+<p>如果您使用的是经典或迷你主机，则还有其他 USB 输入模式可与这些模拟主机一起使用。</p>
+<ul>
+<li>Sega Genesis&#x2F;MegaDrive Mini</li>
+<li>NEOGEO Mini</li>
+<li>PC Engine&#x2F;Turbografx 16 Mini</li>
+<li>EGRET II Mini</li>
+<li>ASTROCITY Mini</li>
+<li>Playstation Classic</li>
+</ul>
+<h2 id="GP2040-CE-是否原生支持-PS5，PS4-或-Xbox-Series-主机？"><a href="#GP2040-CE-是否原生支持-PS5，PS4-或-Xbox-Series-主机？" class="headerlink" title="GP2040-CE 是否原生支持 PS5，PS4 或 Xbox Series 主机？"></a>GP2040-CE 是否原生支持 PS5，PS4 或 Xbox Series 主机？</h2><p>这些主机实现了一些安全措施用来阻止未经授权的控制器接入，破解或绕过这些措施的过程可能涉及到一些法律问题。如果找到用户友好且完全合法的实现方法，例如 <code><a target="_blank" rel="noopener" href="https://gp2040-ce.info/web-configurator/menu-pages/settings#additional-ps4-settings">PS4 Input Mode</a></code> 的实现，将来会支持这些主机。</p>
+<p>目前通过直通身份验证支持 PS5、Xbox One 和 Xbox Series 主机</p>
+<ul>
+<li>PS5 目前仅支持使用直通身份验证；请参阅 <code><a target="_blank" rel="noopener" href="https://gp2040-ce.info/web-configurator/menu-pages/settings#additional-ps5-settings">PS5 Input Mode</a></code>。</li>
+<li>Xbox One 和 Xbox Series 主机仅支持使用直通身份验证；请参阅 <code><a target="_blank" rel="noopener" href="https://gp2040-ce.info/web-configurator/menu-pages/settings#additional-xbox-one-settings">Xbox One Input Mode</a></code>。</li>
+</ul>
+<h2 id="我能在一个设备上使用多个-GP2040-CE-控制器吗？"><a href="#我能在一个设备上使用多个-GP2040-CE-控制器吗？" class="headerlink" title="我能在一个设备上使用多个 GP2040-CE 控制器吗？"></a>我能在一个设备上使用多个 GP2040-CE 控制器吗？</h2><p>是的！每个 GP2040-CE 板都被视为一个单独的控制器。但您需要注意，确保同一时间只运行了一个 Web 配置页面。</p>
+<p>如果您需要在街机中安装基于 GP2040-CE 的控制板，请查看 <a target="_blank" rel="noopener" href="https://gp2040-ce.info/add-ons/player-number">Player Number add-on</a> 用来强制指定每个玩家的编号。</p>
+<h2 id="GP2040-CE-的输入延迟真的低于-1ms？"><a href="#GP2040-CE-的输入延迟真的低于-1ms？" class="headerlink" title="GP2040-CE 的输入延迟真的低于 1ms？"></a>GP2040-CE 的输入延迟真的低于 1ms？</h2><p>是的！如果您的平台支持 1000 Hz USB 轮询，输入延迟将小于 1 毫秒。GP2040-CE 在所有模式下默认配置为 1000 Hz&#x2F;1 ms 轮询，但某些系统会覆盖或忽略控制器请求的轮询速率。1000 Hz 轮询率已确认适用于 PC 和 MiSTer。即使您的平台不支持高速 USB 轮询，GP2040-CE 仍会以目标系统允许的最大速度读取和处理您的输入。</p>
+<h2 id="RGB-LED、玩家-LED-和-OLED-显示屏等附加功能是否会影响性能？"><a href="#RGB-LED、玩家-LED-和-OLED-显示屏等附加功能是否会影响性能？" class="headerlink" title="RGB LED、玩家 LED 和 OLED 显示屏等附加功能是否会影响性能？"></a>RGB LED、玩家 LED 和 OLED 显示屏等附加功能是否会影响性能？</h2><p>完全不会！Pico 的 RP2040 处理器有两个内核，GP2040-CE 将其中一个核心专门用于读取、处理和发送玩家输入，所有辅助功能（例如 LED 和显示器）都在辅助核心上运行。无论集成了多少功能，GP2040-CE 都不会引入额外的输入延迟。</p>
+<h2 id="为什么按键会使用-B3，A1，S2-这种奇怪的标签？"><a href="#为什么按键会使用-B3，A1，S2-这种奇怪的标签？" class="headerlink" title="为什么按键会使用 B3，A1，S2 这种奇怪的标签？"></a>为什么按键会使用 B3，A1，S2 这种奇怪的标签？</h2><p>GP2040-CE 使用通用系统来处理按钮输入，类似于带有一些额外按钮的传统 Play Station 控制器布局。</p>
+<ul>
+<li>4 方向键 (B1-B4)</li>
+<li>4 肩键 (L1，L2，R1，R2)</li>
+<li>选择和启动（S1，S2）摇杆按下（L3，R3）</li>
+<li>两个辅助键（A1，A2）用于引导、PS键、触摸屏、Home 键或者截图键等</li>
+</ul>
+<p>GP2040-CE 文档和 Web 配置器都提供了一个下拉菜单，用于将按钮标签更改为更熟悉的控制器布局。您可以参考 <a target="_blank" rel="noopener" href="https://gp2040-ce.info/usage#buttons">GP2040-CE 说明书</a> 上的按键映射表。</p>
+<h1 id="技术问题"><a href="#技术问题" class="headerlink" title="技术问题"></a>技术问题</h1><h2 id="内建的-Web-配置页面是什么魔术？"><a href="#内建的-Web-配置页面是什么魔术？" class="headerlink" title="内建的 Web 配置页面是什么魔术？"></a>内建的 Web 配置页面是什么魔术？</h2><p>这里没有什么魔法，只是一些很酷的库一起工作：</p>
+<ul>
+<li>使用 React 和 Bootstrap 的单页应用程序嵌入在 GP2040-CE 固件中</li>
+<li>TinyUSB 库通过 RNDIS 提供虚拟网络连接</li>
+<li>lwIP 库提供了一个 HTTP 服务器，为嵌入式 React 应用程序和 Web 配置 API 提供服务</li>
+<li>ArduinoJson 库用于Web API请求的序列化和反序列化</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%89%8B%E6%8A%84%E6%8A%A5/" class="category-chain-item">手抄报</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%89%8B%E6%8A%84%E6%8A%A5/" class="print-no-link">#手抄报</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>[译]GP2040-CE FAQ</div>
+      <div>https://vitsumoc.github.io/[译]GP2040-CE FAQ.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>vc</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年7月30日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/%5B%E8%AF%91%5D%E5%86%99%E7%BB%99%E5%B7%A5%E7%A8%8B%E5%B8%88%EF%BC%9A%E5%85%B3%E4%BA%8E%E8%AF%81%E4%B9%A6%EF%BC%88certificate%EF%BC%89%E5%92%8C%E5%85%AC%E9%92%A5%E5%9F%BA%E7%A1%80%E8%AE%BE%E6%96%BD%EF%BC%88PKI%EF%BC%89%E7%9A%84%E4%B8%80%E5%88%87%20%EF%BC%88SmallStep,%202018%EF%BC%89.html" title="[转][译]写给工程师：关于证书（certificate）和公钥基础设施（PKI）的一切 （SmallStep, 2018）.md">
+                        <span class="hidden-mobile">[转][译]写给工程师：关于证书（certificate）和公钥基础设施（PKI）的一切 （SmallStep, 2018）.md</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>vitusmoc Blog, Powered by </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script  src="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
