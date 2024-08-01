@@ -16,24 +16,28 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="使用gopher-lua，在 Go 中使用lua。gopher-lua 项目地址： https:&#x2F;&#x2F;github.com&#x2F;yuin&#x2F;gopher-lua">
+    <meta name="description" content="起因这个项目是一个纯粹的小玩具，起因是我公司的工作周报都是 .doc 格式存储的，现在到年底了，我又比较想知道我一年都干了哪些工作。显而易见的一个方式就是提取所有周报文字内容做词频分析。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="在Go中使用lua">
-<meta property="og:url" content="https://vitsumoc.github.io/Go.html">
+<meta property="og:title" content="工作周报可视化">
+<meta property="og:url" content="https://vitsumoc.github.io/%E5%B7%A5%E4%BD%9C%E5%91%A8%E6%8A%A5%E5%8F%AF%E8%A7%86%E5%8C%96.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="使用gopher-lua，在 Go 中使用lua。gopher-lua 项目地址： https:&#x2F;&#x2F;github.com&#x2F;yuin&#x2F;gopher-lua">
+<meta property="og:description" content="起因这个项目是一个纯粹的小玩具，起因是我公司的工作周报都是 .doc 格式存储的，现在到年底了，我又比较想知道我一年都干了哪些工作。显而易见的一个方式就是提取所有周报文字内容做词频分析。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-12-05T03:25:15.000Z">
-<meta property="article:modified_time" content="2024-03-25T07:25:25.852Z">
+<meta property="og:image" content="https://vitsumoc.github.io/wordcloud.png">
+<meta property="og:image" content="https://vitsumoc.github.io/river.png">
+<meta property="og:image" content="https://vitsumoc.github.io/disable.png">
+<meta property="article:published_time" content="2023-12-05T03:31:51.000Z">
+<meta property="article:modified_time" content="2024-08-01T11:06:01.038Z">
 <meta property="article:author" content="vc">
-<meta property="article:tag" content="库">
 <meta property="article:tag" content="小玩具">
-<meta property="article:tag" content="Go">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="js">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://vitsumoc.github.io/wordcloud.png">
   
   
   
-  <title>在Go中使用lua - Thinking...</title>
+  <title>工作周报可视化 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -201,7 +205,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">在Go中使用lua</span>
+            <span id="subtitle">工作周报可视化</span>
           
         </div>
 
@@ -212,8 +216,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-12-05 11:25" pubdate>
-          2023年12月5日 上午
+        <time datetime="2023-12-05 11:31" pubdate>
+          2023年12月5日 中午
         </time>
       </span>
     
@@ -224,7 +228,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          159 字
+          172 字
         
       </span>
     
@@ -272,35 +276,25 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">在Go中使用lua</h1>
+            <h1 id="seo-header">工作周报可视化</h1>
             
             
               <div class="markdown-body">
                 
-                <p>使用<code>gopher-lua</code>，在 Go 中使用lua。<code>gopher-lua</code> 项目地址：</p>
-<p><a target="_blank" rel="noopener" href="https://github.com/yuin/gopher-lua">https://github.com/yuin/gopher-lua</a></p>
+                <h1 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h1><p>这个项目是一个纯粹的小玩具，起因是我公司的工作周报都是 <code>.doc</code> 格式存储的，现在到年底了，我又比较想知道我一年都干了哪些工作。显而易见的一个方式就是提取所有周报文字内容做词频分析。</p>
 <span id="more"></span>
 
-<p>使用示例仓库地址：</p>
-<p><a target="_blank" rel="noopener" href="https://github.com/vitsumoc/my-golua">https://github.com/vitsumoc/my-golua</a></p>
-<p>示例列表：</p>
-<ul>
-<li>最基础的用法</li>
-<li>基础数据类型</li>
-<li>在lua中调用go方法</li>
-<li>在go中使用lua协程</li>
-<li>示范如何手动开启模块</li>
-<li>在lua中使用go模块</li>
-<li>在 Go 中调用lua方法</li>
-<li>在lua中使用 Go 数据</li>
-<li>通过context控制停止</li>
-<li>在有协程的情况下使用context控制</li>
-<li>共享lua文件字节码, 减少开销</li>
-<li>通过go协程跑lua的示例 可以把ch带到lua中 和相关限制</li>
-<li>在lua中使用ch的例子</li>
-<li>lua虚拟机池</li>
-<li>在 Go 中提供钩子, 使lua可以注册脚本, 在脚本中获得并修改用户数据</li>
-</ul>
+<h1 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h1><p>完成之后的效果还算不错，源码也放在了github上：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/vitsumoc/weekreport2chart">https://github.com/vitsumoc/weekreport2chart</a></p>
+<p>提取一段时间的工作周报内容，生成词云和河流图</p>
+<p><img src="/wordcloud.png" srcset="/img/loading.gif" lazyload></p>
+<p><img src="/river.png" srcset="/img/loading.gif" lazyload></p>
+<p>可以直接过滤低频词汇，或手动操作删除某些虚词、连词等</p>
+<p><img src="/disable.png" srcset="/img/loading.gif" lazyload></p>
+<h1 id="相关库"><a href="#相关库" class="headerlink" title="相关库"></a>相关库</h1><p>使用libreoffice将doc转为docx</p>
+<p>使用结巴分词分词：<a target="_blank" rel="noopener" href="https://github.com/fxsjy/jieba">https://github.com/fxsjy/jieba</a></p>
+<p>使用wordcloudjs词云：<a target="_blank" rel="noopener" href="https://wordcloud2-js.timdream.org/#love">https://wordcloud2-js.timdream.org/#love</a></p>
+<p>使用echarts河流图</p>
 
                 
               </div>
@@ -334,11 +328,11 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E5%BA%93/" class="print-no-link">#库</a>
-      
         <a href="/tags/%E5%B0%8F%E7%8E%A9%E5%85%B7/" class="print-no-link">#小玩具</a>
       
-        <a href="/tags/Go/" class="print-no-link">#Go</a>
+        <a href="/tags/python/" class="print-no-link">#python</a>
+      
+        <a href="/tags/js/" class="print-no-link">#js</a>
       
     </div>
   
@@ -350,8 +344,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>在Go中使用lua</div>
-      <div>https://vitsumoc.github.io/Go.html</div>
+      <div>工作周报可视化</div>
+      <div>https://vitsumoc.github.io/工作周报可视化.html</div>
     </div>
     <div class="license-meta">
       
@@ -395,9 +389,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/%E5%B7%A5%E4%BD%9C%E5%91%A8%E6%8A%A5%E5%8F%AF%E8%A7%86%E5%8C%96.html" title="工作周报可视化">
+                      <a href="/n2nBeginner.html" title="使用n2n连接不同局域网设备">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">工作周报可视化</span>
+                        <span class="hidden-mobile">使用n2n连接不同局域网设备</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -405,8 +399,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/SSHInSubSocks.html" title="使用SSH包装Socks5代理">
-                        <span class="hidden-mobile">使用SSH包装Socks5代理</span>
+                      <a href="/Go.html" title="在Go中使用lua">
+                        <span class="hidden-mobile">在Go中使用lua</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

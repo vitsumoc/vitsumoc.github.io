@@ -16,28 +16,24 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="起因这个项目是一个纯粹的小玩具，起因是我公司的工作周报都是 .doc 格式存储的，现在到年底了，我又比较想知道我一年都干了哪些工作。显而易见的一个方式就是提取所有周报文字内容做词频分析。">
+    <meta name="description" content="起因公司要参加某个物联网展，展方为了宣传做了一个带拉票功能的宣传页，就是那种很常见的点开链接可以为自己支持的公司投票的那种。公司的前台姐姐把投票链接发到了群里，我很顺手的就投了一票，然后又顺手看了一眼网络请求：">
 <meta property="og:type" content="article">
-<meta property="og:title" content="工作周报可视化">
-<meta property="og:url" content="https://vitsumoc.github.io/weekreport2chart.html">
+<meta property="og:title" content="一个自动投票的小工具">
+<meta property="og:url" content="https://vitsumoc.github.io/undefined.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="起因这个项目是一个纯粹的小玩具，起因是我公司的工作周报都是 .doc 格式存储的，现在到年底了，我又比较想知道我一年都干了哪些工作。显而易见的一个方式就是提取所有周报文字内容做词频分析。">
+<meta property="og:description" content="起因公司要参加某个物联网展，展方为了宣传做了一个带拉票功能的宣传页，就是那种很常见的点开链接可以为自己支持的公司投票的那种。公司的前台姐姐把投票链接发到了群里，我很顺手的就投了一票，然后又顺手看了一眼网络请求：">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://vitsumoc.github.io/weekreport2chart/wordcloud.png">
-<meta property="og:image" content="https://vitsumoc.github.io/weekreport2chart/river.png">
-<meta property="og:image" content="https://vitsumoc.github.io/weekreport2chart/disable.png">
-<meta property="article:published_time" content="2023-12-05T03:31:51.000Z">
-<meta property="article:modified_time" content="2024-03-02T00:55:07.979Z">
+<meta property="article:published_time" content="2024-08-01T11:05:15.000Z">
+<meta property="article:modified_time" content="2024-08-01T11:27:49.260Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="小玩具">
 <meta property="article:tag" content="python">
-<meta property="article:tag" content="js">
+<meta property="article:tag" content="爬虫">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://vitsumoc.github.io/weekreport2chart/wordcloud.png">
   
   
   
-  <title>工作周报可视化 - Thinking...</title>
+  <title>一个自动投票的小工具 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -205,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">工作周报可视化</span>
+            <span id="subtitle">一个自动投票的小工具</span>
           
         </div>
 
@@ -216,8 +212,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-12-05 11:31" pubdate>
-          2023年12月5日 中午
+        <time datetime="2024-08-01 19:05" pubdate>
+          2024年8月1日 晚上
         </time>
       </span>
     
@@ -228,7 +224,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          172 字
+          559 字
         
       </span>
     
@@ -239,7 +235,7 @@
         
         
         
-          2 分钟
+          5 分钟
         
       </span>
     
@@ -276,25 +272,95 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">工作周报可视化</h1>
+            <h1 id="seo-header">一个自动投票的小工具</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h1><p>这个项目是一个纯粹的小玩具，起因是我公司的工作周报都是 <code>.doc</code> 格式存储的，现在到年底了，我又比较想知道我一年都干了哪些工作。显而易见的一个方式就是提取所有周报文字内容做词频分析。</p>
+                <h1 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h1><p>公司要参加某个物联网展，展方为了宣传做了一个带拉票功能的宣传页，就是那种很常见的点开链接可以为自己支持的公司投票的那种。公司的前台姐姐把投票链接发到了群里，我很顺手的就投了一票，然后又顺手看了一眼网络请求：</p>
 <span id="more"></span>
 
-<h1 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h1><p>完成之后的效果还算不错，源码也放在了github上：</p>
-<p><a target="_blank" rel="noopener" href="https://github.com/vitsumoc/weekreport2chart">https://github.com/vitsumoc/weekreport2chart</a></p>
-<p>提取一段时间的工作周报内容，生成词云和河流图</p>
-<p><img src="/weekreport2chart/wordcloud.png" srcset="/img/loading.gif" lazyload></p>
-<p><img src="/weekreport2chart/river.png" srcset="/img/loading.gif" lazyload></p>
-<p>可以直接过滤低频词汇，或手动操作删除某些虚词、连词等</p>
-<p><img src="/weekreport2chart/disable.png" srcset="/img/loading.gif" lazyload></p>
-<h1 id="相关库"><a href="#相关库" class="headerlink" title="相关库"></a>相关库</h1><p>使用libreoffice将doc转为docx</p>
-<p>使用结巴分词分词：<a target="_blank" rel="noopener" href="https://github.com/fxsjy/jieba">https://github.com/fxsjy/jieba</a></p>
-<p>使用wordcloudjs词云：<a target="_blank" rel="noopener" href="https://wordcloud2-js.timdream.org/#love">https://wordcloud2-js.timdream.org/#love</a></p>
-<p>使用echarts河流图</p>
+<p>投票动作是一个 POST 请求，请求体格式是 FormData，内容很简单</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><code class="language-text">token: C791752B7C5342703C6B0635212FBAC309AAF52717C5557BAE2FB8D4FC3BE5E8BBBDD5D6F8CFBD15
+id: 980943910375260160<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+
+<p>我就在群里说了一句：“好像可以刷票哦”，前台姐姐立刻给我安排了一波情绪价值：“哇，你好厉害哦”之类的。得了，这个活就算接下来了。</p>
+<h1 id="思考过程"><a href="#思考过程" class="headerlink" title="思考过程"></a>思考过程</h1><ol>
+<li>先拿 PostMan 胡乱测了一下，同样的请求内容不能再发，服务端会报错：<br><code>您已经投票</code><br>看来是对同一 <code>token</code> 投同一 <code>id</code> 的频率做了限制了。</li>
+<li>修改 id 可以投票成功，但是就投给别的公司了 &#x3D;。&#x3D;，这显然不符合需求。</li>
+<li>修改 <code>token</code> 以后调接口会报错，看来必须使用服务端生成的 <code>token</code> 才行。</li>
+<li>用手机打开链接，又可以投一次，看来没有账号绑定之类的机制，换了设备就能投。</li>
+<li>手机和电脑都连的公司的 Wifi，看来也没有 <code>IP</code> 地址限制。</li>
+<li>用电脑换了个浏览器也能投，看来没有设备指纹之类的东西，应该就是认浏览器。</li>
+<li>在浏览器里到处找，发现 <code>local_sotrage</code> 存了个这个：<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><code class="language-text">token:Qzc5MTc1MkI3QzUzNDI3MDNDNkIwNjM1MjEyRkJBQzMwOUFBRjUyNzE3QzU1NTdCQUUyRkI4RDRGQzNCRTVFOEJCQkRENUQ2RjhDRkJEMTU=<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+等号结尾，有点眼熟，base64解一下，果然和发请求的 <code>token</code> 对上了。</li>
+<li>把这些乱七八糟的缓存都清了，重新打开页面，发现得到了一个新的 <code>token</code>，又能投一票。</li>
+</ol>
+<p>行了，路线通了，这下不会让前台姐姐失望了。</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>本人不是 python 程序员，也没有什么爬虫经验，所有代码都是 AI 帮忙写的。</p>
+<p>其实只有两个步骤，一个是打开浏览器获得新 <code>token</code>：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><div class="caption"><span>获得token</span></div><code class="language-python"><span class="token keyword">def</span> <span class="token function">getToken</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+  <span class="token keyword">global</span> token
+
+  options <span class="token operator">=</span> Options<span class="token punctuation">(</span><span class="token punctuation">)</span>
+  options<span class="token punctuation">.</span>headless <span class="token operator">=</span> <span class="token boolean">True</span>
+  driver <span class="token operator">=</span> webdriver<span class="token punctuation">.</span>Chrome<span class="token punctuation">(</span>options<span class="token operator">=</span>options<span class="token punctuation">)</span>
+  driver<span class="token punctuation">.</span>get<span class="token punctuation">(</span>openUrl<span class="token punctuation">)</span>
+  <span class="token comment"># 拿 token</span>
+  script <span class="token operator">=</span> <span class="token string">"return localStorage.getItem('token');"</span>
+  tokenB64 <span class="token operator">=</span> driver<span class="token punctuation">.</span>execute_script<span class="token punctuation">(</span>script<span class="token punctuation">)</span>
+
+  driver<span class="token punctuation">.</span>quit<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+  <span class="token comment"># 获取token</span>
+  decoded_bytes <span class="token operator">=</span> base64<span class="token punctuation">.</span>b64decode<span class="token punctuation">(</span>tokenB64<span class="token punctuation">)</span>
+  token <span class="token operator">=</span> decoded_bytes<span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token string">'utf-8'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>然后就是投票：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><div class="caption"><span>投票</span></div><code class="language-python"><span class="token keyword">def</span> <span class="token function">vote</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+  <span class="token keyword">global</span> <span class="token builtin">id</span>
+  <span class="token keyword">global</span> token
+  <span class="token comment"># 刷票</span>
+  <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"准备投一票："</span><span class="token punctuation">,</span> time<span class="token punctuation">.</span>ctime<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token comment"># id 代表公司</span>
+  <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"id："</span><span class="token punctuation">,</span> <span class="token builtin">id</span><span class="token punctuation">)</span>
+  <span class="token comment"># 获得的 token</span>
+  <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"token："</span><span class="token punctuation">,</span> token<span class="token punctuation">)</span>
+  <span class="token comment"># 组装请求</span>
+  data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token builtin">id</span><span class="token punctuation">,</span>
+    <span class="token string">"token"</span><span class="token punctuation">:</span> token
+  <span class="token punctuation">&#125;</span>
+  headers <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment"># ":authority:": "api.iotexpo.com.cn",</span>
+    <span class="token comment"># ":method:": "POST",</span>
+    <span class="token comment"># ":path:": "/Expo/ProVoteByMinApp",</span>
+    <span class="token comment"># ":scheme:": "https",</span>
+    <span class="token string">"Accept"</span><span class="token punctuation">:</span> <span class="token string">"application/json, text/javascript, */*; q=0.01"</span><span class="token punctuation">,</span>
+    <span class="token string">"Accept-Encoding"</span><span class="token punctuation">:</span> <span class="token string">"gzip, deflate, br, zstd"</span><span class="token punctuation">,</span>
+    <span class="token string">"Accept-Language"</span><span class="token punctuation">:</span> <span class="token string">"zh-CN,zh;q=0.9"</span><span class="token punctuation">,</span>
+    <span class="token string">"Content-Length"</span><span class="token punctuation">:</span> <span class="token string">"108"</span><span class="token punctuation">,</span>
+    <span class="token string">"Content-Type"</span><span class="token punctuation">:</span> <span class="token string">"application/x-www-form-urlencoded; charset=UTF-8"</span><span class="token punctuation">,</span>
+    <span class="token string">"Origin"</span><span class="token punctuation">:</span> <span class="token string">"https://www.iotexpo.com.cn"</span><span class="token punctuation">,</span>
+    <span class="token string">"Priority"</span><span class="token punctuation">:</span> <span class="token string">"u=1, i"</span><span class="token punctuation">,</span>
+    <span class="token string">"Referer"</span><span class="token punctuation">:</span> <span class="token string">"https://www.iotexpo.com.cn/"</span><span class="token punctuation">,</span>
+    <span class="token string">"Sec-Ch-Ua"</span><span class="token punctuation">:</span> <span class="token string">"\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\""</span><span class="token punctuation">,</span>
+    <span class="token string">"Sec-Ch-Ua-Mobile"</span><span class="token punctuation">:</span> <span class="token string">"?0"</span><span class="token punctuation">,</span>
+    <span class="token string">"Sec-Ch-Ua-Platform"</span><span class="token punctuation">:</span> <span class="token string">"\"Windows\""</span><span class="token punctuation">,</span>
+    <span class="token string">"Sec-Fetch-Dest"</span><span class="token punctuation">:</span> <span class="token string">"empty"</span><span class="token punctuation">,</span>
+    <span class="token string">"Sec-Fetch-Mode"</span><span class="token punctuation">:</span> <span class="token string">"cors"</span><span class="token punctuation">,</span>
+    <span class="token string">"Sec-Fetch-Site"</span><span class="token punctuation">:</span> <span class="token string">"same-site"</span><span class="token punctuation">,</span>
+    <span class="token string">"User-Agent"</span><span class="token punctuation">:</span> <span class="token string">"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"</span><span class="token punctuation">,</span>
+  <span class="token punctuation">&#125;</span>
+  <span class="token comment"># 发送</span>
+  response <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>voteUrl<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">,</span> headers<span class="token operator">=</span>headers<span class="token punctuation">)</span>
+  <span class="token comment"># 打印结果</span>
+  resp <span class="token operator">=</span> json<span class="token punctuation">.</span>loads<span class="token punctuation">(</span>response<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
+  <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"结果："</span><span class="token punctuation">)</span>
+  <span class="token keyword">print</span><span class="token punctuation">(</span>resp<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>然后定时投票就行了。</p>
+<p>很小的案例，关键是又成功刷了一波好感度 &#x3D;。&#x3D;</p>
 
                 
               </div>
@@ -332,7 +398,7 @@
       
         <a href="/tags/python/" class="print-no-link">#python</a>
       
-        <a href="/tags/js/" class="print-no-link">#js</a>
+        <a href="/tags/%E7%88%AC%E8%99%AB/" class="print-no-link">#爬虫</a>
       
     </div>
   
@@ -344,8 +410,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>工作周报可视化</div>
-      <div>https://vitsumoc.github.io/weekreport2chart.html</div>
+      <div>一个自动投票的小工具</div>
+      <div>https://vitsumoc.github.io/undefined.html</div>
     </div>
     <div class="license-meta">
       
@@ -357,7 +423,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年12月5日</div>
+          <div>2024年8月1日</div>
         </div>
       
       
@@ -389,18 +455,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/n2nBeginner.html" title="使用n2n连接不同局域网设备">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">使用n2n连接不同局域网设备</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/Go.html" title="在Go中使用lua">
-                        <span class="hidden-mobile">在Go中使用lua</span>
+                      <a href="/%5B%E8%AF%91%5DGP2040-CE%20FAQ.html" title="[译]GP2040-CE FAQ">
+                        <span class="hidden-mobile">[译]GP2040-CE FAQ</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
