@@ -24,7 +24,7 @@
 <meta property="og:description" content="Caddy常用配置示例最近将公司部分业务从 nginx 迁移到 caddy，为了避免翻车，总结了几个最常见的用法">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-08-27T01:31:29.000Z">
-<meta property="article:modified_time" content="2024-08-27T02:26:48.418Z">
+<meta property="article:modified_time" content="2024-08-27T03:49:59.603Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="caddy">
 <meta name="twitter:card" content="summary_large_image">
@@ -222,7 +222,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          141 字
+          190 字
         
       </span>
     
@@ -321,6 +321,28 @@
 	  reverse_proxy http:&#x2F;&#x2F;127.0.0.1:8080
   &#125;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h2 id="后端服务是-HTTPS"><a href="#后端服务是-HTTPS" class="headerlink" title="后端服务是 HTTPS"></a>后端服务是 HTTPS</h2><ul>
+<li>需要求改请求头, 否则请求不成功</li>
+</ul>
+<figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">example.com &#123;
+	reverse_proxy https:&#x2F;&#x2F;example.com &#123;
+		header_up Host &#123;upstream_hostport&#125;
+	&#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h2 id="添加前缀-代理某后端的-GET-请求-处理路径问题"><a href="#添加前缀-代理某后端的-GET-请求-处理路径问题" class="headerlink" title="添加前缀, 代理某后端的 GET 请求, 处理路径问题"></a>添加前缀, 代理某后端的 GET 请求, 处理路径问题</h2><ul>
+<li><code>:8090/comm/?p=aaa</code> -&gt; <code>https://example.com/index.php?p=aaa</code></li>
+<li>此处可以使用 <code>uri[1:]</code> 语法手动处理 <code>url</code></li>
+</ul>
+<figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">:8090 &#123;
+  handle_path &#x2F;comm&#x2F;* &#123;
+  	rewrite * &#x2F;index.php&#123;uri[1:]&#125;
+  	reverse_proxy https:&#x2F;&#x2F;example.com &#123;
+  		header_up Host &#123;upstream_hostport&#125;
+  	&#125;
+  &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
                 
               </div>
             
