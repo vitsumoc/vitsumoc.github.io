@@ -16,22 +16,22 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="起因在 v2ex 上看到一位老哥分享了这样的帖子 几年接单过程中总结的和甲方初步沟通时需要明确的 20 个问题(偏客户端前端)，深有感触，写一个自己总结的版本。">
+    <meta name="description" content="Caddy常用配置示例最近将公司部分业务从 nginx 迁移到 caddy，为了避免翻车，总结了几个最常见的用法">
 <meta property="og:type" content="article">
-<meta property="og:title" content="做项目前需要明确什么">
-<meta property="og:url" content="https://vitsumoc.github.io/%E5%81%9A%E9%A1%B9%E7%9B%AE%E5%89%8D%E9%9C%80%E8%A6%81%E6%98%8E%E7%A1%AE%E4%BB%80%E4%B9%88.html">
+<meta property="og:title" content="Caddy常用配置示例">
+<meta property="og:url" content="https://vitsumoc.github.io/Caddy%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E7%A4%BA%E4%BE%8B.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="起因在 v2ex 上看到一位老哥分享了这样的帖子 几年接单过程中总结的和甲方初步沟通时需要明确的 20 个问题(偏客户端前端)，深有感触，写一个自己总结的版本。">
+<meta property="og:description" content="Caddy常用配置示例最近将公司部分业务从 nginx 迁移到 caddy，为了避免翻车，总结了几个最常见的用法">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-08-16T07:59:56.000Z">
-<meta property="article:modified_time" content="2024-08-16T09:49:20.874Z">
+<meta property="article:published_time" content="2024-08-27T01:31:29.000Z">
+<meta property="article:modified_time" content="2024-08-27T02:26:48.418Z">
 <meta property="article:author" content="vc">
-<meta property="article:tag" content="软件项目">
+<meta property="article:tag" content="caddy">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>做项目前需要明确什么 - Thinking...</title>
+  <title>Caddy常用配置示例 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -199,7 +199,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">做项目前需要明确什么</span>
+            <span id="subtitle">Caddy常用配置示例</span>
           
         </div>
 
@@ -210,8 +210,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-08-16 15:59" pubdate>
-          2024年8月16日 下午
+        <time datetime="2024-08-27 09:31" pubdate>
+          2024年8月27日 上午
         </time>
       </span>
     
@@ -222,7 +222,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          623 字
+          141 字
         
       </span>
     
@@ -233,7 +233,7 @@
         
         
         
-          6 分钟
+          2 分钟
         
       </span>
     
@@ -270,53 +270,57 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">做项目前需要明确什么</h1>
+            <h1 id="seo-header">Caddy常用配置示例</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h1><p>在 v2ex 上看到一位老哥分享了这样的帖子 <a target="_blank" rel="noopener" href="https://www.v2ex.com/t/1065514">几年接单过程中总结的和甲方初步沟通时需要明确的 20 个问题(偏客户端前端)</a>，深有感触，写一个自己总结的版本。</p>
+                <h1 id="Caddy常用配置示例"><a href="#Caddy常用配置示例" class="headerlink" title="Caddy常用配置示例"></a>Caddy常用配置示例</h1><p>最近将公司部分业务从 <code>nginx</code> 迁移到 <code>caddy</code>，为了避免翻车，总结了几个最常见的用法</p>
 <span id="more"></span>
 
-<h1 id="做项目前需要明确什么"><a href="#做项目前需要明确什么" class="headerlink" title="做项目前需要明确什么"></a>做项目前需要明确什么</h1><h2 id="前期"><a href="#前期" class="headerlink" title="前期"></a>前期</h2><ul>
-<li>项目所属行业的准入政策，法律风险</li>
-<li>客户的预算（用于我方出方案的情况）</li>
-<li>客户的方案（用于我方出报价的情况）</li>
+<h2 id="端口固定响应"><a href="#端口固定响应" class="headerlink" title="端口固定响应"></a>端口固定响应</h2><ul>
+<li>用来测试运维同事有没有正确开放 <code>7000</code> 端口。</li>
 </ul>
-<h2 id="付款和验收"><a href="#付款和验收" class="headerlink" title="付款和验收"></a>付款和验收</h2><ul>
-<li>工期或每个里程碑节点的交付物</li>
-<li>验收方式：服务上线运行？源代码？完成某项任务？</li>
-<li>首付款支付条款，验收标准，尾款支付条款</li>
-</ul>
-<h2 id="工作范围"><a href="#工作范围" class="headerlink" title="工作范围"></a>工作范围</h2><ul>
-<li>产品设计资源由谁提供</li>
-<li>UI设计资源由谁提供</li>
-<li>服务器、网络资源由谁提供</li>
-<li>预期系统规模：并发量、数据量</li>
-<li>是否设计到第三方对接，如何明确我方和第三方的职责范围</li>
-<li>有哪些登录方式，对系统安全性要求多高</li>
-<li>是否涉及现金业务，有多少种支付方式</li>
-<li>服务可用性需求：服务可用性的价值多大？是否需要采用热备？冷备？服务中断是否有赔偿条款？</li>
-<li>数据安全性需求：数据的价值多大？是否需要热备？冷备？数据损坏是否有赔偿条款？</li>
-<li>技术栈有没有特殊要求：操作系统、编程语言、服务组件方面（信创）</li>
-<li>客户端数量：通常取决于业务设计中有多少用户方</li>
-<li>客户端平台：WebAPP、Windows客户端、Linux客户端、安卓、苹果</li>
-<li>客户端分辨率：固定分辨率？多个分辨率？自适应？</li>
-<li>是否提供部署、运维服务</li>
-<li>是否提供客户端上线、提交审核等服务</li>
-<li>是否提供或协助进行软件著作权、专利申请</li>
-<li>是否提供源代码</li>
-<li>是否有现场施工工作</li>
-</ul>
-<h2 id="管理需求"><a href="#管理需求" class="headerlink" title="管理需求"></a>管理需求</h2><ul>
-<li>组织管理要求：对团队规模是否有要求？例会频率，上线频率，各种汇报等</li>
-<li>技术管理要求：codereview，技术文档等</li>
-<li>售后服务要求：售后响应标准，服务年限与费用</li>
-<li>交付前的需求变更流程与费用评估方式（至少要明确需求变更入口）</li>
-<li>交付后的新需求流程与费用评估方式（至少要明确新需求入口）</li>
-<li>是否需要配合进行等保测评等工作</li>
-</ul>
+<figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">:7000 &#123;
+  respond &quot;Hello, im 7000！&quot;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></div></figure>
 
+<h2 id="代理静态站点和后端服务"><a href="#代理静态站点和后端服务" class="headerlink" title="代理静态站点和后端服务"></a>代理静态站点和后端服务</h2><ul>
+<li>前端页面存放在 <code>/home/lenovo/vc/ywyl/web</code></li>
+<li>后台服务接口格式 <code>http://127.0.0.1/m/user/info</code></li>
+</ul>
+<figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">:7000 &#123;
+  # 静态站点根目录
+  root * &#x2F;home&#x2F;lenovo&#x2F;vc&#x2F;ywyl&#x2F;web
+  # 后端服务, 真实地址是 http:&#x2F;&#x2F;127.0.0.1:9090&#x2F;m&#x2F;user&#x2F;info
+	handle &#x2F;m&#x2F;* &#123;
+		reverse_proxy http:&#x2F;&#x2F;127.0.0.1:9090
+	&#125;
+  # 静态站点服务
+	handle &#123;
+		file_server
+	&#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h2 id="自定义前缀用来区分业务"><a href="#自定义前缀用来区分业务" class="headerlink" title="自定义前缀用来区分业务"></a>自定义前缀用来区分业务</h2><ul>
+<li>将 <code>http://localhost:7000/ecard/info</code> 代理到 <code>http://ipServer:80/info</code></li>
+</ul>
+<figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">:7000 &#123;
+  handle_path &#x2F;ecard&#x2F;* &#123;
+	  reverse_proxy http:&#x2F;&#x2F;ipServer:80
+  &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h2 id="自定义前缀-匹配一个有后缀的服务"><a href="#自定义前缀-匹配一个有后缀的服务" class="headerlink" title="自定义前缀, 匹配一个有后缀的服务"></a>自定义前缀, 匹配一个有后缀的服务</h2><ul>
+<li>将 <code>http://127.0.0.1:8090/test2/tt2</code> 代理到 <code>http://127.0.0.1:8080/tt1/tt2</code></li>
+</ul>
+<figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">:8090 &#123;
+  # 8090&#x2F;test2&#x2F;tt2 -&gt; 8080&#x2F;tt1&#x2F;tt2
+  handle_path &#x2F;test2&#x2F;* &#123;
+    rewrite * &#x2F;tt1&#123;uri&#125;
+	  reverse_proxy http:&#x2F;&#x2F;127.0.0.1:8080
+  &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
                 
               </div>
             
@@ -334,7 +338,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E8%BD%AF%E4%BB%B6%E9%A1%B9%E7%9B%AE/" class="category-chain-item">软件项目</a>
+  <a href="/categories/caddy/" class="category-chain-item">caddy</a>
   
   
 
@@ -349,7 +353,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E8%BD%AF%E4%BB%B6%E9%A1%B9%E7%9B%AE/" class="print-no-link">#软件项目</a>
+        <a href="/tags/caddy/" class="print-no-link">#caddy</a>
       
     </div>
   
@@ -361,8 +365,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>做项目前需要明确什么</div>
-      <div>https://vitsumoc.github.io/做项目前需要明确什么.html</div>
+      <div>Caddy常用配置示例</div>
+      <div>https://vitsumoc.github.io/Caddy常用配置示例.html</div>
     </div>
     <div class="license-meta">
       
@@ -374,7 +378,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年8月16日</div>
+          <div>2024年8月27日</div>
         </div>
       
       
@@ -406,18 +410,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/Caddy%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E7%A4%BA%E4%BE%8B.html" title="Caddy常用配置示例">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Caddy常用配置示例</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/undefined.html" title="一个自动投票的小工具">
-                        <span class="hidden-mobile">一个自动投票的小工具</span>
+                      <a href="/%E5%81%9A%E9%A1%B9%E7%9B%AE%E5%89%8D%E9%9C%80%E8%A6%81%E6%98%8E%E7%A1%AE%E4%BB%80%E4%B9%88.html" title="做项目前需要明确什么">
+                        <span class="hidden-mobile">做项目前需要明确什么</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
