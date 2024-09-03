@@ -16,24 +16,24 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="起因公司要参加某个物联网展，展方为了宣传做了一个带拉票功能的宣传页，就是那种很常见的点开链接可以为自己支持的公司投票的那种。公司的前台姐姐把投票链接发到了群里，我很顺手的就投了一票，然后又顺手看了一眼网络请求：">
+    <meta name="description" content="环境手上有个项目上一直使用的一键安装包，包括了上位机、后端、前端、数据库、时序库、nginx等一系列东西。一直都是通过 nssm 将这些软件注册成自启动服务的。注册的方式大概是这样：">
 <meta property="og:type" content="article">
-<meta property="og:title" content="一个自动投票的小工具">
-<meta property="og:url" content="https://vitsumoc.github.io/undefined.html">
+<meta property="og:title" content="[问题]Windows环境下nssm注册的mysql服务无法启动">
+<meta property="og:url" content="https://vitsumoc.github.io/Windows%E7%8E%AF%E5%A2%83%E4%B8%8Bnssm%E6%B3%A8%E5%86%8C%E7%9A%84mysql%E6%9C%8D%E5%8A%A1%E6%97%A0%E6%B3%95%E5%90%AF%E5%8A%A8.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="起因公司要参加某个物联网展，展方为了宣传做了一个带拉票功能的宣传页，就是那种很常见的点开链接可以为自己支持的公司投票的那种。公司的前台姐姐把投票链接发到了群里，我很顺手的就投了一票，然后又顺手看了一眼网络请求：">
+<meta property="og:description" content="环境手上有个项目上一直使用的一键安装包，包括了上位机、后端、前端、数据库、时序库、nginx等一系列东西。一直都是通过 nssm 将这些软件注册成自启动服务的。注册的方式大概是这样：">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-08-01T11:05:15.000Z">
-<meta property="article:modified_time" content="2024-08-01T11:27:49.260Z">
+<meta property="article:published_time" content="2023-12-15T01:30:00.000Z">
+<meta property="article:modified_time" content="2024-09-03T08:22:53.582Z">
 <meta property="article:author" content="vc">
-<meta property="article:tag" content="小玩具">
-<meta property="article:tag" content="python">
-<meta property="article:tag" content="爬虫">
+<meta property="article:tag" content="项目实践">
+<meta property="article:tag" content="问题">
+<meta property="article:tag" content="Windows">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>一个自动投票的小工具 - Thinking...</title>
+  <title>[问题]Windows环境下nssm注册的mysql服务无法启动 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -201,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">一个自动投票的小工具</span>
+            <span id="subtitle">[问题]Windows环境下nssm注册的mysql服务无法启动</span>
           
         </div>
 
@@ -212,8 +212,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-08-01 19:05" pubdate>
-          2024年8月1日 晚上
+        <time datetime="2023-12-15 09:30" pubdate>
+          2023年12月15日 上午
         </time>
       </span>
     
@@ -224,7 +224,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          559 字
+          588 字
         
       </span>
     
@@ -272,95 +272,36 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">一个自动投票的小工具</h1>
+            <h1 id="seo-header">[问题]Windows环境下nssm注册的mysql服务无法启动</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h1><p>公司要参加某个物联网展，展方为了宣传做了一个带拉票功能的宣传页，就是那种很常见的点开链接可以为自己支持的公司投票的那种。公司的前台姐姐把投票链接发到了群里，我很顺手的就投了一票，然后又顺手看了一眼网络请求：</p>
+                <h1 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h1><p>手上有个项目上一直使用的一键安装包，包括了上位机、后端、前端、数据库、时序库、nginx等一系列东西。一直都是通过 <code>nssm</code> 将这些软件注册成自启动服务的。注册的方式大概是这样：</p>
 <span id="more"></span>
 
-<p>投票动作是一个 POST 请求，请求体格式是 FormData，内容很简单</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><code class="language-text">token: C791752B7C5342703C6B0635212FBAC309AAF52717C5557BAE2FB8D4FC3BE5E8BBBDD5D6F8CFBD15
-id: 980943910375260160<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bat" data-language="bat"><div class="caption"><span>install.bat</span></div><code class="language-bat">:: 注册mysql
+nssm-2.24\win64\nssm install xxx-scada-mysql %cd%\mysql-8.0.27-winx64\bin\mysqld.exe
+nssm-2.24\win64\nssm set xxx-scada-mysql AppDirectory %cd%\mysql-8.0.27-winx64\bin
+:: 启动mysql
+nssm-2.24\win64\nssm start xxx-scada-mysql<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
-<p>我就在群里说了一句：“好像可以刷票哦”，前台姐姐立刻给我安排了一波情绪价值：“哇，你好厉害哦”之类的。得了，这个活就算接下来了。</p>
-<h1 id="思考过程"><a href="#思考过程" class="headerlink" title="思考过程"></a>思考过程</h1><ol>
-<li>先拿 PostMan 胡乱测了一下，同样的请求内容不能再发，服务端会报错：<br><code>您已经投票</code><br>看来是对同一 <code>token</code> 投同一 <code>id</code> 的频率做了限制了。</li>
-<li>修改 id 可以投票成功，但是就投给别的公司了 &#x3D;。&#x3D;，这显然不符合需求。</li>
-<li>修改 <code>token</code> 以后调接口会报错，看来必须使用服务端生成的 <code>token</code> 才行。</li>
-<li>用手机打开链接，又可以投一次，看来没有账号绑定之类的机制，换了设备就能投。</li>
-<li>手机和电脑都连的公司的 Wifi，看来也没有 <code>IP</code> 地址限制。</li>
-<li>用电脑换了个浏览器也能投，看来没有设备指纹之类的东西，应该就是认浏览器。</li>
-<li>在浏览器里到处找，发现 <code>local_sotrage</code> 存了个这个：<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><code class="language-text">token:Qzc5MTc1MkI3QzUzNDI3MDNDNkIwNjM1MjEyRkJBQzMwOUFBRjUyNzE3QzU1NTdCQUUyRkI4RDRGQzNCRTVFOEJCQkRENUQ2RjhDRkJEMTU=<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-等号结尾，有点眼熟，base64解一下，果然和发请求的 <code>token</code> 对上了。</li>
-<li>把这些乱七八糟的缓存都清了，重新打开页面，发现得到了一个新的 <code>token</code>，又能投一票。</li>
+<p>前两天我们需要在公司的一台测试服务器上安装这套项目软件，先检查了公司的服务器环境，发现已经有了 <code>mysql</code> 和 <code>nginx</code> 服务，于是手动停止这两个服务，之后使用一键安装包部署项目。</p>
+<blockquote>
+<p>此时，系统中有一个之前已经安装的 <code>mysql</code>，称为 <code>数据库A</code>。<code>数据库A</code> 通过 <code>mysqld install</code> 命令安装了服务，称为 <code>服务A</code>， <code>服务A</code> 已经被手动停止运行。<br>一键安装包中又拷贝了一份 <code>mysql</code> 进去，称为 <code>数据库B</code>。通过 <code>nssm</code> 安装的 <code>数据库B</code> 服务称为 <code>服务B</code>。</p>
+</blockquote>
+<h1 id="问题过程"><a href="#问题过程" class="headerlink" title="问题过程"></a>问题过程</h1><ol>
+<li>发现通过 <code>nssm</code> 注册的 <code>服务B</code> 无法启动，所以关闭 <code>服务B</code>。</li>
+<li>手动运行 <code>数据库B</code> 中的 <code>mysqld</code> 程序，发现程序闪退，没有报错信息，也没有错误日志。</li>
+<li>怀疑是依赖问题，尝试了更新 <code>MSVC</code> ，没有效果。</li>
+<li>尝试使用 <code>数据库B</code> 中的 <code>mysqld --log-error=my.err</code> ，发现 <code>mysqld</code> 不再闪退，但是此时依然不能正常提供数据库服务，并且没有异常的错误日志。</li>
+<li>同事启动了 <code>服务A</code> ，发现可以正常使用。</li>
+<li>受同事启发，尝试删除 <code>服务A</code>，此时脑袋混乱，居然是使用 <code>数据库B</code> 执行的 <code>mysqld --remove</code>，没想到依然能删除 <code>服务A</code>。</li>
+<li>发现删除 <code>服务A</code> 后，<code>数据库B</code> 中的 <code>mysqld</code> 可以正常使用了，再次尝试 <code>服务B</code> ，发现也可以正常使用。</li>
 </ol>
-<p>行了，路线通了，这下不会让前台姐姐失望了。</p>
-<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>本人不是 python 程序员，也没有什么爬虫经验，所有代码都是 AI 帮忙写的。</p>
-<p>其实只有两个步骤，一个是打开浏览器获得新 <code>token</code>：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><div class="caption"><span>获得token</span></div><code class="language-python"><span class="token keyword">def</span> <span class="token function">getToken</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-  <span class="token keyword">global</span> token
-
-  options <span class="token operator">=</span> Options<span class="token punctuation">(</span><span class="token punctuation">)</span>
-  options<span class="token punctuation">.</span>headless <span class="token operator">=</span> <span class="token boolean">True</span>
-  driver <span class="token operator">=</span> webdriver<span class="token punctuation">.</span>Chrome<span class="token punctuation">(</span>options<span class="token operator">=</span>options<span class="token punctuation">)</span>
-  driver<span class="token punctuation">.</span>get<span class="token punctuation">(</span>openUrl<span class="token punctuation">)</span>
-  <span class="token comment"># 拿 token</span>
-  script <span class="token operator">=</span> <span class="token string">"return localStorage.getItem('token');"</span>
-  tokenB64 <span class="token operator">=</span> driver<span class="token punctuation">.</span>execute_script<span class="token punctuation">(</span>script<span class="token punctuation">)</span>
-
-  driver<span class="token punctuation">.</span>quit<span class="token punctuation">(</span><span class="token punctuation">)</span>
-
-  <span class="token comment"># 获取token</span>
-  decoded_bytes <span class="token operator">=</span> base64<span class="token punctuation">.</span>b64decode<span class="token punctuation">(</span>tokenB64<span class="token punctuation">)</span>
-  token <span class="token operator">=</span> decoded_bytes<span class="token punctuation">.</span>decode<span class="token punctuation">(</span><span class="token string">'utf-8'</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-
-<p>然后就是投票：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-python" data-language="python"><div class="caption"><span>投票</span></div><code class="language-python"><span class="token keyword">def</span> <span class="token function">vote</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-  <span class="token keyword">global</span> <span class="token builtin">id</span>
-  <span class="token keyword">global</span> token
-  <span class="token comment"># 刷票</span>
-  <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"准备投一票："</span><span class="token punctuation">,</span> time<span class="token punctuation">.</span>ctime<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-  <span class="token comment"># id 代表公司</span>
-  <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"id："</span><span class="token punctuation">,</span> <span class="token builtin">id</span><span class="token punctuation">)</span>
-  <span class="token comment"># 获得的 token</span>
-  <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"token："</span><span class="token punctuation">,</span> token<span class="token punctuation">)</span>
-  <span class="token comment"># 组装请求</span>
-  data <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-    <span class="token string">"id"</span><span class="token punctuation">:</span> <span class="token builtin">id</span><span class="token punctuation">,</span>
-    <span class="token string">"token"</span><span class="token punctuation">:</span> token
-  <span class="token punctuation">&#125;</span>
-  headers <span class="token operator">=</span> <span class="token punctuation">&#123;</span>
-    <span class="token comment"># ":authority:": "api.iotexpo.com.cn",</span>
-    <span class="token comment"># ":method:": "POST",</span>
-    <span class="token comment"># ":path:": "/Expo/ProVoteByMinApp",</span>
-    <span class="token comment"># ":scheme:": "https",</span>
-    <span class="token string">"Accept"</span><span class="token punctuation">:</span> <span class="token string">"application/json, text/javascript, */*; q=0.01"</span><span class="token punctuation">,</span>
-    <span class="token string">"Accept-Encoding"</span><span class="token punctuation">:</span> <span class="token string">"gzip, deflate, br, zstd"</span><span class="token punctuation">,</span>
-    <span class="token string">"Accept-Language"</span><span class="token punctuation">:</span> <span class="token string">"zh-CN,zh;q=0.9"</span><span class="token punctuation">,</span>
-    <span class="token string">"Content-Length"</span><span class="token punctuation">:</span> <span class="token string">"108"</span><span class="token punctuation">,</span>
-    <span class="token string">"Content-Type"</span><span class="token punctuation">:</span> <span class="token string">"application/x-www-form-urlencoded; charset=UTF-8"</span><span class="token punctuation">,</span>
-    <span class="token string">"Origin"</span><span class="token punctuation">:</span> <span class="token string">"https://www.iotexpo.com.cn"</span><span class="token punctuation">,</span>
-    <span class="token string">"Priority"</span><span class="token punctuation">:</span> <span class="token string">"u=1, i"</span><span class="token punctuation">,</span>
-    <span class="token string">"Referer"</span><span class="token punctuation">:</span> <span class="token string">"https://www.iotexpo.com.cn/"</span><span class="token punctuation">,</span>
-    <span class="token string">"Sec-Ch-Ua"</span><span class="token punctuation">:</span> <span class="token string">"\"Not/A)Brand\";v=\"8\", \"Chromium\";v=\"126\", \"Google Chrome\";v=\"126\""</span><span class="token punctuation">,</span>
-    <span class="token string">"Sec-Ch-Ua-Mobile"</span><span class="token punctuation">:</span> <span class="token string">"?0"</span><span class="token punctuation">,</span>
-    <span class="token string">"Sec-Ch-Ua-Platform"</span><span class="token punctuation">:</span> <span class="token string">"\"Windows\""</span><span class="token punctuation">,</span>
-    <span class="token string">"Sec-Fetch-Dest"</span><span class="token punctuation">:</span> <span class="token string">"empty"</span><span class="token punctuation">,</span>
-    <span class="token string">"Sec-Fetch-Mode"</span><span class="token punctuation">:</span> <span class="token string">"cors"</span><span class="token punctuation">,</span>
-    <span class="token string">"Sec-Fetch-Site"</span><span class="token punctuation">:</span> <span class="token string">"same-site"</span><span class="token punctuation">,</span>
-    <span class="token string">"User-Agent"</span><span class="token punctuation">:</span> <span class="token string">"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"</span><span class="token punctuation">,</span>
-  <span class="token punctuation">&#125;</span>
-  <span class="token comment"># 发送</span>
-  response <span class="token operator">=</span> requests<span class="token punctuation">.</span>post<span class="token punctuation">(</span>voteUrl<span class="token punctuation">,</span> data<span class="token operator">=</span>data<span class="token punctuation">,</span> headers<span class="token operator">=</span>headers<span class="token punctuation">)</span>
-  <span class="token comment"># 打印结果</span>
-  resp <span class="token operator">=</span> json<span class="token punctuation">.</span>loads<span class="token punctuation">(</span>response<span class="token punctuation">.</span>text<span class="token punctuation">)</span>
-  <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"结果："</span><span class="token punctuation">)</span>
-  <span class="token keyword">print</span><span class="token punctuation">(</span>resp<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-
-<p>然后定时投票就行了。</p>
-<p>很小的案例，关键是又成功刷了一波好感度 &#x3D;。&#x3D;</p>
+<h1 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h1><p>本次问题的出现，主要原因还是我对 <code>Windows</code> 系统不熟悉，对于 <code>Windows</code> 系统中服务注册原理完全不懂。</p>
+<p>长期使用 <code>nssm</code> 进行服务管理，让我们可以一直忽略 <code>Windows</code> 的服务管理细节，不断地向前走下去。同时也让我们失去了探索 <code>Windows</code> 服务管理的动力。其实，假如世界上没有 <code>nssm</code> ，也许需要一周，也许需要一两个月，我们总是能学会注册服务的方法。</p>
+<p>因为工具过于方便导致失去了底层能力，这次的问题只是这个道理的再一次体现而已。</p>
 
                 
               </div>
@@ -379,7 +320,7 @@ id: 980943910375260160<span aria-hidden="true" class="line-numbers-rows"><span><
     
       <span class="category-chain">
         
-  <a href="/categories/%E5%B0%8F%E7%8E%A9%E5%85%B7/" class="category-chain-item">小玩具</a>
+  <a href="/categories/%E9%97%AE%E9%A2%98/" class="category-chain-item">问题</a>
   
   
 
@@ -394,11 +335,11 @@ id: 980943910375260160<span aria-hidden="true" class="line-numbers-rows"><span><
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E5%B0%8F%E7%8E%A9%E5%85%B7/" class="print-no-link">#小玩具</a>
+        <a href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" class="print-no-link">#项目实践</a>
       
-        <a href="/tags/python/" class="print-no-link">#python</a>
+        <a href="/tags/%E9%97%AE%E9%A2%98/" class="print-no-link">#问题</a>
       
-        <a href="/tags/%E7%88%AC%E8%99%AB/" class="print-no-link">#爬虫</a>
+        <a href="/tags/Windows/" class="print-no-link">#Windows</a>
       
     </div>
   
@@ -410,8 +351,8 @@ id: 980943910375260160<span aria-hidden="true" class="line-numbers-rows"><span><
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>一个自动投票的小工具</div>
-      <div>https://vitsumoc.github.io/undefined.html</div>
+      <div>[问题]Windows环境下nssm注册的mysql服务无法启动</div>
+      <div>https://vitsumoc.github.io/Windows环境下nssm注册的mysql服务无法启动.html</div>
     </div>
     <div class="license-meta">
       
@@ -423,7 +364,7 @@ id: 980943910375260160<span aria-hidden="true" class="line-numbers-rows"><span><
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年8月1日</div>
+          <div>2023年12月15日</div>
         </div>
       
       
@@ -455,9 +396,9 @@ id: 980943910375260160<span aria-hidden="true" class="line-numbers-rows"><span><
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/%E5%81%9A%E9%A1%B9%E7%9B%AE%E5%89%8D%E9%9C%80%E8%A6%81%E6%98%8E%E7%A1%AE%E4%BB%80%E4%B9%88.html" title="做项目前需要明确什么">
+                      <a href="/translate-sol-2.html" title="[翻译]Sol - 从零开始的MQTT broker - 第二部分：网络">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">做项目前需要明确什么</span>
+                        <span class="hidden-mobile">[翻译]Sol - 从零开始的MQTT broker - 第二部分：网络</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -465,8 +406,8 @@ id: 980943910375260160<span aria-hidden="true" class="line-numbers-rows"><span><
                   <article class="post-next col-6">
                     
                     
-                      <a href="/%5B%E8%AF%91%5DGP2040-CE%20FAQ.html" title="[译]GP2040-CE FAQ">
-                        <span class="hidden-mobile">[译]GP2040-CE FAQ</span>
+                      <a href="/translate-sol-1.html" title="[翻译]Sol - 从零开始的MQTT broker - 第一部分：协议">
+                        <span class="hidden-mobile">[翻译]Sol - 从零开始的MQTT broker - 第一部分：协议</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

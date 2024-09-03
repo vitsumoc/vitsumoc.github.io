@@ -16,22 +16,22 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="彪悍的人生不需要解释，那么彪悍的模块也不需要解释，例如今天所讨论的 log 模块，就绝对称得上是简明易懂、短小精干，只需稍微花个十来分钟阅读源码就可以理解并使用，非常具有 go 的味道。">
+    <meta name="description" content="工作时有时会需要使用一些带有网络操作命令行工具，这些工具也可能需要通过socks5进行代理，proxychains-windows 为我们提供了直接的解决方案。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Go标准库：log">
-<meta property="og:url" content="https://vitsumoc.github.io/Go-log.html">
+<meta property="og:title" content="通过proxychains-windows在命令行中使用socks5代理">
+<meta property="og:url" content="https://vitsumoc.github.io/%E9%80%9A%E8%BF%87proxychains-windows%E5%9C%A8%E5%91%BD%E4%BB%A4%E8%A1%8C%E4%B8%AD%E4%BD%BF%E7%94%A8socks5%E4%BB%A3%E7%90%86.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="彪悍的人生不需要解释，那么彪悍的模块也不需要解释，例如今天所讨论的 log 模块，就绝对称得上是简明易懂、短小精干，只需稍微花个十来分钟阅读源码就可以理解并使用，非常具有 go 的味道。">
+<meta property="og:description" content="工作时有时会需要使用一些带有网络操作命令行工具，这些工具也可能需要通过socks5进行代理，proxychains-windows 为我们提供了直接的解决方案。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-02-29T07:55:29.000Z">
-<meta property="article:modified_time" content="2024-03-25T07:26:31.971Z">
+<meta property="article:published_time" content="2024-02-18T14:57:51.000Z">
+<meta property="article:modified_time" content="2024-09-03T08:22:46.315Z">
 <meta property="article:author" content="vc">
-<meta property="article:tag" content="Go">
+<meta property="article:tag" content="网络工具">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>Go标准库：log - Thinking...</title>
+  <title>通过proxychains-windows在命令行中使用socks5代理 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -199,7 +199,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">Go标准库：log</span>
+            <span id="subtitle">通过proxychains-windows在命令行中使用socks5代理</span>
           
         </div>
 
@@ -210,8 +210,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-02-29 15:55" pubdate>
-          2024年2月29日 下午
+        <time datetime="2024-02-18 22:57" pubdate>
+          2024年2月18日 晚上
         </time>
       </span>
     
@@ -222,7 +222,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          646 字
+          468 字
         
       </span>
     
@@ -233,7 +233,7 @@
         
         
         
-          6 分钟
+          4 分钟
         
       </span>
     
@@ -270,165 +270,40 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Go标准库：log</h1>
+            <h1 id="seo-header">通过proxychains-windows在命令行中使用socks5代理</h1>
             
             
               <div class="markdown-body">
                 
-                <p>彪悍的人生不需要解释，那么彪悍的模块也不需要解释，例如今天所讨论的 <code>log</code> 模块，就绝对称得上是简明易懂、短小精干，只需稍微花个十来分钟阅读源码就可以理解并使用，非常具有 <code>go</code> 的味道。</p>
+                <p>工作时有时会需要使用一些带有网络操作命令行工具，这些工具也可能需要通过socks5进行代理，<a target="_blank" rel="noopener" href="https://github.com/shunf4/proxychains-windows">proxychains-windows</a> 为我们提供了直接的解决方案。</p>
 <span id="more"></span>
 
-<h1 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h1><h4 id="最简单的应用："><a href="#最简单的应用：" class="headerlink" title="最简单的应用："></a>最简单的应用：</h4><figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>test.go</span></div><code class="language-go"><span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-	log<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"Hello Log!"</span><span class="token punctuation">)</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre></div></figure>
-
-<p>输出：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-log" data-language="log"><code class="language-log"><span class="token date number">2024/03/01</span> <span class="token time number">09:46:29</span> Hello Log<span class="token operator">!</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-
-<h4 id="通过-Logger-对象指定写入位置和自定义前缀"><a href="#通过-Logger-对象指定写入位置和自定义前缀" class="headerlink" title="通过 Logger 对象指定写入位置和自定义前缀"></a>通过 Logger 对象指定写入位置和自定义前缀</h4><figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>test.go</span></div><code class="language-go"><span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
-	file<span class="token punctuation">,</span> <span class="token boolean">_</span> <span class="token operator">:=</span> os<span class="token punctuation">.</span><span class="token function">OpenFile</span><span class="token punctuation">(</span><span class="token string">"./test.log"</span><span class="token punctuation">,</span> os<span class="token punctuation">.</span>O_RDWR<span class="token operator">|</span>os<span class="token punctuation">.</span>O_CREATE<span class="token punctuation">,</span> <span class="token number">0666</span><span class="token punctuation">)</span>
-	<span class="token keyword">defer</span> file<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-	logger <span class="token operator">:=</span> log<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span>file<span class="token punctuation">,</span> <span class="token string">"[Custom prefix]"</span><span class="token punctuation">,</span> log<span class="token punctuation">.</span>LstdFlags<span class="token punctuation">)</span>
-	logger<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"Hello Log!"</span><span class="token punctuation">)</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-
-<figure><div class="code-wrapper"><pre class="line-numbers language-log" data-language="log"><div class="caption"><span>test.log</span></div><code class="language-log"><span class="token punctuation">[</span>Custom prefix<span class="token punctuation">]</span><span class="token date number">2024/03/01</span> <span class="token time number">09:51:53</span> Hello Log<span class="token operator">!</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-
-<h1 id="一个结构体"><a href="#一个结构体" class="headerlink" title="一个结构体"></a>一个结构体</h1><p><code>log</code> 模块定义了名为 <code>Logger</code> 的结构体，用来打理一切和日志有关的操作：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><div class="caption"><span>log.go</span></div><code class="language-go"><span class="token keyword">type</span> Logger <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
-	outMu sync<span class="token punctuation">.</span>Mutex
-	out   io<span class="token punctuation">.</span>Writer <span class="token comment">// destination for output</span>
-
-	prefix    atomic<span class="token punctuation">.</span>Pointer<span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span> <span class="token comment">// prefix on each line to identify the logger (but see Lmsgprefix)</span>
-	flag      atomic<span class="token punctuation">.</span>Int32           <span class="token comment">// properties</span>
-	isDiscard atomic<span class="token punctuation">.</span>Bool
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-
-<p><code>Logger</code> 中仅有5个成员变量，其含义如下：</p>
-<table>
-<thead>
-<tr>
-<th>成员</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>outMu</td>
-<td>输出锁，实现并发环境下有序的输出</td>
-</tr>
-<tr>
-<td>out</td>
-<td>输入对象，表示日志输出的目的地</td>
-</tr>
-<tr>
-<td>prefix</td>
-<td>用户设置的日志前缀</td>
-</tr>
-<tr>
-<td>flag</td>
-<td>配置项，一共有8个开关项</td>
-</tr>
-<tr>
-<td>isDiscard</td>
-<td>内部使用，记录输出对象是否为丢弃，当输出目标是丢弃时，输出函数不再处理，直接返回</td>
-</tr>
-</tbody></table>
-<p><code>flag</code> 表示的配置项有这些：</p>
-<table>
-<thead>
-<tr>
-<th>配置项</th>
-<th>含义</th>
-<th>示例</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Ldate</td>
-<td>添加日期</td>
-<td>2009&#x2F;01&#x2F;23</td>
-</tr>
-<tr>
-<td>Ltime</td>
-<td>添加时间</td>
-<td>01:23:23</td>
-</tr>
-<tr>
-<td>Lmicroseconds</td>
-<td>添加微秒</td>
-<td>01:23:23.123123</td>
-</tr>
-<tr>
-<td>Llongfile</td>
-<td>添加完整的日志产生的文件和行数</td>
-<td>&#x2F;a&#x2F;b&#x2F;c&#x2F;d.go:23</td>
-</tr>
-<tr>
-<td>Lshortfile</td>
-<td>添加简短的日志产生的文件和行数</td>
-<td>d.go:23</td>
-</tr>
-<tr>
-<td>LUTC</td>
-<td>使用UTC时间，不使用本地时区</td>
-<td></td>
-</tr>
-<tr>
-<td>Lmsgprefix</td>
-<td>将前缀至于行首，而非消息前</td>
-<td>2024&#x2F;03&#x2F;01 10:30:58 [Custom prefix]Hello Log!</td>
-</tr>
-<tr>
-<td>LstdFlags</td>
-<td>等于 Ldate | Ltime</td>
-<td>设置日期时间的快捷方法</td>
-</tr>
-</tbody></table>
-<h1 id="两种入口"><a href="#两种入口" class="headerlink" title="两种入口"></a>两种入口</h1><p>使用者可以自己创建 <code>Logger</code> 对象，从而定制日志输出的目标、字符串前缀、配置项等，然而更简单的方式是直接使用 <code>log</code> 模块提供的公共函数。这些函数使用 <code>log</code> 模块内置的 <code>Logger</code> 对象、使用 <code>os.stdOut</code> 作为输出、没有前缀并使用 <code>LstdFlags</code> 作为默认配置。</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go">log<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"Hello Log!"</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-
-<p>或者自己创建 <code>Logger</code> 实现更多的定制化需求，或是创建多个 <code>Logger</code> 将日志发往不同地方等：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go">logger <span class="token operator">:=</span> log<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span>file<span class="token punctuation">,</span> <span class="token string">"[Custom prefix]"</span><span class="token punctuation">,</span> log<span class="token punctuation">.</span>LstdFlags<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-
-<h1 id="三类输出方式"><a href="#三类输出方式" class="headerlink" title="三类输出方式"></a>三类输出方式</h1><p>不管是如何创建的 <code>Logger</code> ，都提供了相同的输出方式，即三类、六种功能函数：</p>
-<ul>
-<li>Print[f|ln]</li>
-<li>Fatal[f|ln]</li>
-<li>Panic[f|ln]</li>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>在proxychains-windows的<a target="_blank" rel="noopener" href="https://github.com/shunf4/proxychains-windows/blob/master/README_zh-Hans.md">介绍文档</a>中摘录如下内容：</p>
+<blockquote>
+<p>Proxychains.exe 是一个适用于 Win32(Windows) 和 Cygwin 平台的命令行强制代理工具（Proxifier）。它能够截获大多数 Win32 或 Cygwin 程序的 TCP 连接，强制它们通过一个或多个 SOCKS5 代理隧道。<br>Proxychains.exe 通过给动态链接的程序注入一个 DLL，对 Ws2_32.dll 的 Winsock 函数挂钩子的方式来将应用程序的连接重定向到 SOCKS5 代理。</p>
+</blockquote>
+<blockquote>
+<h1 id="工作原理"><a href="#工作原理" class="headerlink" title="工作原理"></a>工作原理</h1><ul>
+<li>主程序 Hook CreateProcessW Win32 API 函数调用。</li>
+<li>主程序创建按照用户给定的命令行启动子进程。</li>
+<li>创建进程后，挂钩后的 CreateProcessW 函数将 Hook DLL 注入到子进程。当子进程被注入后，它也会 Hook 如下的 Win32 API 函数调用：<ul>
+<li>CreateProcessW，这样每一个后代进程都会被注入；</li>
+<li>connect 和 ConnectEx，这样就劫持了 TCP 连接；</li>
+<li>GetAddrInfoW 系列函数，这样可以使用 Fake IP 来追踪访问的域名，用于远程 DNS 解析；</li>
+<li>等等。</li>
 </ul>
-<table>
-<thead>
-<tr>
-<th>函数</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>Printf</td>
-<td>输出日志</td>
-</tr>
-<tr>
-<td>Println</td>
-<td>输出日志并换行</td>
-</tr>
-<tr>
-<td>Fatalf</td>
-<td>输出日志，之后退出程序</td>
-</tr>
-<tr>
-<td>Fatalln</td>
-<td>输出日志并换行，之后退出程序</td>
-</tr>
-<tr>
-<td>Panicf</td>
-<td>输出日志，之后向上抛出panic，可能退出程序或被recover</td>
-</tr>
-<tr>
-<td>Panicln</td>
-<td>输出日志并换行，之后向上抛出panic，可能退出程序或被recover</td>
-</tr>
-</tbody></table>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p><code>Go</code> 提供的日志模块非常简单，清晰易懂，便于使用者将其封装为各种业务模块。使用方法简单到堪称优雅的程度，再次提醒我们在使用 <code>Go</code> 工作的过程中，要反复不断的去学习标准库，体会其少即是多的设计思想。</p>
+</li>
+<li>主程序并不退出，而是作为一个命名管道服务端存在。子进程与主程序通过命名管道交换包括日志、域名等内容在内的数据。主程序实施大多数关于 Fake IP 和子进程是否还存在的簿记工作。</li>
+<li>当所有后代进程退出后，主程序退出。</li>
+<li>主程序收到一个 SIGINT（Ctrl-C）后，终止所有后代进程。</li>
+</ul>
+</blockquote>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>按照文档，最简单的使用方法为：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">proxychains_win32_x64.exe <span class="token parameter variable">-f</span> proxychains.conf cmd<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
 
+<p>格式为 <code>可执行程序</code> <code>-f</code> <code>配置文件路径</code> <code>被代理的命令行工具</code>，使用 <code>cmd</code> 作为工具则可以在新开的命令行中手动使用其他命令行工具，均会被代理。</p>
+<h1 id="快捷方式"><a href="#快捷方式" class="headerlink" title="快捷方式"></a>快捷方式</h1><p>通过创建下述快捷方式，可以更方便的使用 proxychains-windows。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">C:<span class="token punctuation">\</span>Windows<span class="token punctuation">\</span>System32<span class="token punctuation">\</span>cmd.exe /k C:"<span class="token punctuation">\</span>Program Files<span class="token punctuation">\</span>"proxychains_0.6.8_win32_x64<span class="token punctuation">\</span>proxychains_win32_x64.exe <span class="token parameter variable">-f</span> proxychains.conf cmd<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
                 
               </div>
             
@@ -446,7 +321,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/Go/" class="category-chain-item">Go</a>
+  <a href="/categories/%E7%BD%91%E7%BB%9C%E5%B7%A5%E5%85%B7/" class="category-chain-item">网络工具</a>
   
   
 
@@ -461,7 +336,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Go/" class="print-no-link">#Go</a>
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E5%B7%A5%E5%85%B7/" class="print-no-link">#网络工具</a>
       
     </div>
   
@@ -473,8 +348,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Go标准库：log</div>
-      <div>https://vitsumoc.github.io/Go-log.html</div>
+      <div>通过proxychains-windows在命令行中使用socks5代理</div>
+      <div>https://vitsumoc.github.io/通过proxychains-windows在命令行中使用socks5代理.html</div>
     </div>
     <div class="license-meta">
       
@@ -486,7 +361,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年2月29日</div>
+          <div>2024年2月18日</div>
         </div>
       
       
@@ -518,9 +393,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/effective_go.html" title="[翻译]Effective Go">
+                      <a href="/Go%E6%A0%87%E5%87%86%E5%BA%93%EF%BC%9Alog.html" title="Go标准库：log">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">[翻译]Effective Go</span>
+                        <span class="hidden-mobile">Go标准库：log</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -528,8 +403,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/proxyInCmd.html" title="通过proxychains-windows在命令行中使用socks5代理">
-                        <span class="hidden-mobile">通过proxychains-windows在命令行中使用socks5代理</span>
+                      <a href="/mqtt-v5-0-chinese.html" title="MQTT 5.0 中文文档">
+                        <span class="hidden-mobile">MQTT 5.0 中文文档</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

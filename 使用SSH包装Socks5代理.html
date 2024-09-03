@@ -16,25 +16,26 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="什么是BBR 以下内容摘自Wiki">
+    <meta name="description" content="subSocks简介subSocks是Luyu Huang制作的纯 Go 网络代理软件。 这里是作者本人对此项目的介绍文档。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="在 Ubuntu 22.04 LTS 上使用 BBR">
-<meta property="og:url" content="https://vitsumoc.github.io/usingBBRonUbuntu2204.html">
+<meta property="og:title" content="使用SSH包装Socks5代理">
+<meta property="og:url" content="https://vitsumoc.github.io/%E4%BD%BF%E7%94%A8SSH%E5%8C%85%E8%A3%85Socks5%E4%BB%A3%E7%90%86.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="什么是BBR 以下内容摘自Wiki">
+<meta property="og:description" content="subSocks简介subSocks是Luyu Huang制作的纯 Go 网络代理软件。 这里是作者本人对此项目的介绍文档。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-04-11T04:27:40.000Z">
-<meta property="article:modified_time" content="2024-04-15T02:22:50.234Z">
+<meta property="og:image" content="https://vitsumoc.github.io/%E4%BD%BF%E7%94%A8SSH%E5%8C%85%E8%A3%85Socks5%E4%BB%A3%E7%90%86/wireshark.png">
+<meta property="article:published_time" content="2023-11-22T09:38:25.000Z">
+<meta property="article:modified_time" content="2024-09-03T08:23:08.298Z">
 <meta property="article:author" content="vc">
-<meta property="article:tag" content="豆知识">
-<meta property="article:tag" content="Linux">
-<meta property="article:tag" content="网络工具">
-<meta property="article:tag" content="VPS">
+<meta property="article:tag" content="网络编程">
+<meta property="article:tag" content="SSH">
+<meta property="article:tag" content="Go">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://vitsumoc.github.io/%E4%BD%BF%E7%94%A8SSH%E5%8C%85%E8%A3%85Socks5%E4%BB%A3%E7%90%86/wireshark.png">
   
   
   
-  <title>在 Ubuntu 22.04 LTS 上使用 BBR - Thinking...</title>
+  <title>使用SSH包装Socks5代理 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -202,7 +203,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">在 Ubuntu 22.04 LTS 上使用 BBR</span>
+            <span id="subtitle">使用SSH包装Socks5代理</span>
           
         </div>
 
@@ -213,8 +214,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-04-11 12:27" pubdate>
-          2024年4月11日 中午
+        <time datetime="2023-11-22 17:38" pubdate>
+          2023年11月22日 下午
         </time>
       </span>
     
@@ -225,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          727 字
+          674 字
         
       </span>
     
@@ -236,7 +237,7 @@
         
         
         
-          7 分钟
+          6 分钟
         
       </span>
     
@@ -273,39 +274,69 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">在 Ubuntu 22.04 LTS 上使用 BBR</h1>
+            <h1 id="seo-header">使用SSH包装Socks5代理</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="什么是BBR"><a href="#什么是BBR" class="headerlink" title="什么是BBR"></a>什么是BBR</h1><blockquote>
-<p>以下内容摘自<a target="_blank" rel="noopener" href="https://en.wikipedia.org/wiki/TCP_congestion_control#TCP_BBR">Wiki</a></p>
-</blockquote>
+                <h1 id="subSocks简介"><a href="#subSocks简介" class="headerlink" title="subSocks简介"></a>subSocks简介</h1><p><a target="_blank" rel="noopener" href="https://github.com/luyuhuang/subsocks">subSocks</a>是<a target="_blank" rel="noopener" href="https://luyuhuang.tech/">Luyu Huang</a>制作的纯 Go 网络代理软件。</p>
+<p>这里是作者本人对此项目的介绍<a target="_blank" rel="noopener" href="https://luyuhuang.tech/2020/12/02/subsocks.html">文档</a>。</p>
 <span id="more"></span>
 
-<p>Bottleneck Bandwidth and Round-trip propagation time (BBR) 是由 Google 在 2016年开发的一种拥塞控制算法 (CCA)。虽然其他的拥塞控制算法大多基于丢包机制，通过丢包来检测到拥塞并降低传输速率，但 BBR，和 TCP Vegas 相似，是基于模型的。算法利用网络传送最近一次发出的数据包达到的最大带宽和往返时间来构建网络模型。每次累积确认或选择性确认数据包的传送都会产生一个速率样本，该样本记录了数据包的发送时间和确认时间之间间隔内传送的数据量。</p>
-<p>在 YouTube 的实际部署中，BBRv1 版本平均带来了 4% 的网络吞吐量提升，在某些国家甚至能达到 14%。BBR 算法从 Linux 4.9 版本开始就被集成到 Linux 内核的 TCP 协议栈中。它同样也适用于 QUIC 协议。</p>
-<p>BBR 版本 1 (BBRv1) 对非 BBR 流的公平性存在争议。尽管谷歌的演示文稿显示 BBRv1 可以很好地与 CUBIC 协同工作，但一些研究人员 (例如 Geoff Huston 和 Hock、Bless 及 Zitterbart) 认为它对其他数据流并不公平，并且难以扩展。Hock等人还发现 Linux 4.9 版本的 BBR 实现存在一些严重的固有缺陷，例如增加的队列延迟、不公平性和大量丢包。Soheil Abbasloo 等人 (C2TCP 算法的作者) 指出，BBRv1 版本在动态环境（例如蜂窝网络）中表现不佳。他们还指出 BBR 存在公平性问题。例如，当网络中存在一个 CUBIC 流 (它是 Linux、Android 和 MacOS 操作系统默认的 TCP 实现) 和一个 BBR 流时，BBR 流可能会主导 CUBIC 流，并占用整个链路带宽。</p>
-<p>第 2 版 (Version 2) 尝试解决与基于丢包的拥塞控制 (例如 CUBIC) 共同运行时出现的不公平问题。BBRv2 改进了 BBRv1 的模型，加入了丢包信息和来自显式拥塞通知 (ECN) 的信息。虽然 BBRv2 有时可能比 BBRv1 吞吐量更低，但它通常被认为具有更好的有效吞吐量 (goodput)。[需要来源]</p>
-<p>第 3 版 (BBRv3) 修复了 BBRv2 中的两个漏洞（带宽探测过早结束、带宽收敛问题）并进行了一些性能调整。它还提供了一个变体版本，称为 BBR.Swift，专为数据中心内部链路进行优化：它使用 network_RTT（不包含接收方延迟）作为主要的拥塞控制信号。</p>
-<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>既然 BBR 已经被集成到 Linux 内核中，那么我们稍作配置就可以使用，首先：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">echo</span> <span class="token assign-left variable">net.core.default_qdisc</span><span class="token operator">=</span>fq <span class="token operator">>></span> /etc/sysctl.conf
-<span class="token builtin class-name">echo</span> <span class="token assign-left variable">net.ipv4.tcp_congestion_control</span><span class="token operator">=</span>bbr <span class="token operator">>></span> /etc/sysctl.conf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+<h1 id="为什么要做SSH包装"><a href="#为什么要做SSH包装" class="headerlink" title="为什么要做SSH包装"></a>为什么要做SSH包装</h1><p>因为之前使用v2ray总是被封端口，但是VPS上的22端口始终建在，考虑到SSH协议比较复杂，包括了Shell，SFTP等多种应用。我认为使用SSH协议包装流量可以起到一定的伪装作用，减少端口被封的可能性。</p>
+<p>subSocks项目的代码结构非常漂亮，添加SSH包装非常便捷。</p>
+<h1 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h1><p>首先需要了解subSocks的代码结构，Luyu Huang的<a target="_blank" rel="noopener" href="https://luyuhuang.tech/2020/12/02/subsocks.html">文档</a>中描述的非常详细，我只需要实现SSHWarpper和SSHStripper。</p>
+<p>Go 已经提供了SSH的官方实现，参考<a target="_blank" rel="noopener" href="https://pkg.go.dev/golang.org/x/crypto/ssh">文档</a>。并且提供了使用SSH进行远程Shell的示例。</p>
+<p>之后需要对SSH的<a href="/SSH.html">通讯过程</a>，<code>Session</code> <code>Channel</code> <code>Request</code>等等各种概念有基础的了解。</p>
+<p>使用ssh包中的代码，在服务端使用TCP链接，创建SSH服务器，等待客户端链接后获取Channel，将Channel包装为Stripper。</p>
+<p>客户端与服务端相似，需要使用TCP链接，向服务端完成握手过程，之后可获得Session，将Session包装成Wrapper。</p>
+<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h1><p>改动的源码请参考我 fork 的<a target="_blank" rel="noopener" href="https://github.com/vitsumoc/subsocks">仓库</a></p>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>为了能够使用ssh协议进行代理，并且能支持密码和密钥认证，配置文件添加了一些字段</p>
+<h3 id="客户端"><a href="#客户端" class="headerlink" title="客户端"></a>客户端</h3><figure><div class="code-wrapper"><pre class="line-numbers language-toml" data-language="toml"><div class="caption"><span>client.toml</span></div><code class="language-toml"><span class="token punctuation">[</span><span class="token table class-name">client</span><span class="token punctuation">]</span> <span class="token comment"># client configuration</span>
 
-<p>向 <code>sysctl.conf</code> 写入两条配置：</p>
+<span class="token key property">listen</span> <span class="token punctuation">=</span> <span class="token string">"127.0.0.1:1080"</span>
+<span class="token key property">username</span> <span class="token punctuation">=</span> <span class="token string">"subsocks"</span>
+<span class="token key property">password</span> <span class="token punctuation">=</span> <span class="token string">"subsocks"</span>
+
+<span class="token key property">server.protocol</span> <span class="token punctuation">=</span> <span class="token string">"ssh"</span>
+<span class="token key property">server.address</span> <span class="token punctuation">=</span> <span class="token string">"127.0.0.1:22"</span>
+
+<span class="token key property">ssh.key</span> <span class="token punctuation">=</span> <span class="token string">"./ssWithPass"</span>
+<span class="token key property">ssh.passphrase</span> <span class="token punctuation">=</span> <span class="token string">"123123"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
 <ul>
-<li><code>net.core.default_qdisc=fq</code> 修改 Linux 系统中的的 qdisc 为 fq(fair queue)，避免 BBR 占用太多流量</li>
-<li><code>net.ipv4.tcp_congestion_control=bbr</code> &gt;&gt; 将 ipv4 的 TCP 拥塞控制算法设置为 BBR</li>
+<li>server.protocol：当配置为 ssh 时使用 ssh 协议代理流量</li>
+<li>username，password：这两个字段配置后，ssh协议可以使用账号密码的方式向服务端认证</li>
+<li>ssh.key：配置后客户端可以使用密钥方式向服务端认证，这里配置客户端私钥文件，并把公钥文件存放在服务端</li>
+<li>ssh.passphrase：如果私钥有密码的话，在这里配置</li>
+<li>账号密码验证和密钥验证是选配的，配置其中一种或两者皆配置都可以。</li>
 </ul>
-<p>接下来，保存生效：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sysctl</span> <span class="token parameter variable">-p</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+<p>服务端</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-toml" data-language="toml"><div class="caption"><span>server.toml</span></div><code class="language-toml"><span class="token punctuation">[</span><span class="token table class-name">server</span><span class="token punctuation">]</span> <span class="token comment"># server configuration</span>
 
-<p>查看是否已经应用：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sysctl</span> net.ipv4.tcp_congestion_control
-net.ipv4.tcp_congestion_control <span class="token operator">=</span> bbr<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+<span class="token key property">protocol</span> <span class="token punctuation">=</span> <span class="token string">"ssh"</span>
+<span class="token key property">listen</span> <span class="token punctuation">=</span> <span class="token string">"0.0.0.0:22"</span>
 
-<p>这样就完成了所有配置。</p>
-<p>（经过实际测试，不开启公平队列时 BBR 能提供更大的速率，也许对于一些纯粹跑流量的服务器（例如网络代理），不开启公平队列是更好的用法。）</p>
+<span class="token key property">ssh.key</span> <span class="token punctuation">=</span> <span class="token string">"./ssWithPass"</span>
+<span class="token key property">ssh.passphrase</span> <span class="token punctuation">=</span> <span class="token string">"123123"</span>
+<span class="token key property">ssh.cert</span> <span class="token punctuation">=</span> <span class="token string">"./ssWithPass.pub"</span>
+
+<span class="token punctuation">[</span><span class="token table class-name">server.users</span><span class="token punctuation">]</span>
+<span class="token key property">"subsocks"</span> <span class="token punctuation">=</span> <span class="token string">"subsocks"</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<ul>
+<li>protocol ：当配置为 ssh 时使用 ssh 协议代理流量</li>
+<li>ssh.key：服务端的 ssh 私钥路径，必填</li>
+<li>ssh.passphrase：服务端 ssh 私钥的密码，有密码就填</li>
+<li>[server.users]：支持的账号密码对，配合客户端的账号密码校验</li>
+<li>ssh.cert： 客户端 ssh 公钥路径，用来支持客户端和服务端之间的密钥认证</li>
+</ul>
+<h1 id="SSH私钥加密的说明"><a href="#SSH私钥加密的说明" class="headerlink" title="SSH私钥加密的说明"></a>SSH私钥加密的说明</h1><p>由于 Go 中的ssh暂时还没有支持加密的PKCS#8 format，如果想要使用加密的私钥，需要选择PEM格式。可以用如下命令生成：</p>
+<p>ssh-keygen -t rsa -b 4096 -m PEM<br>使用 ssh-keygen 的默认参数生成的带密码的私钥，在 ssh.ParsePrivateKeyWithPassphrase 过程中会报错。</p>
+<p>情况参考：<a target="_blank" rel="noopener" href="https://github.com/gaia-pipeline/gaia/issues/182#issuecomment-502120516">gaia-pipeline&#x2F;gaia#182 (comment)</a></p>
+<h1 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h1><p>通过抓包验证，握手过程正常，通讯过程与SSH相同，多条链接使用正常，所有数据均经过加密：</p>
+<p><img src="/%E4%BD%BF%E7%94%A8SSH%E5%8C%85%E8%A3%85Socks5%E4%BB%A3%E7%90%86/wireshark.png" srcset="/img/loading.gif" lazyload></p>
+<p>使用 SSH 代理看了一会视频网站，效果也不错，很流畅。</p>
 
                 
               </div>
@@ -324,7 +355,7 @@ net.ipv4.tcp_congestion_control <span class="token operator">=</span> bbr<span a
     
       <span class="category-chain">
         
-  <a href="/categories/%E7%BD%91%E7%BB%9C%E5%B7%A5%E5%85%B7/" class="category-chain-item">网络工具</a>
+  <a href="/categories/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="category-chain-item">网络编程</a>
   
   
 
@@ -339,13 +370,11 @@ net.ipv4.tcp_congestion_control <span class="token operator">=</span> bbr<span a
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E8%B1%86%E7%9F%A5%E8%AF%86/" class="print-no-link">#豆知识</a>
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="print-no-link">#网络编程</a>
       
-        <a href="/tags/Linux/" class="print-no-link">#Linux</a>
+        <a href="/tags/SSH/" class="print-no-link">#SSH</a>
       
-        <a href="/tags/%E7%BD%91%E7%BB%9C%E5%B7%A5%E5%85%B7/" class="print-no-link">#网络工具</a>
-      
-        <a href="/tags/VPS/" class="print-no-link">#VPS</a>
+        <a href="/tags/Go/" class="print-no-link">#Go</a>
       
     </div>
   
@@ -357,8 +386,8 @@ net.ipv4.tcp_congestion_control <span class="token operator">=</span> bbr<span a
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>在 Ubuntu 22.04 LTS 上使用 BBR</div>
-      <div>https://vitsumoc.github.io/usingBBRonUbuntu2204.html</div>
+      <div>使用SSH包装Socks5代理</div>
+      <div>https://vitsumoc.github.io/使用SSH包装Socks5代理.html</div>
     </div>
     <div class="license-meta">
       
@@ -370,7 +399,7 @@ net.ipv4.tcp_congestion_control <span class="token operator">=</span> bbr<span a
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年4月11日</div>
+          <div>2023年11月22日</div>
         </div>
       
       
@@ -402,9 +431,9 @@ net.ipv4.tcp_congestion_control <span class="token operator">=</span> bbr<span a
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/Go%E6%95%99%E7%A8%8B%EF%BC%9A%E6%B3%9B%E5%9E%8B%E5%85%A5%E9%97%A8.html" title="[翻译]Go教程：泛型入门">
+                      <a href="/%E5%9C%A8Go%E4%B8%AD%E4%BD%BF%E7%94%A8lua.html" title="在Go中使用lua">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">[翻译]Go教程：泛型入门</span>
+                        <span class="hidden-mobile">在Go中使用lua</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -412,8 +441,8 @@ net.ipv4.tcp_congestion_control <span class="token operator">=</span> bbr<span a
                   <article class="post-next col-6">
                     
                     
-                      <a href="/%E4%BA%BA%E6%9C%88%E7%A5%9E%E8%AF%9D%E7%9A%84%E5%9B%B0%E5%A2%83.html" title="[转]人月神话的困境：项目经理的挑战与转变">
-                        <span class="hidden-mobile">[转]人月神话的困境：项目经理的挑战与转变</span>
+                      <a href="/Go%E4%B8%8E%E4%B8%B2%E5%8F%A3%E8%AE%BE%E5%A4%87%E5%9C%A8%E9%A1%B9%E7%9B%AE%E4%B8%AD%E7%9A%84%E8%BF%90%E7%94%A8.html" title="Go与串口设备在项目中的运用">
+                        <span class="hidden-mobile">Go与串口设备在项目中的运用</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

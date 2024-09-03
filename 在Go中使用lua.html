@@ -16,24 +16,24 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="环境手上有个项目上一直使用的一键安装包，包括了上位机、后端、前端、数据库、时序库、nginx等一系列东西。一直都是通过 nssm 将这些软件注册成自启动服务的。注册的方式大概是这样：">
+    <meta name="description" content="使用gopher-lua，在 Go 中使用lua。gopher-lua 项目地址： https:&#x2F;&#x2F;github.com&#x2F;yuin&#x2F;gopher-lua">
 <meta property="og:type" content="article">
-<meta property="og:title" content="[问题]Windows环境下nssm注册的mysql服务无法启动">
-<meta property="og:url" content="https://vitsumoc.github.io/question-mysqld-service.html">
+<meta property="og:title" content="在Go中使用lua">
+<meta property="og:url" content="https://vitsumoc.github.io/%E5%9C%A8Go%E4%B8%AD%E4%BD%BF%E7%94%A8lua.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="环境手上有个项目上一直使用的一键安装包，包括了上位机、后端、前端、数据库、时序库、nginx等一系列东西。一直都是通过 nssm 将这些软件注册成自启动服务的。注册的方式大概是这样：">
+<meta property="og:description" content="使用gopher-lua，在 Go 中使用lua。gopher-lua 项目地址： https:&#x2F;&#x2F;github.com&#x2F;yuin&#x2F;gopher-lua">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-12-15T01:30:00.000Z">
-<meta property="article:modified_time" content="2024-03-02T00:55:07.970Z">
+<meta property="article:published_time" content="2023-12-05T03:25:15.000Z">
+<meta property="article:modified_time" content="2024-09-03T08:22:03.361Z">
 <meta property="article:author" content="vc">
-<meta property="article:tag" content="项目实践">
-<meta property="article:tag" content="问题">
-<meta property="article:tag" content="Windows">
+<meta property="article:tag" content="库">
+<meta property="article:tag" content="小玩具">
+<meta property="article:tag" content="Go">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>[问题]Windows环境下nssm注册的mysql服务无法启动 - Thinking...</title>
+  <title>在Go中使用lua - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -201,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">[问题]Windows环境下nssm注册的mysql服务无法启动</span>
+            <span id="subtitle">在Go中使用lua</span>
           
         </div>
 
@@ -212,8 +212,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-12-15 09:30" pubdate>
-          2023年12月15日 上午
+        <time datetime="2023-12-05 11:25" pubdate>
+          2023年12月5日 上午
         </time>
       </span>
     
@@ -224,7 +224,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          588 字
+          159 字
         
       </span>
     
@@ -235,7 +235,7 @@
         
         
         
-          5 分钟
+          2 分钟
         
       </span>
     
@@ -272,36 +272,35 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">[问题]Windows环境下nssm注册的mysql服务无法启动</h1>
+            <h1 id="seo-header">在Go中使用lua</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h1><p>手上有个项目上一直使用的一键安装包，包括了上位机、后端、前端、数据库、时序库、nginx等一系列东西。一直都是通过 <code>nssm</code> 将这些软件注册成自启动服务的。注册的方式大概是这样：</p>
+                <p>使用<code>gopher-lua</code>，在 Go 中使用lua。<code>gopher-lua</code> 项目地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/yuin/gopher-lua">https://github.com/yuin/gopher-lua</a></p>
 <span id="more"></span>
 
-<figure><div class="code-wrapper"><pre class="line-numbers language-bat" data-language="bat"><div class="caption"><span>install.bat</span></div><code class="language-bat">:: 注册mysql
-nssm-2.24\win64\nssm install xxx-scada-mysql %cd%\mysql-8.0.27-winx64\bin\mysqld.exe
-nssm-2.24\win64\nssm set xxx-scada-mysql AppDirectory %cd%\mysql-8.0.27-winx64\bin
-:: 启动mysql
-nssm-2.24\win64\nssm start xxx-scada-mysql<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-
-<p>前两天我们需要在公司的一台测试服务器上安装这套项目软件，先检查了公司的服务器环境，发现已经有了 <code>mysql</code> 和 <code>nginx</code> 服务，于是手动停止这两个服务，之后使用一键安装包部署项目。</p>
-<blockquote>
-<p>此时，系统中有一个之前已经安装的 <code>mysql</code>，称为 <code>数据库A</code>。<code>数据库A</code> 通过 <code>mysqld install</code> 命令安装了服务，称为 <code>服务A</code>， <code>服务A</code> 已经被手动停止运行。<br>一键安装包中又拷贝了一份 <code>mysql</code> 进去，称为 <code>数据库B</code>。通过 <code>nssm</code> 安装的 <code>数据库B</code> 服务称为 <code>服务B</code>。</p>
-</blockquote>
-<h1 id="问题过程"><a href="#问题过程" class="headerlink" title="问题过程"></a>问题过程</h1><ol>
-<li>发现通过 <code>nssm</code> 注册的 <code>服务B</code> 无法启动，所以关闭 <code>服务B</code>。</li>
-<li>手动运行 <code>数据库B</code> 中的 <code>mysqld</code> 程序，发现程序闪退，没有报错信息，也没有错误日志。</li>
-<li>怀疑是依赖问题，尝试了更新 <code>MSVC</code> ，没有效果。</li>
-<li>尝试使用 <code>数据库B</code> 中的 <code>mysqld --log-error=my.err</code> ，发现 <code>mysqld</code> 不再闪退，但是此时依然不能正常提供数据库服务，并且没有异常的错误日志。</li>
-<li>同事启动了 <code>服务A</code> ，发现可以正常使用。</li>
-<li>受同事启发，尝试删除 <code>服务A</code>，此时脑袋混乱，居然是使用 <code>数据库B</code> 执行的 <code>mysqld --remove</code>，没想到依然能删除 <code>服务A</code>。</li>
-<li>发现删除 <code>服务A</code> 后，<code>数据库B</code> 中的 <code>mysqld</code> 可以正常使用了，再次尝试 <code>服务B</code> ，发现也可以正常使用。</li>
-</ol>
-<h1 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h1><p>本次问题的出现，主要原因还是我对 <code>Windows</code> 系统不熟悉，对于 <code>Windows</code> 系统中服务注册原理完全不懂。</p>
-<p>长期使用 <code>nssm</code> 进行服务管理，让我们可以一直忽略 <code>Windows</code> 的服务管理细节，不断地向前走下去。同时也让我们失去了探索 <code>Windows</code> 服务管理的动力。其实，假如世界上没有 <code>nssm</code> ，也许需要一周，也许需要一两个月，我们总是能学会注册服务的方法。</p>
-<p>因为工具过于方便导致失去了底层能力，这次的问题只是这个道理的再一次体现而已。</p>
+<p>使用示例仓库地址：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/vitsumoc/my-golua">https://github.com/vitsumoc/my-golua</a></p>
+<p>示例列表：</p>
+<ul>
+<li>最基础的用法</li>
+<li>基础数据类型</li>
+<li>在lua中调用go方法</li>
+<li>在go中使用lua协程</li>
+<li>示范如何手动开启模块</li>
+<li>在lua中使用go模块</li>
+<li>在 Go 中调用lua方法</li>
+<li>在lua中使用 Go 数据</li>
+<li>通过context控制停止</li>
+<li>在有协程的情况下使用context控制</li>
+<li>共享lua文件字节码, 减少开销</li>
+<li>通过go协程跑lua的示例 可以把ch带到lua中 和相关限制</li>
+<li>在lua中使用ch的例子</li>
+<li>lua虚拟机池</li>
+<li>在 Go 中提供钩子, 使lua可以注册脚本, 在脚本中获得并修改用户数据</li>
+</ul>
 
                 
               </div>
@@ -320,7 +319,7 @@ nssm-2.24\win64\nssm start xxx-scada-mysql<span aria-hidden="true" class="line-n
     
       <span class="category-chain">
         
-  <a href="/categories/%E9%97%AE%E9%A2%98/" class="category-chain-item">问题</a>
+  <a href="/categories/%E5%B0%8F%E7%8E%A9%E5%85%B7/" class="category-chain-item">小玩具</a>
   
   
 
@@ -335,11 +334,11 @@ nssm-2.24\win64\nssm start xxx-scada-mysql<span aria-hidden="true" class="line-n
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" class="print-no-link">#项目实践</a>
+        <a href="/tags/%E5%BA%93/" class="print-no-link">#库</a>
       
-        <a href="/tags/%E9%97%AE%E9%A2%98/" class="print-no-link">#问题</a>
+        <a href="/tags/%E5%B0%8F%E7%8E%A9%E5%85%B7/" class="print-no-link">#小玩具</a>
       
-        <a href="/tags/Windows/" class="print-no-link">#Windows</a>
+        <a href="/tags/Go/" class="print-no-link">#Go</a>
       
     </div>
   
@@ -351,8 +350,8 @@ nssm-2.24\win64\nssm start xxx-scada-mysql<span aria-hidden="true" class="line-n
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>[问题]Windows环境下nssm注册的mysql服务无法启动</div>
-      <div>https://vitsumoc.github.io/question-mysqld-service.html</div>
+      <div>在Go中使用lua</div>
+      <div>https://vitsumoc.github.io/在Go中使用lua.html</div>
     </div>
     <div class="license-meta">
       
@@ -364,7 +363,7 @@ nssm-2.24\win64\nssm start xxx-scada-mysql<span aria-hidden="true" class="line-n
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年12月15日</div>
+          <div>2023年12月5日</div>
         </div>
       
       
@@ -396,9 +395,9 @@ nssm-2.24\win64\nssm start xxx-scada-mysql<span aria-hidden="true" class="line-n
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/translate-sol-2.html" title="[翻译]Sol - 从零开始的MQTT broker - 第二部分：网络">
+                      <a href="/%E5%B7%A5%E4%BD%9C%E5%91%A8%E6%8A%A5%E5%8F%AF%E8%A7%86%E5%8C%96.html" title="工作周报可视化">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">[翻译]Sol - 从零开始的MQTT broker - 第二部分：网络</span>
+                        <span class="hidden-mobile">工作周报可视化</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -406,8 +405,8 @@ nssm-2.24\win64\nssm start xxx-scada-mysql<span aria-hidden="true" class="line-n
                   <article class="post-next col-6">
                     
                     
-                      <a href="/translate-sol-1.html" title="[翻译]Sol - 从零开始的MQTT broker - 第一部分：协议">
-                        <span class="hidden-mobile">[翻译]Sol - 从零开始的MQTT broker - 第一部分：协议</span>
+                      <a href="/%E4%BD%BF%E7%94%A8SSH%E5%8C%85%E8%A3%85Socks5%E4%BB%A3%E7%90%86.html" title="使用SSH包装Socks5代理">
+                        <span class="hidden-mobile">使用SSH包装Socks5代理</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

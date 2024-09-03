@@ -16,23 +16,22 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="项目链接 gookit&#x2F;event">
+    <meta name="description" content="wiresock&#x2F;proxifyre 项目链接">
 <meta property="og:type" content="article">
-<meta property="og:title" content="go轻量级事件库：gookit-event">
-<meta property="og:url" content="https://vitsumoc.github.io/gookit-event.html">
+<meta property="og:title" content="在 Windows 环境使用 proxifyre 代理应用程序">
+<meta property="og:url" content="https://vitsumoc.github.io/%E5%9C%A8%20Windows%20%E7%8E%AF%E5%A2%83%E4%BD%BF%E7%94%A8%20proxifyre%20%E4%BB%A3%E7%90%86%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="项目链接 gookit&#x2F;event">
+<meta property="og:description" content="wiresock&#x2F;proxifyre 项目链接">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-01-04T09:08:00.000Z">
-<meta property="article:modified_time" content="2024-03-25T07:25:30.414Z">
+<meta property="article:published_time" content="2024-04-15T01:03:38.000Z">
+<meta property="article:modified_time" content="2024-09-03T08:24:17.992Z">
 <meta property="article:author" content="vc">
-<meta property="article:tag" content="库">
-<meta property="article:tag" content="Go">
+<meta property="article:tag" content="网络工具">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>go轻量级事件库：gookit-event - Thinking...</title>
+  <title>在 Windows 环境使用 proxifyre 代理应用程序 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -200,7 +199,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">go轻量级事件库：gookit-event</span>
+            <span id="subtitle">在 Windows 环境使用 proxifyre 代理应用程序</span>
           
         </div>
 
@@ -211,8 +210,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-01-04 17:08" pubdate>
-          2024年1月4日 下午
+        <time datetime="2024-04-15 09:03" pubdate>
+          2024年4月15日 上午
         </time>
       </span>
     
@@ -223,7 +222,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          302 字
+          307 字
         
       </span>
     
@@ -271,33 +270,57 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">go轻量级事件库：gookit-event</h1>
+            <h1 id="seo-header">在 Windows 环境使用 proxifyre 代理应用程序</h1>
             
             
               <div class="markdown-body">
                 
                 <blockquote>
-<p>项目链接 <a target="_blank" rel="noopener" href="https://github.com/gookit/event">gookit&#x2F;event</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/wiresock/proxifyre">wiresock&#x2F;proxifyre 项目链接</a></p>
 </blockquote>
 <span id="more"></span>
 
-<p>项目介绍：</p>
-<blockquote>
-<p>Go实现的轻量级的事件管理、调度程序库, 支持设置监听器的优先级, 支持使用通配符来进行一组事件的监听</p>
+<h1 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h1><p>proxifyre 适用于，当您已经拥有一个可用的 socks5 代理，但却不了解如何让某个应用程序通过此代理收发包的情况。</p>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>proxifyre 用于指定一些应用程序的网络流量通过 socks5 代理。</p>
+<p>proxifyre 是基于 Windows 包过滤器 <a target="_blank" rel="noopener" href="https://github.com/wiresock/ndisapi/tree/master/examples/cpp/socksify">socksify</a> demo 做的增强，加入了 UDP 能力，简化了配置。</p>
+<p>proxifyre 支持被注册为 Windows 服务。</p>
+<h1 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h1><p>使用 proxifyre 前需要安装两个依赖：</p>
+<ol>
+<li>Windows Packet Filter (<a target="_blank" rel="noopener" href="https://github.com/wiresock/ndisapi/releases">WinpkFilter</a>)</li>
+<li>Visual Studio Runtime Libraries(<a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170">Visual Studio 2022 redistributable download page</a>)</li>
+</ol>
+<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>proxifyre 默认配置文件名为 app-config.json，将配置文件放到 proxifyre 执行目录下会被直接使用，配置文件示例如下：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">&#123;</span>
+ <span class="token property">"logLevel"</span><span class="token operator">:</span> <span class="token string">"None"</span><span class="token punctuation">,</span>
+ <span class="token property">"proxies"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+         <span class="token punctuation">&#123;</span>
+         <span class="token property">"appNames"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"chrome"</span><span class="token punctuation">,</span> <span class="token string">"C:\\Program Files\\WindowsApps\\ROBLOXCORPORATION.ROBLOX"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+         <span class="token property">"socks5ProxyEndpoint"</span><span class="token operator">:</span> <span class="token string">"158.101.205.51:1080"</span><span class="token punctuation">,</span>
+         <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"username1"</span><span class="token punctuation">,</span>
+         <span class="token property">"password"</span><span class="token operator">:</span> <span class="token string">"password1"</span><span class="token punctuation">,</span>
+         <span class="token property">"supportedProtocols"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"TCP"</span><span class="token punctuation">,</span> <span class="token string">"UDP"</span><span class="token punctuation">]</span>
+         <span class="token punctuation">&#125;</span>
+     <span class="token punctuation">]</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
 <ul>
-<li>支持自定义创建预定义的事件对象</li>
-<li>支持对一个事件添加多个监听器</li>
-<li>支持设置事件监听器的优先级，优先级越高越先触发</li>
-<li>支持通过通配符 * 来进行一组事件的匹配监听.</li>
-<li>ModeSimple - 注册 app.* 事件的监听，触发 app.run app.end 时，都将同时会触发 app.* 监听器</li>
-<li>ModePath - NEW * 只匹配一段非 . 的字符,可以进行更精细的监听; ** 匹配任意多个字符,只能用于开头或结尾</li>
-<li>支持直接使用通配符 * 来监听全部事件的触发</li>
-<li>支持触发事件时投递到 chan, 异步进行消费处理. 触发: Async(), FireAsync()</li>
-<li>完善的单元测试，单元覆盖率 &gt; 95%</li>
+<li>logLevel: 日志等级，可选项为：<code>None</code> <code>Info</code> <code>Deb</code> <code>All</code></li>
+<li>proxies：代理配置列表</li>
+<li>appNames：被代理程序名，采用模糊匹配，例如 <code>chrome</code> 会匹配到包含 <code>chrome</code> 字符串的所有程序。如果使用路径则可以精确匹配。</li>
+<li>socks5ProxyEndpoint：socks5 服务位置，地址+端口。</li>
+<li>username：如果 socks5 服务用户名，可不填。</li>
+<li>password：socks5 服务密码，可不填。</li>
+<li>supportedProtocols：被代理的网络协议，支持 TCP UDP。</li>
 </ul>
-</blockquote>
-<p>我非常喜欢这种类型的项目，小巧、专注、恰到好处的feature。</p>
-<p>当前这个项目可能没有经过足够的检验，可能存在一些bug，但是没有关系，他的代码足够简单，即便他产生了问题也可以轻松修复。</p>
+<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>完成配置后，直接运行 ProxiFyre.exe 即可使用，日志文件会生成在 <code>/logs</code> 路径。</p>
+<p>也可以通过下列命令进行服务的注册、启动、停止和卸载，通过 Windows 服务管理：</p>
+<ul>
+<li>ProxiFyre.exe install</li>
+<li>ProxiFyre.exe start</li>
+<li>ProxiFyre.exe stop</li>
+<li>ProxiFyre.exe uninstall</li>
+</ul>
+<p>当然也可以通过 nssm 工具将 ProxiFyre.exe 注册为 Windows 服务。</p>
 
                 
               </div>
@@ -316,7 +339,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/Go/" class="category-chain-item">Go</a>
+  <a href="/categories/%E7%BD%91%E7%BB%9C%E5%B7%A5%E5%85%B7/" class="category-chain-item">网络工具</a>
   
   
 
@@ -331,9 +354,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E5%BA%93/" class="print-no-link">#库</a>
-      
-        <a href="/tags/Go/" class="print-no-link">#Go</a>
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E5%B7%A5%E5%85%B7/" class="print-no-link">#网络工具</a>
       
     </div>
   
@@ -345,8 +366,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>go轻量级事件库：gookit-event</div>
-      <div>https://vitsumoc.github.io/gookit-event.html</div>
+      <div>在 Windows 环境使用 proxifyre 代理应用程序</div>
+      <div>https://vitsumoc.github.io/在 Windows 环境使用 proxifyre 代理应用程序.html</div>
     </div>
     <div class="license-meta">
       
@@ -358,7 +379,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年1月4日</div>
+          <div>2024年4月15日</div>
         </div>
       
       
@@ -390,9 +411,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/mqtt-v5-0-chinese.html" title="MQTT 5.0 中文文档">
+                      <a href="/Joel%E6%B5%8B%E8%AF%95%EF%BC%9A12%E6%AD%A5%E8%8E%B7%E5%BE%97%E6%9B%B4%E5%A5%BD%E7%9A%84%E4%BB%A3%E7%A0%81.html" title="[翻译]Joel测试：12步获得更好的代码">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">MQTT 5.0 中文文档</span>
+                        <span class="hidden-mobile">[翻译]Joel测试：12步获得更好的代码</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -400,8 +421,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/translate-sol-bonus.html" title="[翻译]Sol - 从零开始的MQTT broker - 特别篇：重构与事件循环">
-                        <span class="hidden-mobile">[翻译]Sol - 从零开始的MQTT broker - 特别篇：重构与事件循环</span>
+                      <a href="/Go%E6%95%99%E7%A8%8B%EF%BC%9A%E6%B3%9B%E5%9E%8B%E5%85%A5%E9%97%A8.html" title="[翻译]Go教程：泛型入门">
+                        <span class="hidden-mobile">[翻译]Go教程：泛型入门</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

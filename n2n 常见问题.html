@@ -16,22 +16,24 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="wiresock&#x2F;proxifyre 项目链接">
+    <meta name="description" content="原文 n2n Frequently Asked Questions">
 <meta property="og:type" content="article">
-<meta property="og:title" content="在 Windows 环境使用 proxifyre 代理应用程序">
-<meta property="og:url" content="https://vitsumoc.github.io/usingProxifyreInWindows.html">
+<meta property="og:title" content="[翻译] n2n 常见问题">
+<meta property="og:url" content="https://vitsumoc.github.io/n2n%20%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="wiresock&#x2F;proxifyre 项目链接">
+<meta property="og:description" content="原文 n2n Frequently Asked Questions">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-04-15T01:03:38.000Z">
-<meta property="article:modified_time" content="2024-04-15T01:43:06.433Z">
+<meta property="article:published_time" content="2023-12-07T08:55:07.000Z">
+<meta property="article:modified_time" content="2024-09-03T08:23:24.296Z">
 <meta property="article:author" content="vc">
+<meta property="article:tag" content="网络编程">
 <meta property="article:tag" content="网络工具">
+<meta property="article:tag" content="翻译">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>在 Windows 环境使用 proxifyre 代理应用程序 - Thinking...</title>
+  <title>[翻译] n2n 常见问题 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -199,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">在 Windows 环境使用 proxifyre 代理应用程序</span>
+            <span id="subtitle">[翻译] n2n 常见问题</span>
           
         </div>
 
@@ -210,8 +212,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-04-15 09:03" pubdate>
-          2024年4月15日 上午
+        <time datetime="2023-12-07 16:55" pubdate>
+          2023年12月7日 下午
         </time>
       </span>
     
@@ -222,7 +224,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          307 字
+          1.3k 字
         
       </span>
     
@@ -233,7 +235,7 @@
         
         
         
-          3 分钟
+          11 分钟
         
       </span>
     
@@ -270,57 +272,48 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">在 Windows 环境使用 proxifyre 代理应用程序</h1>
+            <h1 id="seo-header">[翻译] n2n 常见问题</h1>
             
             
               <div class="markdown-body">
                 
                 <blockquote>
-<p><a target="_blank" rel="noopener" href="https://github.com/wiresock/proxifyre">wiresock&#x2F;proxifyre 项目链接</a></p>
+<p>原文 <a target="_blank" rel="noopener" href="https://github.com/ntop/n2n/blob/dev/doc/Faq.md">n2n Frequently Asked Questions</a></p>
 </blockquote>
 <span id="more"></span>
 
-<h1 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h1><p>proxifyre 适用于，当您已经拥有一个可用的 socks5 代理，但却不了解如何让某个应用程序通过此代理收发包的情况。</p>
-<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>proxifyre 用于指定一些应用程序的网络流量通过 socks5 代理。</p>
-<p>proxifyre 是基于 Windows 包过滤器 <a target="_blank" rel="noopener" href="https://github.com/wiresock/ndisapi/tree/master/examples/cpp/socksify">socksify</a> demo 做的增强，加入了 UDP 能力，简化了配置。</p>
-<p>proxifyre 支持被注册为 Windows 服务。</p>
-<h1 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h1><p>使用 proxifyre 前需要安装两个依赖：</p>
-<ol>
-<li>Windows Packet Filter (<a target="_blank" rel="noopener" href="https://github.com/wiresock/ndisapi/releases">WinpkFilter</a>)</li>
-<li>Visual Studio Runtime Libraries(<a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170">Visual Studio 2022 redistributable download page</a>)</li>
-</ol>
-<h1 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h1><p>proxifyre 默认配置文件名为 app-config.json，将配置文件放到 proxifyre 执行目录下会被直接使用，配置文件示例如下：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-json" data-language="json"><code class="language-json"><span class="token punctuation">&#123;</span>
- <span class="token property">"logLevel"</span><span class="token operator">:</span> <span class="token string">"None"</span><span class="token punctuation">,</span>
- <span class="token property">"proxies"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
-         <span class="token punctuation">&#123;</span>
-         <span class="token property">"appNames"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"chrome"</span><span class="token punctuation">,</span> <span class="token string">"C:\\Program Files\\WindowsApps\\ROBLOXCORPORATION.ROBLOX"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-         <span class="token property">"socks5ProxyEndpoint"</span><span class="token operator">:</span> <span class="token string">"158.101.205.51:1080"</span><span class="token punctuation">,</span>
-         <span class="token property">"username"</span><span class="token operator">:</span> <span class="token string">"username1"</span><span class="token punctuation">,</span>
-         <span class="token property">"password"</span><span class="token operator">:</span> <span class="token string">"password1"</span><span class="token punctuation">,</span>
-         <span class="token property">"supportedProtocols"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"TCP"</span><span class="token punctuation">,</span> <span class="token string">"UDP"</span><span class="token punctuation">]</span>
-         <span class="token punctuation">&#125;</span>
-     <span class="token punctuation">]</span>
-<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-
-<ul>
-<li>logLevel: 日志等级，可选项为：<code>None</code> <code>Info</code> <code>Deb</code> <code>All</code></li>
-<li>proxies：代理配置列表</li>
-<li>appNames：被代理程序名，采用模糊匹配，例如 <code>chrome</code> 会匹配到包含 <code>chrome</code> 字符串的所有程序。如果使用路径则可以精确匹配。</li>
-<li>socks5ProxyEndpoint：socks5 服务位置，地址+端口。</li>
-<li>username：如果 socks5 服务用户名，可不填。</li>
-<li>password：socks5 服务密码，可不填。</li>
-<li>supportedProtocols：被代理的网络协议，支持 TCP UDP。</li>
-</ul>
-<h1 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h1><p>完成配置后，直接运行 ProxiFyre.exe 即可使用，日志文件会生成在 <code>/logs</code> 路径。</p>
-<p>也可以通过下列命令进行服务的注册、启动、停止和卸载，通过 Windows 服务管理：</p>
-<ul>
-<li>ProxiFyre.exe install</li>
-<li>ProxiFyre.exe start</li>
-<li>ProxiFyre.exe stop</li>
-<li>ProxiFyre.exe uninstall</li>
-</ul>
-<p>当然也可以通过 nssm 工具将 ProxiFyre.exe 注册为 Windows 服务。</p>
+<h1 id="n2n-常见问题"><a href="#n2n-常见问题" class="headerlink" title="n2n 常见问题"></a>n2n 常见问题</h1><h2 id="发布"><a href="#发布" class="headerlink" title="发布"></a>发布</h2><h3 id="哪里能找到Windows系统的n2n软件？"><a href="#哪里能找到Windows系统的n2n软件？" class="headerlink" title="哪里能找到Windows系统的n2n软件？"></a>哪里能找到Windows系统的n2n软件？</h3><p>我们没有在<code>release</code>中发布Windows版本的n2n，但是我们的自动化测试流程会创建他们。你可以点击项目界面中的 <code>Actions</code>，选择 <code>Testing</code>，进入最近一次的运行实例，在界面最下方的 <code>Artifacts</code> 处下载 <code>binaries</code>，其中就包括了编译好的windows版本<code>n2n</code>。通常来说你可以使用 <code>x86_64-w64-mingw32\usr\sbin</code> 路径下的版本。</p>
+<p>此外，正如我们的<a target="_blank" rel="noopener" href="https://github.com/ntop/n2n#further-readings-and-related-projects">README</a>中提到的，luckytu 一直在更新<code>n2n</code>的<a target="_blank" rel="noopener" href="https://github.com/lucktu/n2n">Windows版本</a>，你也可以在他那里直接下载编译后的软件。</p>
+<h2 id="Supernode"><a href="#Supernode" class="headerlink" title="Supernode"></a>Supernode</h2><h3 id="我想部署一个私有的，有密码保护的supernode，需要怎么设置？"><a href="#我想部署一个私有的，有密码保护的supernode，需要怎么设置？" class="headerlink" title="我想部署一个私有的，有密码保护的supernode，需要怎么设置？"></a>我想部署一个私有的，有密码保护的supernode，需要怎么设置？</h3><p>你可以直接配置 <code>community.list</code> 文件，在其中设置一个 <code>&lt;community name&gt;</code> (输入单行文本即可) ，然后把这个 <code>&lt;community name&gt;</code> 当作您的密码。</p>
+<p>在启动 <code>supernode</code> 时，记得加上 <code>-c &lt;community file&gt;</code> 参数指定配置文件。这样，只有设置了 <code>-c &lt;community name&gt;</code> 的 <code>edge</code> 可以使用 <code>supernode</code>。</p>
+<p>此时，在您的 <code>edge</code> 向 <code>supernode</code> 注册的过程中，<code>&lt;community name&gt;</code> 是明文传递的。如果您想要对传输过程进行加密，需要在<strong>所有</strong> <code>edge</code> 节点启动时添加 <code>-H</code> 参数。</p>
+<p>另外，请参阅 <code>n2n</code> 附带的 <code>community.list</code> 文件以了解该文件的高级使用。</p>
+<p>除了这个访问障碍之外，您可能希望在边缘使用有效负载加密 -A_。</p>
+<p>只有边缘（而不是超级节点）能够解密有效负载数据。</p>
+<p>因此，即使任何人都能够打破超级节点的访问障碍，有效负载仍然受到有效负载加密的保护，请参阅此文档了解详细信息。</p>
+<p>除了上述的这些安全手段之外，您还可以在 <code>edge</code> 添加 <code>-A_</code> 参数来加密传输的数据。数据的加密和解密都是 <code>edge</code> 进行的，所以即使是 <code>supernode</code> 节点也无法解密数据内容。因此，即使你的 <code>supernode</code> 节点被黑客入侵，你的数据内容依然是被加密算法保护的。更多细节可以参考这一篇关于加密的<a target="_blank" rel="noopener" href="https://github.com/ntop/n2n/blob/dev/doc/Crypto.md">文档</a>。</p>
+<h3 id="我可以在supernode查看接入的edge列表吗？"><a href="#我可以在supernode查看接入的edge列表吗？" class="headerlink" title="我可以在supernode查看接入的edge列表吗？"></a>我可以在supernode查看接入的edge列表吗？</h3><p>可以，<code>supernode</code> 通过UDP提供了基本的管理接口，默认端口是5645，可以通过 <code>-t</code> 参数修改。</p>
+<p>只需要发送一个新的行就可以查询当前状态，例如，在 <code>supernode</code> <strong>本机</strong>（远程链接不可以）上按下[ENTER]键，然后输入如下命令：</p>
+<p><code>netcat -u localhost 5645</code></p>
+<h3 id="支持多个supernode节点的部署方式吗？"><a href="#支持多个supernode节点的部署方式吗？" class="headerlink" title="支持多个supernode节点的部署方式吗？"></a>支持多个supernode节点的部署方式吗？</h3><p>支持，这篇<a target="_blank" rel="noopener" href="https://github.com/ntop/n2n/blob/dev/doc/Federation.md">文档</a>描述了如何部署多个 <code>supernode</code> 节点来提升网络的可用性。</p>
+<h3 id="supernode可以监听多个UDP端口吗？"><a href="#supernode可以监听多个UDP端口吗？" class="headerlink" title="supernode可以监听多个UDP端口吗？"></a>supernode可以监听多个UDP端口吗？</h3><p><code>supernode</code> 本身只支持监听一个端口，但是你应该可以通过做NAT的方式将多个端口映射到同一个端口上，例如：</p>
+<p><code>sudo iptables -t nat -A PREROUTING -i &lt;network interface name&gt; -d &lt;supernode&#39;s ip address&gt; -p udp --dport &lt;additional port number&gt; -j REDIRECT --to-ports &lt;regular supernode port number&gt;</code></p>
+<p>这条命令可以作为 <code>ExecStartPost=</code> 添加到 <code>supernode</code> 的 <code>.service</code> 文件中（不需要加sudo），如果需要映射多个端口，可以多加几行。</p>
+<h3 id="这个报错是怎么回事-“process-udp-dropped-a-packet-with-seemingly-encrypted-header-for-which-no-matching-community-which-uses-encrypted-headers-was-found”？"><a href="#这个报错是怎么回事-“process-udp-dropped-a-packet-with-seemingly-encrypted-header-for-which-no-matching-community-which-uses-encrypted-headers-was-found”？" class="headerlink" title="这个报错是怎么回事 “process_udp dropped a packet with seemingly encrypted header for which no matching community which uses encrypted headers was found”？"></a>这个报错是怎么回事 “process_udp dropped a packet with seemingly encrypted header for which no matching community which uses encrypted headers was found”？</h3><p>这条报错的意思是 <code>supernode</code> 收到了一个无法使用的数据包。<code>supernode</code> 先将这个包视为一个未加密的包来处理，如果处理失败的话，<code>supernode</code> 会<strong>假定</strong>这是一个加密的数据包，之后 <code>supernode</code> 会尝试所有可以生成key的 <code>community</code> （排除明确没有加密的<code>community</code>）。如果任何 <code>community</code> 的key都无法解开此数据包，就会产生这条报错。</p>
+<p>如果所有 <code>edge</code> 的 <code>-H</code> 参数配置是相同的（都有 <code>-H</code> 或者都没有 <code>-H</code> ），并且重启 <code>supernode</code> 后依然报错，最大的可能是 <code>supernode</code> 或者 <code>edge</code> 的版本不一致，导致了数据包格式不一致。</p>
+<p>因此，请确保所有 <code>edge</code> <strong>和</strong> <code>supernode</code> 具有完全相同的版本，例如：最新的 <code>_dev_</code> 分支。</p>
+<h2 id="Edge"><a href="#Edge" class="headerlink" title="Edge"></a>Edge</h2><h3 id="如何查看p2p链接的状态？"><a href="#如何查看p2p链接的状态？" class="headerlink" title="如何查看p2p链接的状态？"></a>如何查看p2p链接的状态？</h3><p><code>edge</code> 同样提供了一个本地的UDP管理端口，包括了 <em>peers</em> 这种已经建立的p2p链接，还有 <em>pending peers</em> 这种通过 <code>supernode</code> 中转的链接。</p>
+<p><code>edge</code> 的默认管理端口号是 5644，可以通过 <code>-t</code> 参数修改。可以在<strong>本机</strong>通过此命令查看：</p>
+<p><code>netcat -u localhost 5644</code></p>
+<p>发送空行就可以查看链接信息，对于其他的命令行功能，请通过 <code>help</code> 查看。</p>
+<h3 id="edge-反复报错-“Authentication-error-MAC-or-IP-address-already-in-use-or-not-released-yet-by-supernode”。是什么问题？"><a href="#edge-反复报错-“Authentication-error-MAC-or-IP-address-already-in-use-or-not-released-yet-by-supernode”。是什么问题？" class="headerlink" title="edge 反复报错 “Authentication error. MAC or IP address already in use or not released yet by supernode”。是什么问题？"></a>edge 反复报错 “Authentication error. MAC or IP address already in use or not released yet by supernode”。是什么问题？</h3><p>Edge 遇到了 n2n 的防欺骗保护。</p>
+<p>它可以防止一个边缘的身份（MAC 和 IP 地址）在原始边缘仍然在线时被其他边缘冒充，请参阅一些详细信息。</p>
+<p>大多数情况下，有两种情况可以触发此操作：</p>
+<p>这是触发了 <code>n2n</code> 的防欺骗保护机制，这个机制可以防止已经在线的 <code>edge</code> 节点被其他人冒充，这篇<a href="Authentication.md">文档</a>有更详细的描述。总之，大部分情况下，有两种可能触发这个机制：</p>
+<p>你使用的 MAC 地址或 IP 地址已经被使用了，修改这些参数就可以了。</p>
+<p>如果一个 <code>edge</code> 非正常退出，例如被 <code>kill -9 ...</code> 或 <code>kill -SIGKILL ...</code>，那么这个 <code>edge</code> 可能没有机会通知 <code>supernode</code> 取消注册，因此 <code>supernode</code> 仍然认为此 <code>edge</code> 在线，此时具有相同 MAC 或 IP 地址的注册就不会成功。</p>
+<p><code>supernode</code> 记录 <code>edge</code> 的超时时间是两分钟，所以可以等待两分钟，或者换不同的 MAC 和 IP 地址注册。</p>
+<p>基本上来说，不管是 <code>CTRL</code> + <code>C</code> 或是 <code>kill -SIGTERM ...</code> 或者 <code>kill -SIGINT ...</code> 或者 <code>kill ...</code> 不带9，都可以正常的结束 <code>edge</code>，在管理接口下发 <code>stop</code> 命令也可以停止 <code>edge</code> ，所以大部分情况下无需使用 <code>kill -9 ...</code>。</p>
 
                 
               </div>
@@ -354,7 +347,11 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
+        <a href="/tags/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="print-no-link">#网络编程</a>
+      
         <a href="/tags/%E7%BD%91%E7%BB%9C%E5%B7%A5%E5%85%B7/" class="print-no-link">#网络工具</a>
+      
+        <a href="/tags/%E7%BF%BB%E8%AF%91/" class="print-no-link">#翻译</a>
       
     </div>
   
@@ -366,8 +363,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>在 Windows 环境使用 proxifyre 代理应用程序</div>
-      <div>https://vitsumoc.github.io/usingProxifyreInWindows.html</div>
+      <div>[翻译] n2n 常见问题</div>
+      <div>https://vitsumoc.github.io/n2n 常见问题.html</div>
     </div>
     <div class="license-meta">
       
@@ -379,7 +376,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年4月15日</div>
+          <div>2023年12月7日</div>
         </div>
       
       
@@ -411,9 +408,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/Joel%E6%B5%8B%E8%AF%95%EF%BC%9A12%E6%AD%A5%E8%8E%B7%E5%BE%97%E6%9B%B4%E5%A5%BD%E7%9A%84%E4%BB%A3%E7%A0%81.html" title="[翻译]Joel测试：12步获得更好的代码">
+                      <a href="/translate-sol-1.html" title="[翻译]Sol - 从零开始的MQTT broker - 第一部分：协议">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">[翻译]Joel测试：12步获得更好的代码</span>
+                        <span class="hidden-mobile">[翻译]Sol - 从零开始的MQTT broker - 第一部分：协议</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -421,8 +418,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/Go%E6%95%99%E7%A8%8B%EF%BC%9A%E6%B3%9B%E5%9E%8B%E5%85%A5%E9%97%A8.html" title="[翻译]Go教程：泛型入门">
-                        <span class="hidden-mobile">[翻译]Go教程：泛型入门</span>
+                      <a href="/%E4%BD%BF%E7%94%A8n2n%E8%BF%9E%E6%8E%A5%E4%B8%8D%E5%90%8C%E5%B1%80%E5%9F%9F%E7%BD%91%E8%AE%BE%E5%A4%87.html" title="使用n2n连接不同局域网设备">
+                        <span class="hidden-mobile">使用n2n连接不同局域网设备</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
