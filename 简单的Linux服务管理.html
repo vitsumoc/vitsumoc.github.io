@@ -24,7 +24,7 @@
 <meta property="og:description" content="在这里记录一些基础的 Linux 服务管理维护方式，作为程序员，总是会用到的。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-05-22T07:30:38.000Z">
-<meta property="article:modified_time" content="2024-05-22T08:10:27.402Z">
+<meta property="article:modified_time" content="2024-09-06T06:33:23.370Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="Linux">
 <meta property="article:tag" content="运维">
@@ -223,7 +223,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          272 字
+          365 字
         
       </span>
     
@@ -234,7 +234,7 @@
         
         
         
-          3 分钟
+          4 分钟
         
       </span>
     
@@ -290,7 +290,7 @@
 <li>难以接入各种自动化工具</li>
 </ul>
 <p>因此，将程序注册为服务是一个更好的选择。</p>
-<h1 id="注册服务"><a href="#注册服务" class="headerlink" title="注册服务"></a>注册服务</h1><p>如果想将我们的程序注册为服务，首先需要编写一个配置文件，这个文件可以放在 <code>/etc/systemd/system/</code> 路径下。</p>
+<h1 id="使用-root-用户操作系统级服务"><a href="#使用-root-用户操作系统级服务" class="headerlink" title="使用 root 用户操作系统级服务"></a>使用 root 用户操作系统级服务</h1><h2 id="注册服务"><a href="#注册服务" class="headerlink" title="注册服务"></a>注册服务</h2><p>如果想将我们的程序注册为服务，首先需要编写一个配置文件，这个文件可以放在 <code>/etc/systemd/system/</code> 路径下。</p>
 <p>文件的名称一般参考服务的名称，并以 <code>.server</code> 结尾，因此在这个例子中，我的文件名为 <code>yongwang.service</code>：</p>
 <figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><div class="caption"><span>yongwang.service</span></div><code class="language-text">[Unit]
 Description=YongWang Server
@@ -305,7 +305,7 @@ WantedBy=multi-user.target<span aria-hidden="true" class="line-numbers-rows"><sp
 <p>之后，需要通过命令注册服务</p>
 <figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">systemctl daemon-reload<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
 
-<h1 id="服务管理命令"><a href="#服务管理命令" class="headerlink" title="服务管理命令"></a>服务管理命令</h1><p>后续我们对服务的管理，一般包括：</p>
+<h2 id="服务管理命令"><a href="#服务管理命令" class="headerlink" title="服务管理命令"></a>服务管理命令</h2><p>后续我们对服务的管理，一般包括：</p>
 <ul>
 <li>启动服务</li>
 </ul>
@@ -330,6 +330,22 @@ WantedBy=multi-user.target<span aria-hidden="true" class="line-numbers-rows"><sp
 <li>取消开机自启</li>
 </ul>
 <figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">systemctl disable yongwang<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+
+<h1 id="使用普通用户注册用户级服务"><a href="#使用普通用户注册用户级服务" class="headerlink" title="使用普通用户注册用户级服务"></a>使用普通用户注册用户级服务</h1><h2 id="注册服务-1"><a href="#注册服务-1" class="headerlink" title="注册服务"></a>注册服务</h2><p>对于非 root 用户，也可以使用自身的权限注册用户级服务，将配置文件编写在 <code>/etc/systemd/user/</code> 路径下：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><div class="caption"><span>yongwangapp.service</span></div><code class="language-text">[Unit]
+Description=YongWang Server
+
+[Service]
+User=lenovo
+Group=lenovo
+WorkingDirectory=/home/lenovo/vc/ywyl/server/
+ExecStart=java -jar YongWang-1.0-SNAPSHOT.jar
+
+[Install]
+WantedBy=multi-user.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h2 id="服务管理命令-1"><a href="#服务管理命令-1" class="headerlink" title="服务管理命令"></a>服务管理命令</h2><p>普通用户的服务管理命令与 root 用户相似，但都需要添加 <code>--user</code> 参数，例如：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">systemctl <span class="token parameter variable">--user</span> start yongwang<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
                 
               </div>
             
