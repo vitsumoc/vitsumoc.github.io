@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>在Ubuntu上安装SVN服务</title>
+    <link href="/%E5%9C%A8Ubuntu%E4%B8%8A%E5%AE%89%E8%A3%85SVN%E6%9C%8D%E5%8A%A1.html"/>
+    <url>/%E5%9C%A8Ubuntu%E4%B8%8A%E5%AE%89%E8%A3%85SVN%E6%9C%8D%E5%8A%A1.html</url>
+    
+    <content type="html"><![CDATA[<p><a href="https://www.cnblogs.com/xiaostudy/p/11374100.html">参考</a></p><h3 id="安装-SVN-服务"><a href="#安装-SVN-服务" class="headerlink" title="安装 SVN 服务"></a>安装 SVN 服务</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> subversion<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure><span id="more"></span><h3 id="创建根目录文件夹"><a href="#创建根目录文件夹" class="headerlink" title="创建根目录文件夹"></a>创建根目录文件夹</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">mkdir</span> /root/svn<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure><h3 id="创建仓库文件夹"><a href="#创建仓库文件夹" class="headerlink" title="创建仓库文件夹"></a>创建仓库文件夹</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">mkdir</span> /root/svn/shidian<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure><h3 id="创建仓库"><a href="#创建仓库" class="headerlink" title="创建仓库"></a>创建仓库</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">svnadmin create /root/svn/shidian<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure><h3 id="仓库创建成功"><a href="#仓库创建成功" class="headerlink" title="仓库创建成功"></a>仓库创建成功</h3><p>文件夹中生成了下列内容：</p><ul><li>conf</li><li>db</li><li>format</li><li>hooks</li><li>locks</li><li>README.txt</li></ul><h3 id="启动服务"><a href="#启动服务" class="headerlink" title="启动服务"></a>启动服务</h3><p>svnserve -d -r &#x2F;root&#x2F;svn –listen-port 17749</p><h3 id="创建全局的账号密码和权限文件"><a href="#创建全局的账号密码和权限文件" class="headerlink" title="创建全局的账号密码和权限文件"></a>创建全局的账号密码和权限文件</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">touch</span> /root/svn/passwd<span class="token function">touch</span> /root/svn/authz<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure><h3 id="添加账号密码"><a href="#添加账号密码" class="headerlink" title="添加账号密码"></a>添加账号密码</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">vi</span> /root/svn/passwd<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure><figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><div class="caption"><span>passwd</span></div><code class="language-text">[users]user1 = password<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure><h3 id="添加权限配置"><a href="#添加权限配置" class="headerlink" title="添加权限配置"></a>添加权限配置</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">vi</span> /root/svn/authz<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure><p>可按分组或按用户配置：</p><figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><div class="caption"><span>authz</span></div><code class="language-text">[groups]coder = user1,user2[shidian:/]@coder = rw* = r[u1:/]user1 = rw<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure><h3 id="在仓库中配置鉴权"><a href="#在仓库中配置鉴权" class="headerlink" title="在仓库中配置鉴权"></a>在仓库中配置鉴权</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">vi</span> /root/svn/shidian/conf/svnserve.conf<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure><p>修改下列四行</p><figure><div class="code-wrapper"><pre class="line-numbers language-conf" data-language="conf"><div class="caption"><span>svnserve.conf</span></div><code class="language-conf">anon-access &#x3D; noneauth-access &#x3D; writepassword-db &#x3D; &#x2F;root&#x2F;svn&#x2F;passwdauthz-db &#x3D; &#x2F;root&#x2F;svn&#x2F;authz<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>运维</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>运维</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>[未完成]一个Go中的闭包问题</title>
     <link href="/%E4%B8%80%E4%B8%AAGo%E4%B8%AD%E7%9A%84%E9%97%AD%E5%8C%85%E9%97%AE%E9%A2%98.html"/>
     <url>/%E4%B8%80%E4%B8%AAGo%E4%B8%AD%E7%9A%84%E9%97%AD%E5%8C%85%E9%97%AE%E9%A2%98.html</url>

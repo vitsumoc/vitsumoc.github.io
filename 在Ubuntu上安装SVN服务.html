@@ -16,22 +16,22 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="&#x2F;&#x2F; 用来记录找到节点的数据 var resultKt *model.KnowTree resultList :&#x3D; make([]*model.KnowTree, 0) resultMap :&#x3D; make(map[int]*model.KnowTree) fmt.Println(id)  &#x2F;&#x2F; 先找到根节点 for _, kt :&#x3D; range kts &amp;#123; 	if *kt.Id &#x3D;&#x3D; i">
+    <meta name="description" content="参考 安装 SVN 服务sudo apt-get install subversion">
 <meta property="og:type" content="article">
-<meta property="og:title" content="[未完成]一个Go中的闭包问题">
-<meta property="og:url" content="https://vitsumoc.github.io/%E4%B8%80%E4%B8%AAGo%E4%B8%AD%E7%9A%84%E9%97%AD%E5%8C%85%E9%97%AE%E9%A2%98.html">
+<meta property="og:title" content="在Ubuntu上安装SVN服务">
+<meta property="og:url" content="https://vitsumoc.github.io/%E5%9C%A8Ubuntu%E4%B8%8A%E5%AE%89%E8%A3%85SVN%E6%9C%8D%E5%8A%A1.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="&#x2F;&#x2F; 用来记录找到节点的数据 var resultKt *model.KnowTree resultList :&#x3D; make([]*model.KnowTree, 0) resultMap :&#x3D; make(map[int]*model.KnowTree) fmt.Println(id)  &#x2F;&#x2F; 先找到根节点 for _, kt :&#x3D; range kts &amp;#123; 	if *kt.Id &#x3D;&#x3D; i">
+<meta property="og:description" content="参考 安装 SVN 服务sudo apt-get install subversion">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-09-03T08:19:35.000Z">
-<meta property="article:modified_time" content="2024-09-03T08:21:16.155Z">
+<meta property="article:published_time" content="2024-09-11T05:22:06.000Z">
+<meta property="article:modified_time" content="2024-09-11T05:59:26.402Z">
 <meta property="article:author" content="vc">
-<meta property="article:tag" content="go">
+<meta property="article:tag" content="运维">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>[未完成]一个Go中的闭包问题 - Thinking...</title>
+  <title>在Ubuntu上安装SVN服务 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -199,7 +199,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">[未完成]一个Go中的闭包问题</span>
+            <span id="subtitle">在Ubuntu上安装SVN服务</span>
           
         </div>
 
@@ -210,8 +210,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-09-03 16:19" pubdate>
-          2024年9月3日 下午
+        <time datetime="2024-09-11 13:22" pubdate>
+          2024年9月11日 下午
         </time>
       </span>
     
@@ -222,7 +222,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          17 字
+          96 字
         
       </span>
     
@@ -270,25 +270,60 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">[未完成]一个Go中的闭包问题</h1>
+            <h1 id="seo-header">在Ubuntu上安装SVN服务</h1>
             
             
               <div class="markdown-body">
                 
-                <figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// 用来记录找到节点的数据</span>
-<span class="token keyword">var</span> resultKt <span class="token operator">*</span>model<span class="token punctuation">.</span>KnowTree
-resultList <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">*</span>model<span class="token punctuation">.</span>KnowTree<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
-resultMap <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">int</span><span class="token punctuation">]</span><span class="token operator">*</span>model<span class="token punctuation">.</span>KnowTree<span class="token punctuation">)</span>
-fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span>id<span class="token punctuation">)</span>
+                <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/xiaostudy/p/11374100.html">参考</a></p>
+<h3 id="安装-SVN-服务"><a href="#安装-SVN-服务" class="headerlink" title="安装 SVN 服务"></a>安装 SVN 服务</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> subversion<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
 
-<span class="token comment">// 先找到根节点</span>
-<span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> kt <span class="token operator">:=</span> <span class="token keyword">range</span> kts <span class="token punctuation">&#123;</span>
-	<span class="token keyword">if</span> <span class="token operator">*</span>kt<span class="token punctuation">.</span>Id <span class="token operator">==</span> id <span class="token punctuation">&#123;</span>
-		fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token operator">*</span>kt<span class="token punctuation">.</span>Id<span class="token punctuation">)</span>
-		resultKt <span class="token operator">=</span> <span class="token operator">&amp;</span>kt
-	<span class="token punctuation">&#125;</span>
-<span class="token punctuation">&#125;</span>
-fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span>resultKt<span class="token punctuation">.</span><span class="token function">ToDebug</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<span id="more"></span>
+
+<h3 id="创建根目录文件夹"><a href="#创建根目录文件夹" class="headerlink" title="创建根目录文件夹"></a>创建根目录文件夹</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">mkdir</span> /root/svn<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+
+<h3 id="创建仓库文件夹"><a href="#创建仓库文件夹" class="headerlink" title="创建仓库文件夹"></a>创建仓库文件夹</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">mkdir</span> /root/svn/shidian<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+
+<h3 id="创建仓库"><a href="#创建仓库" class="headerlink" title="创建仓库"></a>创建仓库</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">svnadmin create /root/svn/shidian<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+
+<h3 id="仓库创建成功"><a href="#仓库创建成功" class="headerlink" title="仓库创建成功"></a>仓库创建成功</h3><p>文件夹中生成了下列内容：</p>
+<ul>
+<li>conf</li>
+<li>db</li>
+<li>format</li>
+<li>hooks</li>
+<li>locks</li>
+<li>README.txt</li>
+</ul>
+<h3 id="启动服务"><a href="#启动服务" class="headerlink" title="启动服务"></a>启动服务</h3><p>svnserve -d -r &#x2F;root&#x2F;svn –listen-port 17749</p>
+<h3 id="创建全局的账号密码和权限文件"><a href="#创建全局的账号密码和权限文件" class="headerlink" title="创建全局的账号密码和权限文件"></a>创建全局的账号密码和权限文件</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">touch</span> /root/svn/passwd
+<span class="token function">touch</span> /root/svn/authz<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+
+<h3 id="添加账号密码"><a href="#添加账号密码" class="headerlink" title="添加账号密码"></a>添加账号密码</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">vi</span> /root/svn/passwd<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+
+<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><div class="caption"><span>passwd</span></div><code class="language-text">[users]
+user1 = password<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+
+<h3 id="添加权限配置"><a href="#添加权限配置" class="headerlink" title="添加权限配置"></a>添加权限配置</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">vi</span> /root/svn/authz<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+
+<p>可按分组或按用户配置：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><div class="caption"><span>authz</span></div><code class="language-text">[groups]
+coder = user1,user2
+
+[shidian:/]
+@coder = rw
+* = r
+
+[u1:/]
+user1 = rw<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h3 id="在仓库中配置鉴权"><a href="#在仓库中配置鉴权" class="headerlink" title="在仓库中配置鉴权"></a>在仓库中配置鉴权</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">vi</span> /root/svn/shidian/conf/svnserve.conf<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+
+<p>修改下列四行</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-conf" data-language="conf"><div class="caption"><span>svnserve.conf</span></div><code class="language-conf">anon-access &#x3D; none
+auth-access &#x3D; write
+password-db &#x3D; &#x2F;root&#x2F;svn&#x2F;passwd
+authz-db &#x3D; &#x2F;root&#x2F;svn&#x2F;authz<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
                 
               </div>
             
@@ -306,7 +341,7 @@ fmt<span class="token punctuation">.</span><span class="token function">Println<
     
       <span class="category-chain">
         
-  <a href="/categories/go/" class="category-chain-item">go</a>
+  <a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-chain-item">运维</a>
   
   
 
@@ -321,7 +356,7 @@ fmt<span class="token punctuation">.</span><span class="token function">Println<
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/go/" class="print-no-link">#go</a>
+        <a href="/tags/%E8%BF%90%E7%BB%B4/" class="print-no-link">#运维</a>
       
     </div>
   
@@ -333,8 +368,8 @@ fmt<span class="token punctuation">.</span><span class="token function">Println<
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>[未完成]一个Go中的闭包问题</div>
-      <div>https://vitsumoc.github.io/一个Go中的闭包问题.html</div>
+      <div>在Ubuntu上安装SVN服务</div>
+      <div>https://vitsumoc.github.io/在Ubuntu上安装SVN服务.html</div>
     </div>
     <div class="license-meta">
       
@@ -346,7 +381,7 @@ fmt<span class="token punctuation">.</span><span class="token function">Println<
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年9月3日</div>
+          <div>2024年9月11日</div>
         </div>
       
       
@@ -378,18 +413,12 @@ fmt<span class="token punctuation">.</span><span class="token function">Println<
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/%E5%9C%A8Ubuntu%E4%B8%8A%E5%AE%89%E8%A3%85SVN%E6%9C%8D%E5%8A%A1.html" title="在Ubuntu上安装SVN服务">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">在Ubuntu上安装SVN服务</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/%5B%E8%BD%AC%5Dnetperf%E5%92%8Ciperf%E7%BD%91%E7%BB%9C%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95%E5%B0%8F%E7%BB%93.html" title="[转]netperf和iperf网络性能测试小结">
-                        <span class="hidden-mobile">[转]netperf和iperf网络性能测试小结</span>
+                      <a href="/%E4%B8%80%E4%B8%AAGo%E4%B8%AD%E7%9A%84%E9%97%AD%E5%8C%85%E9%97%AE%E9%A2%98.html" title="[未完成]一个Go中的闭包问题">
+                        <span class="hidden-mobile">[未完成]一个Go中的闭包问题</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
