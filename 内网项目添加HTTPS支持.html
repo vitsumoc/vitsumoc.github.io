@@ -16,22 +16,24 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="参考 安装 SVN 服务sudo apt-get install subversion">
+    <meta name="description" content="公司实施了一些部署在客户内网的项目，思来想去还是用 HTTPS 访问服务器比较好，既解决了很多数据安全的问题，又满足了很多浏览器功能的安全性要求。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="在Ubuntu上安装SVN服务">
-<meta property="og:url" content="https://vitsumoc.github.io/%E5%9C%A8Ubuntu%E4%B8%8A%E5%AE%89%E8%A3%85SVN%E6%9C%8D%E5%8A%A1.html">
+<meta property="og:title" content="内网项目添加HTTPS支持">
+<meta property="og:url" content="https://vitsumoc.github.io/%E5%86%85%E7%BD%91%E9%A1%B9%E7%9B%AE%E6%B7%BB%E5%8A%A0HTTPS%E6%94%AF%E6%8C%81.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="参考 安装 SVN 服务sudo apt-get install subversion">
+<meta property="og:description" content="公司实施了一些部署在客户内网的项目，思来想去还是用 HTTPS 访问服务器比较好，既解决了很多数据安全的问题，又满足了很多浏览器功能的安全性要求。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-09-11T05:22:06.000Z">
-<meta property="article:modified_time" content="2024-09-11T05:59:26.402Z">
+<meta property="article:published_time" content="2024-10-22T02:43:29.000Z">
+<meta property="article:modified_time" content="2024-10-22T07:12:50.798Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="运维">
+<meta property="article:tag" content="caddy">
+<meta property="article:tag" content="项目实战">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>在Ubuntu上安装SVN服务 - Thinking...</title>
+  <title>内网项目添加HTTPS支持 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -199,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">在Ubuntu上安装SVN服务</span>
+            <span id="subtitle">内网项目添加HTTPS支持</span>
           
         </div>
 
@@ -210,8 +212,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-09-11 13:22" pubdate>
-          2024年9月11日 下午
+        <time datetime="2024-10-22 10:43" pubdate>
+          2024年10月22日 上午
         </time>
       </span>
     
@@ -222,7 +224,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          96 字
+          260 字
         
       </span>
     
@@ -233,7 +235,7 @@
         
         
         
-          1 分钟
+          3 分钟
         
       </span>
     
@@ -270,60 +272,97 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">在Ubuntu上安装SVN服务</h1>
+            <h1 id="seo-header">内网项目添加HTTPS支持</h1>
             
             
               <div class="markdown-body">
                 
-                <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/xiaostudy/p/11374100.html">参考</a></p>
-<h3 id="安装-SVN-服务"><a href="#安装-SVN-服务" class="headerlink" title="安装 SVN 服务"></a>安装 SVN 服务</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">apt-get</span> <span class="token function">install</span> subversion<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-
+                <p>公司实施了一些部署在客户内网的项目，思来想去还是用 HTTPS 访问服务器比较好，既解决了很多数据安全的问题，又满足了很多浏览器功能的安全性要求。</p>
 <span id="more"></span>
 
-<h3 id="创建根目录文件夹"><a href="#创建根目录文件夹" class="headerlink" title="创建根目录文件夹"></a>创建根目录文件夹</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">mkdir</span> /root/svn<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-
-<h3 id="创建仓库文件夹"><a href="#创建仓库文件夹" class="headerlink" title="创建仓库文件夹"></a>创建仓库文件夹</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">mkdir</span> /root/svn/shidian<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-
-<h3 id="创建仓库"><a href="#创建仓库" class="headerlink" title="创建仓库"></a>创建仓库</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">svnadmin create /root/svn/shidian<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-
-<h3 id="仓库创建成功"><a href="#仓库创建成功" class="headerlink" title="仓库创建成功"></a>仓库创建成功</h3><p>文件夹中生成了下列内容：</p>
+<p>实现路径大致如下：</p>
 <ul>
-<li>conf</li>
-<li>db</li>
-<li>format</li>
-<li>hooks</li>
-<li>locks</li>
-<li>README.txt</li>
+<li>创建和签名SSL&#x2F;TLS证书</li>
+<li>部署 HTTPS 服务</li>
+<li>修改 DNS 或客户端 host，让客户端可将域名解析到服务器</li>
+<li>客户端安装证书</li>
 </ul>
-<h3 id="启动服务"><a href="#启动服务" class="headerlink" title="启动服务"></a>启动服务</h3><p>svnserve -d -r &#x2F;root&#x2F;svn –listen-port 17749</p>
-<h3 id="创建全局的账号密码和权限文件"><a href="#创建全局的账号密码和权限文件" class="headerlink" title="创建全局的账号密码和权限文件"></a>创建全局的账号密码和权限文件</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">touch</span> /root/svn/passwd
-<span class="token function">touch</span> /root/svn/authz<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+<h1 id="创建和签名-SSL-TLS-证书"><a href="#创建和签名-SSL-TLS-证书" class="headerlink" title="创建和签名 SSL&#x2F;TLS 证书"></a>创建和签名 SSL&#x2F;TLS 证书</h1><blockquote>
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/shisuizhe/p/13712591.html">参考</a><br><a target="_blank" rel="noopener" href="https://monkeywie.cn/2019/11/15/create-ssl-cert-with-san/">参考</a></p>
+</blockquote>
+<ul>
+<li><p>CA私钥和自签证书</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">openssl req <span class="token parameter variable">-x509</span> <span class="token parameter variable">-newkey</span> rsa:4096 <span class="token parameter variable">-days</span> <span class="token number">25568</span> <span class="token parameter variable">-keyout</span> ca-key.pem <span class="token parameter variable">-out</span> ca-cert.pem <span class="token parameter variable">-subj</span> <span class="token string">"/C=cn/ST=shenzhen/L=shenzhen/O=msj/OU=msj/CN=msj"</span>
+Enter PEM pass phrase:******<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+</li>
+<li><p>服务器私钥和请求</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">openssl req <span class="token parameter variable">-newkey</span> rsa:4096 <span class="token parameter variable">-nodes</span> <span class="token parameter variable">-keyout</span> battery-cap-key.pem <span class="token parameter variable">-out</span> battery-cap-req.pem <span class="token parameter variable">-subj</span> <span class="token string">"/C=cn/ST=shenzhen/L=shenzhen/O=msj/OU=msj/CN=battery-cap.msj"</span> <span class="token parameter variable">-reqexts</span> SAN <span class="token parameter variable">-config</span> openssl.cnf<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+</li>
+<li><p>CA 签署服务器证书</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">openssl ca <span class="token parameter variable">-in</span> battery-cap-req.pem <span class="token parameter variable">-md</span> sha256 <span class="token parameter variable">-days</span> <span class="token number">25568</span> <span class="token parameter variable">-keyfile</span> ca-key.pem <span class="token parameter variable">-cert</span> ca-cert.pem <span class="token parameter variable">-extensions</span> SAN <span class="token parameter variable">-config</span> openssl.cnf <span class="token parameter variable">-out</span> battery-cap-cert.pem<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure></li>
+</ul>
+<h1 id="部署-HTTPS-服务"><a href="#部署-HTTPS-服务" class="headerlink" title="部署 HTTPS 服务"></a>部署 HTTPS 服务</h1><blockquote>
+<p><a href="/Caddy%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E7%A4%BA%E4%BE%8B.html">参考</a></p>
+</blockquote>
+<p>可以先部署静态站点进行测试</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">battery-cap.msj &#123;
+	encode zstd gzip
+	tls &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;battery-cap-cert.pem &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;battery-cap-key.pem
+	handle &#123;
+		root * &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;web&#x2F;dist
+		file_server
+	&#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
-<h3 id="添加账号密码"><a href="#添加账号密码" class="headerlink" title="添加账号密码"></a>添加账号密码</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">vi</span> /root/svn/passwd<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+<h1 id="手动修改host"><a href="#手动修改host" class="headerlink" title="手动修改host"></a>手动修改host</h1><p>C:\Windows\System32\drivers\etc\hosts</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-none"><code class="language-none">192.168.34.197 battery-cap.msj<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
 
-<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><div class="caption"><span>passwd</span></div><code class="language-text">[users]
-user1 = password<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre></div></figure>
+<h1 id="客户端手动安装证书"><a href="#客户端手动安装证书" class="headerlink" title="客户端手动安装证书"></a>客户端手动安装证书</h1><p><a target="_blank" rel="noopener" href="https://wenku.csdn.net/answer/eecfaab1adcf40a3a5e8724c4e3454fe">参考</a></p>
+<h1 id="自动修改host、安装证书"><a href="#自动修改host、安装证书" class="headerlink" title="自动修改host、安装证书"></a>自动修改host、安装证书</h1><p>通过一个程序将修改 host 文件和安装证书两件事情放到一起，方便实施同事交付。</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	domain <span class="token operator">:=</span> <span class="token string">"battery-cap.msj"</span>
+	address <span class="token operator">:=</span> <span class="token string">"192.168.34.197"</span>
+	cert <span class="token operator">:=</span> <span class="token string">"msj-cert.pem"</span>
 
-<h3 id="添加权限配置"><a href="#添加权限配置" class="headerlink" title="添加权限配置"></a>添加权限配置</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">vi</span> /root/svn/authz<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
+	<span class="token comment">// 日志</span>
+	file<span class="token punctuation">,</span> err <span class="token operator">:=</span> os<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span><span class="token string">"证书安装.log"</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token function">MessageBoxPlain</span><span class="token punctuation">(</span><span class="token string">"提示"</span><span class="token punctuation">,</span> <span class="token string">"失败"</span><span class="token punctuation">)</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">defer</span> file<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	logger <span class="token operator">:=</span> log<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span>file<span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> log<span class="token punctuation">.</span>LstdFlags<span class="token punctuation">)</span>
 
-<p>可按分组或按用户配置：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-text" data-language="text"><div class="caption"><span>authz</span></div><code class="language-text">[groups]
-coder = user1,user2
+	<span class="token comment">// 参数回显</span>
+	logger<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"域名："</span> <span class="token operator">+</span> domain<span class="token punctuation">)</span>
+	logger<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"地址："</span> <span class="token operator">+</span> address<span class="token punctuation">)</span>
+	logger<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"证书："</span> <span class="token operator">+</span> cert<span class="token punctuation">)</span>
 
-[shidian:/]
-@coder = rw
-* = r
+	<span class="token comment">// 改host</span>
+	logger<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"修改 host 文件"</span><span class="token punctuation">)</span>
+	hostFile<span class="token punctuation">,</span> err <span class="token operator">:=</span> os<span class="token punctuation">.</span><span class="token function">OpenFile</span><span class="token punctuation">(</span><span class="token string">"C:/Windows/System32/drivers/etc/hosts"</span><span class="token punctuation">,</span> os<span class="token punctuation">.</span>O_WRONLY<span class="token operator">|</span>os<span class="token punctuation">.</span>O_APPEND<span class="token punctuation">,</span> <span class="token number">0600</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token function">MessageBoxPlain</span><span class="token punctuation">(</span><span class="token string">"提示"</span><span class="token punctuation">,</span> <span class="token string">"失败"</span><span class="token punctuation">)</span>
+		logger<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+		<span class="token keyword">return</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">defer</span> hostFile<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	hostFile<span class="token punctuation">.</span><span class="token function">WriteString</span><span class="token punctuation">(</span>address <span class="token operator">+</span> <span class="token string">" "</span> <span class="token operator">+</span> domain <span class="token operator">+</span> <span class="token string">"\n"</span><span class="token punctuation">)</span>
+	logger<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"ok"</span><span class="token punctuation">)</span>
 
-[u1:/]
-user1 = rw<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+	<span class="token comment">// 安装证书</span>
+	logger<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"安装证书"</span><span class="token punctuation">)</span>
+	cmd <span class="token operator">:=</span> exec<span class="token punctuation">.</span><span class="token function">Command</span><span class="token punctuation">(</span><span class="token string">"cmd"</span><span class="token punctuation">,</span> <span class="token string">"/C"</span><span class="token punctuation">,</span> <span class="token string">"certmgr.exe /c /add  "</span><span class="token operator">+</span>cert<span class="token operator">+</span><span class="token string">" /s root"</span><span class="token punctuation">)</span>
+	output<span class="token punctuation">,</span> err <span class="token operator">:=</span> cmd<span class="token punctuation">.</span><span class="token function">CombinedOutput</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token function">MessageBoxPlain</span><span class="token punctuation">(</span><span class="token string">"提示"</span><span class="token punctuation">,</span> <span class="token string">"失败"</span><span class="token punctuation">)</span>
+		logger<span class="token punctuation">.</span><span class="token function">Fatal</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	logger<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span>output<span class="token punctuation">)</span>
+	logger<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"ok"</span><span class="token punctuation">)</span>
 
-<h3 id="在仓库中配置鉴权"><a href="#在仓库中配置鉴权" class="headerlink" title="在仓库中配置鉴权"></a>在仓库中配置鉴权</h3><figure><div class="code-wrapper"><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">vi</span> /root/svn/shidian/conf/svnserve.conf<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre></div></figure>
-
-<p>修改下列四行</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-conf" data-language="conf"><div class="caption"><span>svnserve.conf</span></div><code class="language-conf">anon-access &#x3D; none
-auth-access &#x3D; write
-password-db &#x3D; &#x2F;root&#x2F;svn&#x2F;passwd
-authz-db &#x3D; &#x2F;root&#x2F;svn&#x2F;authz<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+	<span class="token function">MessageBoxPlain</span><span class="token punctuation">(</span><span class="token string">"提示"</span><span class="token punctuation">,</span> <span class="token string">"完成"</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
                 
               </div>
             
@@ -358,6 +397,10 @@ authz-db &#x3D; &#x2F;root&#x2F;svn&#x2F;authz<span aria-hidden="true" class="li
       
         <a href="/tags/%E8%BF%90%E7%BB%B4/" class="print-no-link">#运维</a>
       
+        <a href="/tags/caddy/" class="print-no-link">#caddy</a>
+      
+        <a href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E6%88%98/" class="print-no-link">#项目实战</a>
+      
     </div>
   
 </div>
@@ -368,8 +411,8 @@ authz-db &#x3D; &#x2F;root&#x2F;svn&#x2F;authz<span aria-hidden="true" class="li
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>在Ubuntu上安装SVN服务</div>
-      <div>https://vitsumoc.github.io/在Ubuntu上安装SVN服务.html</div>
+      <div>内网项目添加HTTPS支持</div>
+      <div>https://vitsumoc.github.io/内网项目添加HTTPS支持.html</div>
     </div>
     <div class="license-meta">
       
@@ -381,7 +424,7 @@ authz-db &#x3D; &#x2F;root&#x2F;svn&#x2F;authz<span aria-hidden="true" class="li
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年9月11日</div>
+          <div>2024年10月22日</div>
         </div>
       
       
@@ -413,18 +456,12 @@ authz-db &#x3D; &#x2F;root&#x2F;svn&#x2F;authz<span aria-hidden="true" class="li
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/%E5%86%85%E7%BD%91%E9%A1%B9%E7%9B%AE%E6%B7%BB%E5%8A%A0HTTPS%E6%94%AF%E6%8C%81.html" title="内网项目添加HTTPS支持">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">内网项目添加HTTPS支持</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/%5B%E8%BD%AC%5Dnetperf%E5%92%8Ciperf%E7%BD%91%E7%BB%9C%E6%80%A7%E8%83%BD%E6%B5%8B%E8%AF%95%E5%B0%8F%E7%BB%93.html" title="[转]netperf和iperf网络性能测试小结">
-                        <span class="hidden-mobile">[转]netperf和iperf网络性能测试小结</span>
+                      <a href="/%E5%9C%A8Ubuntu%E4%B8%8A%E5%AE%89%E8%A3%85SVN%E6%9C%8D%E5%8A%A1.html" title="在Ubuntu上安装SVN服务">
+                        <span class="hidden-mobile">在Ubuntu上安装SVN服务</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
