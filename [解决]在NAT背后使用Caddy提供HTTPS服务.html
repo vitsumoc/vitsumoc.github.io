@@ -16,22 +16,26 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="前端开发的一大痛点就是参考资料太多，css，h5 标准，浏览器的各种规范等等。AI 的出现真的很大程度上缓解了这些问题，让我这种半桶水的前端也能够快速的定位到我需要的文档。">
+    <meta name="description" content="在 问题 的最后，我突然想到可以用 frp 代理一个 HTTP 服务出去，这样虽然不能使用 https 的功能，但是起码可以访问其他的基础功能。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="WEB项目集成人脸识别">
-<meta property="og:url" content="https://vitsumoc.github.io/WEB%E9%A1%B9%E7%9B%AE%E9%9B%86%E6%88%90%E4%BA%BA%E8%84%B8%E8%AF%86%E5%88%AB.html">
+<meta property="og:title" content="[解决]在NAT背后使用Caddy提供HTTPS服务">
+<meta property="og:url" content="https://vitsumoc.github.io/[%E8%A7%A3%E5%86%B3]%E5%9C%A8NAT%E8%83%8C%E5%90%8E%E4%BD%BF%E7%94%A8Caddy%E6%8F%90%E4%BE%9BHTTPS%E6%9C%8D%E5%8A%A1.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="前端开发的一大痛点就是参考资料太多，css，h5 标准，浏览器的各种规范等等。AI 的出现真的很大程度上缓解了这些问题，让我这种半桶水的前端也能够快速的定位到我需要的文档。">
+<meta property="og:description" content="在 问题 的最后，我突然想到可以用 frp 代理一个 HTTP 服务出去，这样虽然不能使用 https 的功能，但是起码可以访问其他的基础功能。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-10-22T08:32:48.000Z">
-<meta property="article:modified_time" content="2024-10-22T09:05:27.077Z">
+<meta property="article:published_time" content="2024-10-30T09:08:59.000Z">
+<meta property="article:modified_time" content="2024-10-30T09:26:35.212Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="项目实践">
+<meta property="article:tag" content="问题">
+<meta property="article:tag" content="运维">
+<meta property="article:tag" content="HTTPS">
+<meta property="article:tag" content="caddy">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>WEB项目集成人脸识别 - Thinking...</title>
+  <title>[解决]在NAT背后使用Caddy提供HTTPS服务 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -199,7 +203,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">WEB项目集成人脸识别</span>
+            <span id="subtitle">[解决]在NAT背后使用Caddy提供HTTPS服务</span>
           
         </div>
 
@@ -210,8 +214,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-10-22 16:32" pubdate>
-          2024年10月22日 下午
+        <time datetime="2024-10-30 17:08" pubdate>
+          2024年10月30日 下午
         </time>
       </span>
     
@@ -222,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          339 字
+          225 字
         
       </span>
     
@@ -233,7 +237,7 @@
         
         
         
-          3 分钟
+          2 分钟
         
       </span>
     
@@ -270,117 +274,51 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">WEB项目集成人脸识别</h1>
+            <h1 id="seo-header">[解决]在NAT背后使用Caddy提供HTTPS服务</h1>
             
             
               <div class="markdown-body">
                 
-                <p>前端开发的一大痛点就是参考资料太多，css，h5 标准，浏览器的各种规范等等。AI 的出现真的很大程度上缓解了这些问题，让我这种半桶水的前端也能够快速的定位到我需要的文档。</p>
+                <p>在 <a href="/%5B%E9%97%AE%E9%A2%98%5D%E5%9C%A8NAT%E8%83%8C%E5%90%8E%E4%BD%BF%E7%94%A8Caddy%E6%8F%90%E4%BE%9BHTTPS%E6%9C%8D%E5%8A%A1">问题</a> 的最后，我突然想到可以用 frp 代理一个 HTTP 服务出去，这样虽然不能使用 https 的功能，但是起码可以访问其他的基础功能。</p>
 <span id="more"></span>
 
-<p>项目中需要让客户使用人脸识别验证身份，很自然的想到如下实现思路：</p>
-<ol>
-<li>浏览器调用摄像头，获得视频</li>
-<li>视频截图，发往后端</li>
-<li>后端将照片和系统现有用户比对</li>
-</ol>
-<h1 id="浏览器调用摄像头"><a href="#浏览器调用摄像头" class="headerlink" title="浏览器调用摄像头"></a>浏览器调用摄像头</h1><p>托 AI 的福，很快就查到了关键词：摄像头调用使用 <code>navigator.mediaDevices</code> 相关接口，视频播放使用 <code>video</code> 元素。</p>
-<h1 id="视频截图"><a href="#视频截图" class="headerlink" title="视频截图"></a>视频截图</h1><p>直接用 <code>canvas</code> 把 <code>video</code> 内容画上来，当成图片发给后端就好。</p>
-<h1 id="后端比对"><a href="#后端比对" class="headerlink" title="后端比对"></a>后端比对</h1><p>使用 github 的 <a target="_blank" rel="noopener" href="https://github.com/ageitgey/face_recognition">face_recognition</a> 仓库，该仓库可以使用命令行进行人脸比对，用 go 稍微封装一下就好了。</p>
-<p>再次感谢无数开源作者为世界做出的贡献。</p>
-<h1 id="前端代码示例"><a href="#前端代码示例" class="headerlink" title="前端代码示例"></a>前端代码示例</h1><p>用 <code>vue2</code> 做了一个简易的人脸识别弹窗：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-vue" data-language="vue"><code class="language-vue">&lt;template&gt;
-  &lt;div class&#x3D;&quot;app-container&quot;&gt;
-    选择您的摄像头设备
-    &lt;el-button-group&gt;
-      &lt;el-button v-for&#x3D;&quot;(camera, x) in cameras&quot; :key&#x3D;&quot;x&quot; @click&#x3D;&quot;playThis(camera)&quot;&gt;&#123;&#123; camera.label &#125;&#125;&lt;&#x2F;el-button&gt;
-    &lt;&#x2F;el-button-group&gt;
-    &lt;video id&#x3D;&quot;video&quot;&gt;&lt;&#x2F;video &gt;
-    &lt;canvas id&#x3D;&quot;photo&quot; width&#x3D;&quot;640&quot; height&#x3D;&quot;420&quot; &#x2F;&gt;
-  &lt;&#x2F;div&gt;
-&lt;&#x2F;template&gt;
-
-&lt;script&gt;
-export default &#123;
-  data() &#123;
-    return &#123;
-      cameras: [], &#x2F;&#x2F; 摄像头列表
-      video_dom: undefined,
-      timeHandler: undefined
-    &#125;
-  &#125;,
-  mounted() &#123;
-    const self &#x3D; this
-    this.video_dom &#x3D; document.getElementById(&#39;video&#39;)
-    navigator.mediaDevices.enumerateDevices().then(function(devices) &#123;
-      devices.forEach(device &#x3D;&gt; &#123;
-        if (device.kind &#x3D;&#x3D;&#x3D; &#39;videoinput&#39;) &#123;
-          self.cameras.push(device)
+<p>于是我做了这个：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">http:&#x2F;&#x2F;192.168.34.197:10443 &#123;
+        encode zstd gzip
+        reverse_proxy https:&#x2F;&#x2F;192.168.34.197 &#123;
+                header_up Host &#123;upstream_hostport&#125;
+                transport http &#123;
+                        tls_insecure_skip_verify
+                &#125;
         &#125;
-      &#125;)
-    &#125;).catch(function(err) &#123;
-      alert(&#39;你的浏览器无法获摄像头设备列表&#39;)
-      this.$emit(&#39;cancel&#39;)
-    &#125;)
-  &#125;,
-  methods: &#123;
-    playThis(camera) &#123;
-      this.atClose()
-      const self &#x3D; this
-      navigator.mediaDevices.getUserMedia(&#123; video: &#123; deviceId: camera.deviceId &#125; &#125;).then(function(stream) &#123;
-        const video &#x3D; document.getElementById(&#39;video&#39;)
-        video.srcObject &#x3D; stream
-        video.play()
-        self.toPhoto()
-      &#125;).catch(function(err) &#123;
-        console.log(&#39;获取摄像头媒体流时出现错误：&#39;, err)
-        alert(&#39;你的浏览器无法获取此设备流&#39;)
-        self.$emit(&#39;cancel&#39;)
-      &#125;)
-    &#125;,
-    toPhoto() &#123;
-      let self &#x3D; this
-      const canvas &#x3D; document.getElementById(&#39;photo&#39;)
-      const context &#x3D; canvas.getContext(&#39;2d&#39;)
-      const video &#x3D; document.getElementById(&#39;video&#39;)
-      this.timeHandler &#x3D; setTimeout(function() &#123;
-        context.drawImage(video, 0, 0, 640, 420)
-        let img &#x3D; canvas.toDataURL(&#39;image&#x2F;jpg&#39;)
-        img &#x3D; img.split(&#39;,&#39;)[1] &#x2F;&#x2F; 照片的 base64
-        &#x2F;&#x2F; TODO 发到后端做人脸识别判断
+&#125;
+https:&#x2F;&#x2F;192.168.34.197 &#123;
+        encode zstd gzip
+        tls &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;19216834197-cert.pem &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;19216834197-key.pem
+        handle &#123;
+                root * &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;web&#x2F;dist
+                file_server
+        &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
-        self.toPhoto()
-      &#125;,300)
-    &#125;,
-    atClose() &#123;
-      clearTimeout(this.timeHandler)
-      const video &#x3D; document.getElementById(&#39;video&#39;)
-      if (video &amp;&amp; video.srcObject) &#123;
-        let stream &#x3D; video.srcObject
-        let tracks &#x3D; stream.getTracks()
-        tracks.forEach(function(track) &#123;
-            track.stop()
-        &#125;)
-        video.srcObject &#x3D; null
-      &#125;
-    &#125;
-  &#125;
-&#125;
-&lt;&#x2F;script&gt;
+<p>发现只能内网访问，通过 frp 代理地址还是不能访问（只有 HTTP ok，没有内容）。</p>
+<p>这一下打破了我原有的想法，我原本以为是网络和 TLS 问题，现在看来不是，然后注意到 <code>http://192.168.34.197:10443</code>，我开始怀疑是 caddy 的路由没匹配上。</p>
+<p>改成 <code>:10443</code> 后，frp 可用了。</p>
+<blockquote>
+<p>caddy 中配置的 address 必须和用户在浏览器输入的地址相同。</p>
+</blockquote>
+<p>后来把 Caddyfile 改成这样，直接按端口提供服务，一切问题都解决了：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">:443 &#123;
+        encode zstd gzip
+        tls &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;19216834197-cert.pem &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;19216834197-key.pem
+        handle &#123;
+                root * &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;web&#x2F;dist
+                file_server
+        &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
-&lt;style lang&#x3D;&quot;scss&quot;&gt;
-#video &#123;
-  width: 640px;
-  height: 420px;
-  background: #333;
-  margin-top: 20px;
-&#125;
-#photo &#123;
-  width: 640px;
-  height: 420px;
-  display: none;
-&#125;
-&lt;&#x2F;style&gt;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+<p>也不需要按照浏览器的公网地址生成证书，反正都是信任不安全的证书，只要用内网地址生成一个证书就可以了。</p>
+
                 
               </div>
             
@@ -398,7 +336,7 @@ export default &#123;
     
       <span class="category-chain">
         
-  <a href="/categories/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" class="category-chain-item">项目实践</a>
+  <a href="/categories/%E9%97%AE%E9%A2%98/" class="category-chain-item">问题</a>
   
   
 
@@ -415,6 +353,14 @@ export default &#123;
       
         <a href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" class="print-no-link">#项目实践</a>
       
+        <a href="/tags/%E9%97%AE%E9%A2%98/" class="print-no-link">#问题</a>
+      
+        <a href="/tags/%E8%BF%90%E7%BB%B4/" class="print-no-link">#运维</a>
+      
+        <a href="/tags/HTTPS/" class="print-no-link">#HTTPS</a>
+      
+        <a href="/tags/caddy/" class="print-no-link">#caddy</a>
+      
     </div>
   
 </div>
@@ -425,8 +371,8 @@ export default &#123;
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>WEB项目集成人脸识别</div>
-      <div>https://vitsumoc.github.io/WEB项目集成人脸识别.html</div>
+      <div>[解决]在NAT背后使用Caddy提供HTTPS服务</div>
+      <div>https://vitsumoc.github.io/[解决]在NAT背后使用Caddy提供HTTPS服务.html</div>
     </div>
     <div class="license-meta">
       
@@ -438,7 +384,7 @@ export default &#123;
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年10月22日</div>
+          <div>2024年10月30日</div>
         </div>
       
       
@@ -470,18 +416,12 @@ export default &#123;
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/%5B%E9%97%AE%E9%A2%98%5D%E5%9C%A8NAT%E8%83%8C%E5%90%8E%E4%BD%BF%E7%94%A8Caddy%E6%8F%90%E4%BE%9BHTTPS%E6%9C%8D%E5%8A%A1.html" title="[问题]在NAT背后使用Caddy提供HTTPS服务">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">[问题]在NAT背后使用Caddy提供HTTPS服务</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/%E5%86%85%E7%BD%91%E9%A1%B9%E7%9B%AE%E6%B7%BB%E5%8A%A0HTTPS%E6%94%AF%E6%8C%81.html" title="内网项目添加HTTPS支持">
-                        <span class="hidden-mobile">内网项目添加HTTPS支持</span>
+                      <a href="/%5B%E9%97%AE%E9%A2%98%5D%E5%9C%A8NAT%E8%83%8C%E5%90%8E%E4%BD%BF%E7%94%A8Caddy%E6%8F%90%E4%BE%9BHTTPS%E6%9C%8D%E5%8A%A1.html" title="[问题]在NAT背后使用Caddy提供HTTPS服务">
+                        <span class="hidden-mobile">[问题]在NAT背后使用Caddy提供HTTPS服务</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
