@@ -1,0 +1,761 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/avatar.png">
+  <link rel="icon" href="/img/avatar.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="vc">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前段时间，我尝试了 在内网中使用 HTTPS 部署，但立刻就在随后的实践中发现了一个问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[问题]在NAT背后使用Caddy提供HTTPS服务">
+<meta property="og:url" content="https://vitsumoc.github.io/%E5%9C%A8NAT%E8%83%8C%E5%90%8E%E4%BD%BF%E7%94%A8Caddy%E6%8F%90%E4%BE%9BHTTPS%E6%9C%8D%E5%8A%A1.html">
+<meta property="og:site_name" content="Thinking...">
+<meta property="og:description" content="前段时间，我尝试了 在内网中使用 HTTPS 部署，但立刻就在随后的实践中发现了一个问题。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-10-30T06:02:49.000Z">
+<meta property="article:modified_time" content="2024-10-30T08:17:17.391Z">
+<meta property="article:author" content="vc">
+<meta property="article:tag" content="项目实践">
+<meta property="article:tag" content="问题">
+<meta property="article:tag" content="运维">
+<meta property="article:tag" content="HTTPS">
+<meta property="article:tag" content="caddy">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>[问题]在NAT背后使用Caddy提供HTTPS服务 - Thinking...</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"vitsumoc.github.io","root":"/","version":"1.9.6","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":3},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 60vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Thinking...</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle">[问题]在NAT背后使用Caddy提供HTTPS服务</span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-10-30 14:02" pubdate>
+          2024年10月30日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          906 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          8 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">[问题]在NAT背后使用Caddy提供HTTPS服务</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>前段时间，我尝试了 <a href="/%E5%86%85%E7%BD%91%E9%A1%B9%E7%9B%AE%E6%B7%BB%E5%8A%A0HTTPS%E6%94%AF%E6%8C%81">在内网中使用 HTTPS 部署</a>，但立刻就在随后的实践中发现了一个问题。</p>
+<span id="more"></span>
+
+<p>我的领导告诉我，客户并不想运行我的证书安装程序，客户只是想打开浏览器输入地址就可以访问系统（因为这样比较方便）。</p>
+<p>于是我就使用服务器的内网地址签发了一张证书，这样在内网通过 <code>https://ip</code> 的方式就可以访问系统了，虽然浏览器会提示不安全，但是所有功能也都可以正常使用，问题就算解决了。</p>
+<p>随后，我想把这个服务通过一台路由设备代理到外网，也通过 https 访问，这样我可以方便的进行一些运维测试之类的工作。我就这样掉进了坑里。</p>
+<h1 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h1><p>涉及到的设备包括：</p>
+<ul>
+<li>公网客户端（有公网地址的普通电脑一台）</li>
+<li>路由器（用来做 NAT，只有基本的 NAT 能力）</li>
+<li>服务器（在内网提供服务）</li>
+</ul>
+<p>涉及到的网络地址包括：</p>
+<ul>
+<li>路由器公网地址：36.33.xx.xx</li>
+<li>路由器内网地址：192.168.34.1</li>
+<li>服务器内网地址：192.168.34.197</li>
+</ul>
+<p>当前已经可以在内网使用 <code>https://192.168.34.197</code> 访问服务，目标是通过配置路由器 NAT 和服务器上的 caddy，使公网客户端可以使用 <code>https://36.33.xx.xx</code> 访问服务。</p>
+<p><em>公网地址的 443 端口确定可用，之前测试过</em></p>
+<h1 id="失败的尝试"><a href="#失败的尝试" class="headerlink" title="失败的尝试"></a>失败的尝试</h1><h3 id="公网地址-443-端口代理到服务器-443"><a href="#公网地址-443-端口代理到服务器-443" class="headerlink" title="公网地址 443 端口代理到服务器 443"></a>公网地址 443 端口代理到服务器 443</h3><p>最开始的思路比较简单，直接配置路由器将公网 443 端口映射到服务器 443 端口。</p>
+<p>Caddyfile的配置也很简单：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">https:&#x2F;&#x2F;192.168.34.197 &#123;
+	encode zstd gzip
+	tls &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;19216834197-cert.pem &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;19216834197-key.pem
+        handle &#123;
+                root * &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;web&#x2F;dist
+                file_server
+        &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>这种情况下，浏览器在报安全验证之后就可以进入网页，但请求不返回任何内容。观察 <code>response</code> 发现：</p>
+<ul>
+<li>content-length: 0</li>
+<li>server: Caddy</li>
+</ul>
+<p>服务到达了 caddy，但是没有提供网站内容，接下来查看 caddy 的日志发现：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-log" data-language="log"><code class="language-log"><span class="token date number">2024/10/30</span> <span class="token time number">07:05:56.420</span>	<span class="token level debug keyword">DEBUG</span>	<span class="token domain constant">http.stdlib</span>	http<span class="token operator">:</span> TLS handshake error from 36<span class="token punctuation">.</span>33<span class="token punctuation">.</span>xx<span class="token punctuation">.</span>xx<span class="token operator">:</span><span class="token number">65222</span><span class="token operator">:</span> remote error<span class="token operator">:</span> tls<span class="token operator">:</span> unknown certificate
+<span class="token date number">2024/10/30</span> <span class="token time number">07:05:56.422</span>	<span class="token level debug keyword">DEBUG</span>	events	event	<span class="token operator">&#123;</span><span class="token string">"name"</span><span class="token operator">:</span> <span class="token string">"tls_get_certificate"</span><span class="token punctuation">,</span> <span class="token string">"id"</span><span class="token operator">:</span> <span class="token string">"9a9f30ec-e627-48e4-b7ee-52beb6bad236"</span><span class="token punctuation">,</span> <span class="token string">"origin"</span><span class="token operator">:</span> <span class="token string">"tls"</span><span class="token punctuation">,</span> <span class="token string">"data"</span><span class="token operator">:</span> <span class="token operator">&#123;</span><span class="token string">"client_hello"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token string">"CipherSuites"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token number">10794</span><span class="token punctuation">,</span><span class="token number">4865</span><span class="token punctuation">,</span><span class="token number">4866</span><span class="token punctuation">,</span><span class="token number">4867</span><span class="token punctuation">,</span><span class="token number">49195</span><span class="token punctuation">,</span><span class="token number">49199</span><span class="token punctuation">,</span><span class="token number">49196</span><span class="token punctuation">,</span><span class="token number">49200</span><span class="token punctuation">,</span><span class="token number">52393</span><span class="token punctuation">,</span><span class="token number">52392</span><span class="token punctuation">,</span><span class="token number">49171</span><span class="token punctuation">,</span><span class="token number">49172</span><span class="token punctuation">,</span><span class="token number">156</span><span class="token punctuation">,</span><span class="token number">157</span><span class="token punctuation">,</span><span class="token number">47</span><span class="token punctuation">,</span><span class="token number">53</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"ServerName"</span><span class="token operator">:</span><span class="token string">""</span><span class="token punctuation">,</span><span class="token string">"SupportedCurves"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token number">64250</span><span class="token punctuation">,</span><span class="token number">25497</span><span class="token punctuation">,</span><span class="token number">29</span><span class="token punctuation">,</span><span class="token number">23</span><span class="token punctuation">,</span><span class="token number">24</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"SupportedPoints"</span><span class="token operator">:</span><span class="token string">"AA=="</span><span class="token punctuation">,</span><span class="token string">"SignatureSchemes"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token number">1027</span><span class="token punctuation">,</span><span class="token number">2052</span><span class="token punctuation">,</span><span class="token number">1025</span><span class="token punctuation">,</span><span class="token number">1283</span><span class="token punctuation">,</span><span class="token number">2053</span><span class="token punctuation">,</span><span class="token number">1281</span><span class="token punctuation">,</span><span class="token number">2054</span><span class="token punctuation">,</span><span class="token number">1537</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"SupportedProtos"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token string">"h2"</span><span class="token punctuation">,</span><span class="token string">"http/1.1"</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"SupportedVersions"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token number">60138</span><span class="token punctuation">,</span><span class="token number">772</span><span class="token punctuation">,</span><span class="token number">771</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"RemoteAddr"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token string">"IP"</span><span class="token operator">:</span><span class="token string">"36.33.xx.xx"</span><span class="token punctuation">,</span><span class="token string">"Port"</span><span class="token operator">:</span><span class="token number">65223</span><span class="token punctuation">,</span><span class="token string">"Zone"</span><span class="token operator">:</span><span class="token string">""</span><span class="token operator">&#125;</span><span class="token punctuation">,</span><span class="token string">"LocalAddr"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token string">"IP"</span><span class="token operator">:</span><span class="token string">"192.168.34.197"</span><span class="token punctuation">,</span><span class="token string">"Port"</span><span class="token operator">:</span><span class="token number">443</span><span class="token punctuation">,</span><span class="token string">"Zone"</span><span class="token operator">:</span><span class="token string">""</span><span class="token operator">&#125;</span><span class="token operator">&#125;</span><span class="token operator">&#125;</span><span class="token operator">&#125;</span>
+<span class="token date number">2024/10/30</span> <span class="token time number">07:05:56.422</span>	<span class="token level debug keyword">DEBUG</span>	<span class="token domain constant">tls.handshake</span>	choosing certificate	<span class="token operator">&#123;</span><span class="token string">"identifier"</span><span class="token operator">:</span> <span class="token string">"192.168.34.197"</span><span class="token punctuation">,</span> <span class="token string">"num_choices"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token operator">&#125;</span>
+<span class="token date number">2024/10/30</span> <span class="token time number">07:05:56.422</span>	<span class="token level debug keyword">DEBUG</span>	<span class="token domain constant">tls.handshake</span>	default certificate selection results	<span class="token operator">&#123;</span><span class="token string">"identifier"</span><span class="token operator">:</span> <span class="token string">"192.168.34.197"</span><span class="token punctuation">,</span> <span class="token string">"subjects"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"192.168.34.197"</span><span class="token punctuation">,</span> <span class="token string">"*.192.168.34.197"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">"managed"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span> <span class="token string">"issuer_key"</span><span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token string">"hash"</span><span class="token operator">:</span> <span class="token string">"00c8e2e97b167d3f278fe71d0a962cd29174fec485fe2c00f25bb718e345f961"</span><span class="token operator">&#125;</span>
+<span class="token date number">2024/10/30</span> <span class="token time number">07:05:56.422</span>	<span class="token level debug keyword">DEBUG</span>	<span class="token domain constant">tls.handshake</span>	matched certificate in cache	<span class="token operator">&#123;</span><span class="token string">"remote_ip"</span><span class="token operator">:</span> <span class="token string">"36.33.xx.xx"</span><span class="token punctuation">,</span> <span class="token string">"remote_port"</span><span class="token operator">:</span> <span class="token string">"65223"</span><span class="token punctuation">,</span> <span class="token string">"subjects"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"192.168.34.197"</span><span class="token punctuation">,</span> <span class="token string">"*.192.168.34.197"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">"managed"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span> <span class="token string">"expiration"</span><span class="token operator">:</span> <span class="token string">"2094/10/31 03:05:40.000"</span><span class="token punctuation">,</span> <span class="token string">"hash"</span><span class="token operator">:</span> <span class="token string">"00c8e2e97b167d3f278fe71d0a962cd29174fec485fe2c00f25bb718e345f961"</span><span class="token operator">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>从日志里可以看到 <code>remote error: tls: unknown certificate</code>，我猜想是客户端不认证书，然后看到证书的 subjects 是 <code>192.168.34.197</code>，我就觉得是因为客户端输入的地址和证书提供的 CN 或者 SAN 不匹配导致的问题。</p>
+<p>然后我就觉得，如果服务器能够提供 <code>36.33.xx.xx</code> 的证书就好了。</p>
+<h3 id="使用公网地址的证书"><a href="#使用公网地址的证书" class="headerlink" title="使用公网地址的证书"></a>使用公网地址的证书</h3><p>然后就按照公网地址制作了证书，修改 Caddyfile：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">https:&#x2F;&#x2F;192.168.34.197 &#123;
+	encode zstd gzip
+	tls &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;3633xxxx-cert.pem &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;3633xxxx-key.pem
+        handle &#123;
+                root * &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;web&#x2F;dist
+                file_server
+        &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>这下连 443 端口都没起来，查看日志是这样的：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-log" data-language="log"><code class="language-log"><span class="token date number">2024/10/30</span> <span class="token time number">07:16:40.600</span>	<span class="token level warning important">WARN</span>	tls	stapling OCSP	<span class="token operator">&#123;</span><span class="token string">"error"</span><span class="token operator">:</span> <span class="token string">"no OCSP stapling for [36.33.xx.xx *.36.33.xx.xx]: no OCSP server specified in certificate"</span><span class="token operator">&#125;</span>
+<span class="token date number">2024/10/30</span> <span class="token time number">07:16:40.600</span>	<span class="token level debug keyword">DEBUG</span>	events	event	<span class="token operator">&#123;</span><span class="token string">"name"</span><span class="token operator">:</span> <span class="token string">"cached_unmanaged_cert"</span><span class="token punctuation">,</span> <span class="token string">"id"</span><span class="token operator">:</span> <span class="token string">"ca1f1002-a94b-4af4-a7fe-a88960129791"</span><span class="token punctuation">,</span> <span class="token string">"origin"</span><span class="token operator">:</span> <span class="token string">"tls"</span><span class="token punctuation">,</span> <span class="token string">"data"</span><span class="token operator">:</span> <span class="token operator">&#123;</span><span class="token string">"sans"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token string">"36.33.xx.xx"</span><span class="token punctuation">,</span><span class="token string">"*.36.33.xx.xx"</span><span class="token punctuation">]</span><span class="token operator">&#125;</span><span class="token operator">&#125;</span>
+<span class="token date number">2024/10/30</span> <span class="token time number">07:16:40.600</span>	<span class="token level debug keyword">DEBUG</span>	<span class="token domain constant">tls.cache</span>	added certificate to cache	<span class="token operator">&#123;</span><span class="token string">"subjects"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"36.33.xx.xx"</span><span class="token punctuation">,</span> <span class="token string">"*.36.33.xx.xx"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">"expiration"</span><span class="token operator">:</span> <span class="token string">"2094/10/31 03:01:19.000"</span><span class="token punctuation">,</span> <span class="token string">"managed"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span> <span class="token string">"issuer_key"</span><span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token string">"hash"</span><span class="token operator">:</span> <span class="token string">"15f7c42ab20c2daa817947d6d066a353fea00e6e69e2c873c33d3ebd2542257a"</span><span class="token punctuation">,</span> <span class="token string">"cache_size"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span> <span class="token string">"cache_capacity"</span><span class="token operator">:</span> <span class="token number">10000</span><span class="token operator">&#125;</span>
+<span class="token date number">2024/10/30</span> <span class="token time number">07:16:40.600</span>	<span class="token level info keyword">INFO</span>	http<span class="token punctuation">.</span>auto_https	enabling automatic HTTP<span class="token operator">-</span><span class="token operator">></span>HTTPS redirects	<span class="token operator">&#123;</span><span class="token string">"server_name"</span><span class="token operator">:</span> <span class="token string">"srv0"</span><span class="token operator">&#125;</span>
+<span class="token date number">2024/10/30</span> <span class="token time number">07:16:40.600</span>	<span class="token level debug keyword">DEBUG</span>	http<span class="token punctuation">.</span>auto_https	adjusted config	<span class="token operator">&#123;</span><span class="token string">"tls"</span><span class="token operator">:</span> <span class="token operator">&#123;</span><span class="token string">"automation"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token string">"policies"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token operator">&#123;</span><span class="token string">"subjects"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token string">"192.168.34.197"</span><span class="token punctuation">]</span><span class="token operator">&#125;</span><span class="token punctuation">,</span><span class="token operator">&#123;</span><span class="token operator">&#125;</span><span class="token punctuation">]</span><span class="token operator">&#125;</span><span class="token operator">&#125;</span><span class="token punctuation">,</span> <span class="token string">"http"</span><span class="token operator">:</span> <span class="token operator">&#123;</span><span class="token string">"servers"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token string">"remaining_auto_https_redirects"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token string">"listen"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token string">":80"</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"routes"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token operator">&#123;</span><span class="token operator">&#125;</span><span class="token punctuation">,</span><span class="token operator">&#123;</span><span class="token operator">&#125;</span><span class="token punctuation">]</span><span class="token operator">&#125;</span><span class="token punctuation">,</span><span class="token string">"srv0"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token string">"listen"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token string">":443"</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"routes"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token operator">&#123;</span><span class="token string">"handle"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token operator">&#123;</span><span class="token string">"handler"</span><span class="token operator">:</span><span class="token string">"subroute"</span><span class="token punctuation">,</span><span class="token string">"routes"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token operator">&#123;</span><span class="token string">"handle"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token operator">&#123;</span><span class="token string">"encodings"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token string">"gzip"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token operator">&#125;</span><span class="token punctuation">,</span><span class="token string">"zstd"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token operator">&#125;</span><span class="token operator">&#125;</span><span class="token punctuation">,</span><span class="token string">"handler"</span><span class="token operator">:</span><span class="token string">"encode"</span><span class="token punctuation">,</span><span class="token string">"prefer"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token string">"zstd"</span><span class="token punctuation">,</span><span class="token string">"gzip"</span><span class="token punctuation">]</span><span class="token operator">&#125;</span><span class="token punctuation">,</span><span class="token operator">&#123;</span><span class="token string">"handler"</span><span class="token operator">:</span><span class="token string">"subroute"</span><span class="token punctuation">,</span><span class="token string">"routes"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token operator">&#123;</span><span class="token string">"handle"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token operator">&#123;</span><span class="token string">"handler"</span><span class="token operator">:</span><span class="token string">"vars"</span><span class="token punctuation">,</span><span class="token string">"root"</span><span class="token operator">:</span><span class="token string">"/home/caddy/herong/web/dist"</span><span class="token operator">&#125;</span><span class="token punctuation">,</span><span class="token operator">&#123;</span><span class="token string">"handler"</span><span class="token operator">:</span><span class="token string">"file_server"</span><span class="token punctuation">,</span><span class="token string">"hide"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token string">"./Caddyfile"</span><span class="token punctuation">]</span><span class="token operator">&#125;</span><span class="token punctuation">]</span><span class="token operator">&#125;</span><span class="token punctuation">]</span><span class="token operator">&#125;</span><span class="token punctuation">]</span><span class="token operator">&#125;</span><span class="token punctuation">]</span><span class="token operator">&#125;</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"terminal"</span><span class="token operator">:</span><span class="token boolean">true</span><span class="token operator">&#125;</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"tls_connection_policies"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token operator">&#123;</span><span class="token string">"match"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token string">"sni"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token string">"192.168.34.197"</span><span class="token punctuation">]</span><span class="token operator">&#125;</span><span class="token punctuation">,</span><span class="token string">"certificate_selection"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token string">"any_tag"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token string">"cert0"</span><span class="token punctuation">]</span><span class="token operator">&#125;</span><span class="token operator">&#125;</span><span class="token punctuation">,</span><span class="token operator">&#123;</span><span class="token operator">&#125;</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"automatic_https"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token operator">&#125;</span><span class="token operator">&#125;</span><span class="token operator">&#125;</span><span class="token operator">&#125;</span><span class="token operator">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>怀疑是证书中的地址和 caddy 配置中的地址对不上。</p>
+<p>于是就再签了一张 SAN 同时包括两个地址的证书。</p>
+<h3 id="同时包含公网和私网的证书"><a href="#同时包含公网和私网的证书" class="headerlink" title="同时包含公网和私网的证书"></a>同时包含公网和私网的证书</h3><p>制作了 CN 为 <code>36.33.xx.xx</code>，SAN 同时包括 <code>36.33.xx.xx</code> 和 <code>192.168.34.197</code> 的证书，使用后 443 端口算是能够起来了，caddy 配置文件也只改了证书：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">https:&#x2F;&#x2F;192.168.34.197 &#123;
+	encode zstd gzip
+	tls &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;3633xxxxw197-cert.pem &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;3633xxxxw197-key.pem
+        handle &#123;
+                root * &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;web&#x2F;dist
+                file_server
+        &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>但是！客户端访问的问题依然存在，问题现象也和之前一模一样。只不过这次从客户端看到的证书的 CN 和 SAN 都是 <code>36.33.xx.xx</code>，这一点倒是符合预期。</p>
+<p>查看 caddy 的日志，发现连报错都一样：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-log" data-language="log"><code class="language-log"><span class="token date number">2024/10/30</span> <span class="token time number">07:25:45.013</span>	<span class="token level debug keyword">DEBUG</span>	<span class="token domain constant">http.stdlib</span>	http<span class="token operator">:</span> TLS handshake error from 36<span class="token punctuation">.</span>33<span class="token punctuation">.</span>xx<span class="token punctuation">.</span>xx<span class="token operator">:</span><span class="token number">49913</span><span class="token operator">:</span> remote error<span class="token operator">:</span> tls<span class="token operator">:</span> unknown certificate
+<span class="token date number">2024/10/30</span> <span class="token time number">07:25:45.015</span>	<span class="token level debug keyword">DEBUG</span>	events	event	<span class="token operator">&#123;</span><span class="token string">"name"</span><span class="token operator">:</span> <span class="token string">"tls_get_certificate"</span><span class="token punctuation">,</span> <span class="token string">"id"</span><span class="token operator">:</span> <span class="token string">"aa9a98f8-1058-4331-a1d9-e642f0645cf4"</span><span class="token punctuation">,</span> <span class="token string">"origin"</span><span class="token operator">:</span> <span class="token string">"tls"</span><span class="token punctuation">,</span> <span class="token string">"data"</span><span class="token operator">:</span> <span class="token operator">&#123;</span><span class="token string">"client_hello"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token string">"CipherSuites"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token number">19018</span><span class="token punctuation">,</span><span class="token number">4865</span><span class="token punctuation">,</span><span class="token number">4866</span><span class="token punctuation">,</span><span class="token number">4867</span><span class="token punctuation">,</span><span class="token number">49195</span><span class="token punctuation">,</span><span class="token number">49199</span><span class="token punctuation">,</span><span class="token number">49196</span><span class="token punctuation">,</span><span class="token number">49200</span><span class="token punctuation">,</span><span class="token number">52393</span><span class="token punctuation">,</span><span class="token number">52392</span><span class="token punctuation">,</span><span class="token number">49171</span><span class="token punctuation">,</span><span class="token number">49172</span><span class="token punctuation">,</span><span class="token number">156</span><span class="token punctuation">,</span><span class="token number">157</span><span class="token punctuation">,</span><span class="token number">47</span><span class="token punctuation">,</span><span class="token number">53</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"ServerName"</span><span class="token operator">:</span><span class="token string">""</span><span class="token punctuation">,</span><span class="token string">"SupportedCurves"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token number">60138</span><span class="token punctuation">,</span><span class="token number">25497</span><span class="token punctuation">,</span><span class="token number">29</span><span class="token punctuation">,</span><span class="token number">23</span><span class="token punctuation">,</span><span class="token number">24</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"SupportedPoints"</span><span class="token operator">:</span><span class="token string">"AA=="</span><span class="token punctuation">,</span><span class="token string">"SignatureSchemes"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token number">1027</span><span class="token punctuation">,</span><span class="token number">2052</span><span class="token punctuation">,</span><span class="token number">1025</span><span class="token punctuation">,</span><span class="token number">1283</span><span class="token punctuation">,</span><span class="token number">2053</span><span class="token punctuation">,</span><span class="token number">1281</span><span class="token punctuation">,</span><span class="token number">2054</span><span class="token punctuation">,</span><span class="token number">1537</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"SupportedProtos"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token string">"h2"</span><span class="token punctuation">,</span><span class="token string">"http/1.1"</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"SupportedVersions"</span><span class="token operator">:</span><span class="token punctuation">[</span><span class="token number">51914</span><span class="token punctuation">,</span><span class="token number">772</span><span class="token punctuation">,</span><span class="token number">771</span><span class="token punctuation">]</span><span class="token punctuation">,</span><span class="token string">"RemoteAddr"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token string">"IP"</span><span class="token operator">:</span><span class="token string">"36.33.xx.xx"</span><span class="token punctuation">,</span><span class="token string">"Port"</span><span class="token operator">:</span><span class="token number">49914</span><span class="token punctuation">,</span><span class="token string">"Zone"</span><span class="token operator">:</span><span class="token string">""</span><span class="token operator">&#125;</span><span class="token punctuation">,</span><span class="token string">"LocalAddr"</span><span class="token operator">:</span><span class="token operator">&#123;</span><span class="token string">"IP"</span><span class="token operator">:</span><span class="token string">"192.168.34.197"</span><span class="token punctuation">,</span><span class="token string">"Port"</span><span class="token operator">:</span><span class="token number">443</span><span class="token punctuation">,</span><span class="token string">"Zone"</span><span class="token operator">:</span><span class="token string">""</span><span class="token operator">&#125;</span><span class="token operator">&#125;</span><span class="token operator">&#125;</span><span class="token operator">&#125;</span>
+<span class="token date number">2024/10/30</span> <span class="token time number">07:25:45.015</span>	<span class="token level debug keyword">DEBUG</span>	<span class="token domain constant">tls.handshake</span>	choosing certificate	<span class="token operator">&#123;</span><span class="token string">"identifier"</span><span class="token operator">:</span> <span class="token string">"192.168.34.197"</span><span class="token punctuation">,</span> <span class="token string">"num_choices"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token operator">&#125;</span>
+<span class="token date number">2024/10/30</span> <span class="token time number">07:25:45.015</span>	<span class="token level debug keyword">DEBUG</span>	<span class="token domain constant">tls.handshake</span>	default certificate selection results	<span class="token operator">&#123;</span><span class="token string">"identifier"</span><span class="token operator">:</span> <span class="token string">"192.168.34.197"</span><span class="token punctuation">,</span> <span class="token string">"subjects"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"36.33.xx.xx"</span><span class="token punctuation">,</span> <span class="token string">"192.168.34.197"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">"managed"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span> <span class="token string">"issuer_key"</span><span class="token operator">:</span> <span class="token string">""</span><span class="token punctuation">,</span> <span class="token string">"hash"</span><span class="token operator">:</span> <span class="token string">"109ba9582f4bde945134e6794168af4c947a3cdf6d0391388cb09310fb811def"</span><span class="token operator">&#125;</span>
+<span class="token date number">2024/10/30</span> <span class="token time number">07:25:45.015</span>	<span class="token level debug keyword">DEBUG</span>	<span class="token domain constant">tls.handshake</span>	matched certificate in cache	<span class="token operator">&#123;</span><span class="token string">"remote_ip"</span><span class="token operator">:</span> <span class="token string">"36.33.xx.xx"</span><span class="token punctuation">,</span> <span class="token string">"remote_port"</span><span class="token operator">:</span> <span class="token string">"49914"</span><span class="token punctuation">,</span> <span class="token string">"subjects"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"36.33.xx.xx"</span><span class="token punctuation">,</span> <span class="token string">"192.168.34.197"</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token string">"managed"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span> <span class="token string">"expiration"</span><span class="token operator">:</span> <span class="token string">"2094/10/31 07:24:23.000"</span><span class="token punctuation">,</span> <span class="token string">"hash"</span><span class="token operator">:</span> <span class="token string">"109ba9582f4bde945134e6794168af4c947a3cdf6d0391388cb09310fb811def"</span><span class="token operator">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h3 id="其他的失败尝试"><a href="#其他的失败尝试" class="headerlink" title="其他的失败尝试"></a>其他的失败尝试</h3><p>例如另起一个服务端口，然后使用反向代理提供服务：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">https:&#x2F;&#x2F;192.168.34.197:10443 &#123;
+        encode zstd gzip
+        tls &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;3633xxxx-cert.pem &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;3633xxxx-key.pem
+        reverse_proxy https:&#x2F;&#x2F;192.168.34.197 &#123;
+                header_up Host &#123;upstream_hostport&#125;
+        &#125;
+&#125;
+https:&#x2F;&#x2F;192.168.34.197 &#123;
+	encode zstd gzip
+	tls &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;19216834197-cert.pem &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;19216834197-key.pem
+        handle &#123;
+                root * &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;web&#x2F;dist
+                file_server
+        &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<p>我期望着第一个服务能够提供公网地址的证书，但是不行。</p>
+<p>甚至用 HTTP 都不行：</p>
+<figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">http:&#x2F;&#x2F;192.168.34.197:10443 &#123;
+        encode zstd gzip
+        reverse_proxy https:&#x2F;&#x2F;192.168.34.197 &#123;
+                header_up Host &#123;upstream_hostport&#125;
+        &#125;
+&#125;
+https:&#x2F;&#x2F;192.168.34.197 &#123;
+        encode zstd gzip
+        tls &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;19216834197-cert.pem &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;tls&#x2F;19216834197-key.pem
+        handle &#123;
+                root * &#x2F;home&#x2F;caddy&#x2F;herong&#x2F;web&#x2F;dist
+                file_server
+        &#125;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
+
+<h1 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h1><ol>
+<li>是不是提供 HTTPS 服务的设备必须同时拥有地址和证书？</li>
+<li>大型企业是否会遇到这样的问题？他们是怎么解决的？是不是有相关解决方案的供应商？</li>
+<li>如果在更低层的网络上进行编程，能否解决这个问题？例如在服务器的 TCP 层进行编程？是否已经有相关的解决方案？</li>
+</ol>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E9%97%AE%E9%A2%98/" class="category-chain-item">问题</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%A1%B9%E7%9B%AE%E5%AE%9E%E8%B7%B5/" class="print-no-link">#项目实践</a>
+      
+        <a href="/tags/%E9%97%AE%E9%A2%98/" class="print-no-link">#问题</a>
+      
+        <a href="/tags/%E8%BF%90%E7%BB%B4/" class="print-no-link">#运维</a>
+      
+        <a href="/tags/HTTPS/" class="print-no-link">#HTTPS</a>
+      
+        <a href="/tags/caddy/" class="print-no-link">#caddy</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>[问题]在NAT背后使用Caddy提供HTTPS服务</div>
+      <div>https://vitsumoc.github.io/在NAT背后使用Caddy提供HTTPS服务.html</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>vc</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年10月30日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/WEB%E9%A1%B9%E7%9B%AE%E9%9B%86%E6%88%90%E4%BA%BA%E8%84%B8%E8%AF%86%E5%88%AB.html" title="WEB项目集成人脸识别">
+                        <span class="hidden-mobile">WEB项目集成人脸识别</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <span>vitusmoc Blog, Powered by </span> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script  src="https://lib.baomitu.com/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js" ></script>
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
