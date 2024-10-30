@@ -24,7 +24,7 @@
 <meta property="og:description" content="在 问题 的最后，我突然想到可以用 frp 代理一个 HTTP 服务出去，这样虽然不能使用 https 的功能，但是起码可以访问其他的基础功能。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-10-30T09:08:59.000Z">
-<meta property="article:modified_time" content="2024-10-30T09:26:35.212Z">
+<meta property="article:modified_time" content="2024-10-30T09:33:51.676Z">
 <meta property="article:author" content="vc">
 <meta property="article:tag" content="项目实践">
 <meta property="article:tag" content="问题">
@@ -226,7 +226,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          225 字
+          335 字
         
       </span>
     
@@ -237,7 +237,7 @@
         
         
         
-          2 分钟
+          3 分钟
         
       </span>
     
@@ -304,9 +304,6 @@ https:&#x2F;&#x2F;192.168.34.197 &#123;
 <p>发现只能内网访问，通过 frp 代理地址还是不能访问（只有 HTTP ok，没有内容）。</p>
 <p>这一下打破了我原有的想法，我原本以为是网络和 TLS 问题，现在看来不是，然后注意到 <code>http://192.168.34.197:10443</code>，我开始怀疑是 caddy 的路由没匹配上。</p>
 <p>改成 <code>:10443</code> 后，frp 可用了。</p>
-<blockquote>
-<p>caddy 中配置的 address 必须和用户在浏览器输入的地址相同。</p>
-</blockquote>
 <p>后来把 Caddyfile 改成这样，直接按端口提供服务，一切问题都解决了：</p>
 <figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">:443 &#123;
         encode zstd gzip
@@ -318,6 +315,12 @@ https:&#x2F;&#x2F;192.168.34.197 &#123;
 &#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
 
 <p>也不需要按照浏览器的公网地址生成证书，反正都是信任不安全的证书，只要用内网地址生成一个证书就可以了。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><blockquote>
+<p>caddy 中配置的 address 必须和用户在浏览器输入的地址相同。</p>
+</blockquote>
+<p>我怀疑是 caddy 会根据请求中的 Host 做请求匹配，如果在 address 中配置了完整的域名，那么就必须是能够匹配的请求才会被处理。</p>
+<p>由于服务器前面是个纯 NAT 设备，caddy 就是 HTTP 的第一层入口，那么匹配不到 caddy 处理器的请求就没有经过任何处理，只能获得 0 长度的返回。</p>
+<p>感觉这个机制和 nginx 中的 server_name 差不多。</p>
 
                 
               </div>
