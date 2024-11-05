@@ -4,6 +4,35 @@
   
   
   <entry>
+    <title>部署Prometheus并监控Caddy</title>
+    <link href="/%E9%83%A8%E7%BD%B2Prometheus%E5%B9%B6%E7%9B%91%E6%8E%A7Caddy.html"/>
+    <url>/%E9%83%A8%E7%BD%B2Prometheus%E5%B9%B6%E7%9B%91%E6%8E%A7Caddy.html</url>
+    
+    <content type="html"><![CDATA[<p><a href="https://prometheus.io/">普罗米修斯（Prometheus）</a> 是一套开源的监控系统，可以用来监控并存储软件程序运行中的各项指标。</p><span id="more"></span><h1 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h1><p><a href="https://prometheus.io/download/">下载</a>、解压。</p><p>修改文件夹中的 <code>prometheus.yml</code>，配置对自身指标的监控：</p><figure><div class="code-wrapper"><pre class="line-numbers language-yaml" data-language="yaml"><div class="caption"><span>prometheus.yml</span></div><code class="language-yaml"><span class="token key atrule">global</span><span class="token punctuation">:</span>  <span class="token key atrule">scrape_interval</span><span class="token punctuation">:</span>     15s <span class="token comment"># By default, scrape targets every 15 seconds.</span>  <span class="token comment"># Attach these labels to any time series or alerts when communicating with</span>  <span class="token comment"># external systems (federation, remote storage, Alertmanager).</span>  <span class="token key atrule">external_labels</span><span class="token punctuation">:</span>    <span class="token key atrule">monitor</span><span class="token punctuation">:</span> <span class="token string">'codelab-monitor'</span><span class="token comment"># A scrape configuration containing exactly one endpoint to scrape:</span><span class="token comment"># Here it's Prometheus itself.</span><span class="token key atrule">scrape_configs</span><span class="token punctuation">:</span>  <span class="token comment"># The job name is added as a label `job=&lt;job_name>` to any timeseries scraped from this config.</span>  <span class="token punctuation">-</span> <span class="token key atrule">job_name</span><span class="token punctuation">:</span> <span class="token string">'prometheus'</span>    <span class="token comment"># Override the global default and scrape targets from this job every 5 seconds.</span>    <span class="token key atrule">scrape_interval</span><span class="token punctuation">:</span> 5s    <span class="token key atrule">static_configs</span><span class="token punctuation">:</span>      <span class="token punctuation">-</span> <span class="token key atrule">targets</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'localhost:9090'</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure><p>运行 <code>prometheus</code>，默认服务端口号即为 9090，已经可以通过 WEB 查看服务。</p><h1 id="查看指标"><a href="#查看指标" class="headerlink" title="查看指标"></a>查看指标</h1><p>通过<a href="https://prometheus.io/docs/prometheus/latest/querying/basics/">表达式（expression）</a> 筛选想要查询的内容，例如 <code>prometheus_target_interval_length_seconds</code> 用来查询普罗米修斯对系统每次指标采集的间隔。</p><h2 id="条件筛选"><a href="#条件筛选" class="headerlink" title="条件筛选"></a>条件筛选</h2><p><code>表达式&#123;key=&quot;value&quot;&#125;</code> 的方式筛选，例如 <code>&#123;job=&quot;prometheus&quot;, quantile=&quot;0.99&quot;&#125;</code>，表示采集任务是 prometheus（监控自己），获得其中 0.99 分位数的指标（即 99% 的数据延迟都低于该值）。</p><h1 id="监控Caddy"><a href="#监控Caddy" class="headerlink" title="监控Caddy"></a>监控Caddy</h1><p>Caddy 中的 admin 服务已经按照<a href="https://prometheus.io/docs/instrumenting/exposition_formats/#text-based-format">普罗米修斯指标标准</a>实现了一套监控指标，只需在全局选项中打开：</p><figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">&#123;    servers &#123;        metrics    &#125;&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure><p>然后在普罗米修斯中添加任务：</p><figure><div class="code-wrapper"><pre class="line-numbers language-yaml" data-language="yaml"><div class="caption"><span>prometheus.yml</span></div><code class="language-yaml"><span class="token key atrule">scrape_configs</span><span class="token punctuation">:</span>  <span class="token punctuation">-</span> <span class="token key atrule">job_name</span><span class="token punctuation">:</span> caddy    <span class="token key atrule">static_configs</span><span class="token punctuation">:</span>      <span class="token punctuation">-</span> <span class="token key atrule">targets</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'localhost:2019'</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure><p>之后就能用表达式查看 caddy 提供的数据，例如这样的：<code>go_gc_duration_seconds&#123;job=&quot;caddy&quot;&#125;</code>。</p><h1 id="简单总结"><a href="#简单总结" class="headerlink" title="简单总结"></a>简单总结</h1><p>指标监控是各种系统中都非常常见的一项需求，而普罗米修斯提供了一套标准化的解决方案。</p><p>至于能否在生产环境中满足具体项目的指标要求，则还是需要在项目开始前对具体情况进行考察和测试。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>运维</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>运维</tag>
+      
+      <tag>caddy</tag>
+      
+      <tag>prometheus</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>[解决]在NAT背后使用Caddy提供HTTPS服务</title>
     <link href="/%5B%E8%A7%A3%E5%86%B3%5D%E5%9C%A8NAT%E8%83%8C%E5%90%8E%E4%BD%BF%E7%94%A8Caddy%E6%8F%90%E4%BE%9BHTTPS%E6%9C%8D%E5%8A%A1.html"/>
     <url>/%5B%E8%A7%A3%E5%86%B3%5D%E5%9C%A8NAT%E8%83%8C%E5%90%8E%E4%BD%BF%E7%94%A8Caddy%E6%8F%90%E4%BE%9BHTTPS%E6%9C%8D%E5%8A%A1.html</url>
