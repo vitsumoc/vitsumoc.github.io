@@ -16,24 +16,22 @@
   <meta name="author" content="vc">
   <meta name="keywords" content="">
   
-    <meta name="description" content="普罗米修斯（Prometheus） 是一套开源的监控系统，可以用来监控并存储软件程序运行中的各项指标。">
+    <meta name="description" content="在大众眼中，程序员们似乎总有着这样的形象：他们一直在钻研某些技术的底层实现、他们一直在探索解决问题的新鲜工具。然而，对于那些与工作切实相关，被程序员称为“业务”的部分——他们却常常不屑一顾：“这不过是为了工资不得不做的事”。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="部署Prometheus并监控Caddy">
-<meta property="og:url" content="https://vitsumoc.github.io/%E9%83%A8%E7%BD%B2Prometheus%E5%B9%B6%E7%9B%91%E6%8E%A7Caddy.html">
+<meta property="og:title" content="底层原理与新鲜工具">
+<meta property="og:url" content="https://vitsumoc.github.io/%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E4%B8%8E%E6%96%B0%E9%B2%9C%E5%B7%A5%E5%85%B7.html">
 <meta property="og:site_name" content="Thinking...">
-<meta property="og:description" content="普罗米修斯（Prometheus） 是一套开源的监控系统，可以用来监控并存储软件程序运行中的各项指标。">
+<meta property="og:description" content="在大众眼中，程序员们似乎总有着这样的形象：他们一直在钻研某些技术的底层实现、他们一直在探索解决问题的新鲜工具。然而，对于那些与工作切实相关，被程序员称为“业务”的部分——他们却常常不屑一顾：“这不过是为了工资不得不做的事”。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-11-05T06:58:26.000Z">
-<meta property="article:modified_time" content="2024-11-05T07:54:21.027Z">
+<meta property="article:published_time" content="2024-11-06T02:05:57.000Z">
+<meta property="article:modified_time" content="2024-11-06T03:26:03.529Z">
 <meta property="article:author" content="vc">
-<meta property="article:tag" content="运维">
-<meta property="article:tag" content="caddy">
-<meta property="article:tag" content="prometheus">
+<meta property="article:tag" content="想想">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>部署Prometheus并监控Caddy - Thinking...</title>
+  <title>底层原理与新鲜工具 - Thinking...</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -201,7 +199,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle">部署Prometheus并监控Caddy</span>
+            <span id="subtitle">底层原理与新鲜工具</span>
           
         </div>
 
@@ -212,8 +210,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-11-05 14:58" pubdate>
-          2024年11月5日 下午
+        <time datetime="2024-11-06 10:05" pubdate>
+          2024年11月6日 上午
         </time>
       </span>
     
@@ -224,7 +222,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          325 字
+          624 字
         
       </span>
     
@@ -235,7 +233,7 @@
         
         
         
-          3 分钟
+          6 分钟
         
       </span>
     
@@ -272,55 +270,31 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">部署Prometheus并监控Caddy</h1>
+            <h1 id="seo-header">底层原理与新鲜工具</h1>
             
             
               <div class="markdown-body">
                 
-                <p><a target="_blank" rel="noopener" href="https://prometheus.io/">普罗米修斯（Prometheus）</a> 是一套开源的监控系统，可以用来监控并存储软件程序运行中的各项指标。</p>
+                <p>在大众眼中，程序员们似乎总有着这样的形象：他们一直在钻研某些技术的底层实现、他们一直在探索解决问题的新鲜工具。然而，对于那些与工作切实相关，被程序员称为“业务”的部分——他们却常常不屑一顾：“这不过是为了工资不得不做的事”。</p>
 <span id="more"></span>
 
-<h1 id="部署"><a href="#部署" class="headerlink" title="部署"></a>部署</h1><p><a target="_blank" rel="noopener" href="https://prometheus.io/download/">下载</a>、解压。</p>
-<p>修改文件夹中的 <code>prometheus.yml</code>，配置对自身指标的监控：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-yaml" data-language="yaml"><div class="caption"><span>prometheus.yml</span></div><code class="language-yaml"><span class="token key atrule">global</span><span class="token punctuation">:</span>
-  <span class="token key atrule">scrape_interval</span><span class="token punctuation">:</span>     15s <span class="token comment"># By default, scrape targets every 15 seconds.</span>
-
-  <span class="token comment"># Attach these labels to any time series or alerts when communicating with</span>
-  <span class="token comment"># external systems (federation, remote storage, Alertmanager).</span>
-  <span class="token key atrule">external_labels</span><span class="token punctuation">:</span>
-    <span class="token key atrule">monitor</span><span class="token punctuation">:</span> <span class="token string">'codelab-monitor'</span>
-
-<span class="token comment"># A scrape configuration containing exactly one endpoint to scrape:</span>
-<span class="token comment"># Here it's Prometheus itself.</span>
-<span class="token key atrule">scrape_configs</span><span class="token punctuation">:</span>
-  <span class="token comment"># The job name is added as a label `job=&lt;job_name>` to any timeseries scraped from this config.</span>
-  <span class="token punctuation">-</span> <span class="token key atrule">job_name</span><span class="token punctuation">:</span> <span class="token string">'prometheus'</span>
-
-    <span class="token comment"># Override the global default and scrape targets from this job every 5 seconds.</span>
-    <span class="token key atrule">scrape_interval</span><span class="token punctuation">:</span> 5s
-
-    <span class="token key atrule">static_configs</span><span class="token punctuation">:</span>
-      <span class="token punctuation">-</span> <span class="token key atrule">targets</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'localhost:9090'</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-
-<p>运行 <code>prometheus</code>，默认服务端口号即为 9090，已经可以通过 WEB 查看服务。</p>
-<h1 id="查看指标"><a href="#查看指标" class="headerlink" title="查看指标"></a>查看指标</h1><p>通过<a target="_blank" rel="noopener" href="https://prometheus.io/docs/prometheus/latest/querying/basics/">表达式（expression）</a> 筛选想要查询的内容，例如 <code>prometheus_target_interval_length_seconds</code> 用来查询普罗米修斯对系统每次指标采集的间隔。</p>
-<h2 id="条件筛选"><a href="#条件筛选" class="headerlink" title="条件筛选"></a>条件筛选</h2><p><code>表达式&#123;key=&quot;value&quot;&#125;</code> 的方式筛选，例如 <code>&#123;job=&quot;prometheus&quot;, quantile=&quot;0.99&quot;&#125;</code>，表示采集任务是 prometheus（监控自己），获得其中 0.99 分位数的指标（即 99% 的数据延迟都低于该值）。</p>
-<h1 id="监控Caddy"><a href="#监控Caddy" class="headerlink" title="监控Caddy"></a>监控Caddy</h1><p>Caddy 中的 admin 服务已经按照<a target="_blank" rel="noopener" href="https://prometheus.io/docs/instrumenting/exposition_formats/#text-based-format">普罗米修斯指标标准</a>实现了一套监控指标，只需在全局选项中打开：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-caddy" data-language="caddy"><code class="language-caddy">&#123;
-    servers &#123;
-        metrics
-    &#125;
-&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-
-<p>然后在普罗米修斯中添加任务：</p>
-<figure><div class="code-wrapper"><pre class="line-numbers language-yaml" data-language="yaml"><div class="caption"><span>prometheus.yml</span></div><code class="language-yaml"><span class="token key atrule">scrape_configs</span><span class="token punctuation">:</span>
-  <span class="token punctuation">-</span> <span class="token key atrule">job_name</span><span class="token punctuation">:</span> caddy
-    <span class="token key atrule">static_configs</span><span class="token punctuation">:</span>
-      <span class="token punctuation">-</span> <span class="token key atrule">targets</span><span class="token punctuation">:</span> <span class="token punctuation">[</span><span class="token string">'localhost:2019'</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre></div></figure>
-
-<p>之后就能用表达式查看 caddy 提供的数据，例如这样的：<code>go_gc_duration_seconds&#123;job=&quot;caddy&quot;&#125;</code>。</p>
-<h1 id="简单总结"><a href="#简单总结" class="headerlink" title="简单总结"></a>简单总结</h1><p>指标监控是各种系统中都非常常见的一项需求，而普罗米修斯提供了一套标准化的解决方案。</p>
-<p>至于能否在生产环境中满足具体项目的指标要求，则还是需要在项目开始前对具体情况进行考察和测试。</p>
+<h1 id="底层原理？"><a href="#底层原理？" class="headerlink" title="底层原理？"></a>底层原理？</h1><p>经过一段时间的工作后，我逐渐发现所谓的“底层原理”并非是一个固定的范围，而是一类知识的统称，具有以下三个特点：</p>
+<ul>
+<li>我的当前工作所依赖的</li>
+<li>我的知识范围能够触及的</li>
+<li>我有兴趣去学习的</li>
+</ul>
+<p>“底层原理”就是这么个很主观的东西：业务员觉得运维支持老哥很底层、运维老哥觉得开发人员很底层、开发人员觉得做编译器的人很底层、编译器老哥觉得做操作系统的很底层、操作系统老哥……好吧，他们真的很底层，但是他们也依赖于CPU老哥、CPU老哥依赖于研究半导体和芯片制造的老哥、然后这些人又依赖于物理学家和数学家。</p>
+<p>我们都有好奇心，每当好奇心推动我们去探索一些事物的时候，我们就把这些事物称为“底层原理”，其实就是这样。</p>
+<h1 id="新鲜工具"><a href="#新鲜工具" class="headerlink" title="新鲜工具"></a>新鲜工具</h1><p>不同于底层原理带来的缓慢提升，新鲜工具则是能立竿见影的带来收益，当然，也伴随着风险。</p>
+<p>我觉得最好的获取新鲜工具的过程是这样的：</p>
+<ul>
+<li>在做业务的过程中，遇到了一个棘手的问题</li>
+<li>自己尝试去解决，在这个过程中经历了很多思考</li>
+<li>领导点拨或突然偶遇新鲜工具，感慨是最佳实践，从此豁然开朗</li>
+</ul>
+<p>只有先经历过问题和思考，才能深刻理解答案的珍贵。从我自己的经验来看，第一次接触 redis、MQTT、时序库的时候，都曾给我带来如梦初醒的感觉。</p>
+<h1 id="业务的价值"><a href="#业务的价值" class="headerlink" title="业务的价值"></a>业务的价值</h1><p>因此，业务的价值也不仅仅是完成本分并拿到工资，更重要的是在业务开发的过程中，驱使着我们的好奇心去探索“底层”，给我们设置难题促使我们找寻“工具”，进而一步一步的实现更有价值的自己。</p>
 
                 
               </div>
@@ -339,7 +313,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E8%BF%90%E7%BB%B4/" class="category-chain-item">运维</a>
+  <a href="/categories/%E6%83%B3%E6%83%B3/" class="category-chain-item">想想</a>
   
   
 
@@ -354,11 +328,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E8%BF%90%E7%BB%B4/" class="print-no-link">#运维</a>
-      
-        <a href="/tags/caddy/" class="print-no-link">#caddy</a>
-      
-        <a href="/tags/prometheus/" class="print-no-link">#prometheus</a>
+        <a href="/tags/%E6%83%B3%E6%83%B3/" class="print-no-link">#想想</a>
       
     </div>
   
@@ -370,8 +340,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>部署Prometheus并监控Caddy</div>
-      <div>https://vitsumoc.github.io/部署Prometheus并监控Caddy.html</div>
+      <div>底层原理与新鲜工具</div>
+      <div>https://vitsumoc.github.io/底层原理与新鲜工具.html</div>
     </div>
     <div class="license-meta">
       
@@ -383,7 +353,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年11月5日</div>
+          <div>2024年11月6日</div>
         </div>
       
       
@@ -415,18 +385,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86%E4%B8%8E%E6%96%B0%E9%B2%9C%E5%B7%A5%E5%85%B7.html" title="底层原理与新鲜工具">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">底层原理与新鲜工具</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/%5B%E8%A7%A3%E5%86%B3%5D%E5%9C%A8NAT%E8%83%8C%E5%90%8E%E4%BD%BF%E7%94%A8Caddy%E6%8F%90%E4%BE%9BHTTPS%E6%9C%8D%E5%8A%A1.html" title="[解决]在NAT背后使用Caddy提供HTTPS服务">
-                        <span class="hidden-mobile">[解决]在NAT背后使用Caddy提供HTTPS服务</span>
+                      <a href="/%E9%83%A8%E7%BD%B2Prometheus%E5%B9%B6%E7%9B%91%E6%8E%A7Caddy.html" title="部署Prometheus并监控Caddy">
+                        <span class="hidden-mobile">部署Prometheus并监控Caddy</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
